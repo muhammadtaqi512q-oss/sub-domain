@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#05050c">
+<meta name="description" content="LYRA LINK SHORTENER — Compress game links instantly. Created by Muhammad Taqi.">
+<title>LYRA LINK SHORTENER — by Muhammad Taqi</title>
+<style>
+/* ============================ BASE ============================ */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',sans-serif;
+  background:#05050c;color:#e8ecf8;
+  min-height:100vh;overflow-x:hidden;
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;position:relative;
+}
+
+/* ============================ ANIMATED BG ============================ */
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bg::before,.bg::after{
+  content:"";position:absolute;border-radius:50%;
+  filter:blur(110px);opacity:.42;
+  animation:float 24s ease-in-out infinite;
+}
+.bg::before{
+  width:520px;height:520px;
+  background:radial-gradient(circle,#7c3aed,#4c1d95);
+  top:-180px;left:-180px;
+}
+.bg::after{
+  width:480px;height:480px;
+  background:radial-gradient(circle,#0891b2,#164e63);
+  bottom:-150px;right:-150px;
+  animation-delay:-9s;
+}
+.blob-mid{
+  position:absolute;width:360px;height:360px;border-radius:50%;
+  background:radial-gradient(circle,#db2777,#831843);
+  filter:blur(100px);opacity:.28;
+  top:42%;left:62%;
+  animation:float 20s ease-in-out infinite;
+  animation-delay:-14s;
+}
+@keyframes float{
+  0%,100%{transform:translate(0,0) scale(1)}
+  33%{transform:translate(60px,-50px) scale(1.14)}
+  66%{transform:translate(-50px,60px) scale(.9)}
+}
+
+/* ============================ CARD ============================ */
+.card{
+  position:relative;z-index:1;
+  width:100%;max-width:600px;
+  background:rgba(255,255,255,.055);
+  backdrop-filter:blur(30px) saturate(1.5);
+  -webkit-backdrop-filter:blur(30px) saturate(1.5);
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:28px;
+  padding:42px 32px 36px;
+  box-shadow:
+    0 30px 80px rgba(0,0,0,.6),
+    inset 0 1px 0 rgba(255,255,255,.1),
+    0 0 0 1px rgba(255,255,255,.02);
+  animation:cardIn .6s cubic-bezier(.4,0,.2,1);
+}
+@keyframes cardIn{
+  from{opacity:0;transform:translateY(30px) scale(.96)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+
+/* ============================ HEADER ============================ */
+.logo{
+  text-align:center;
+  font-size:.72rem;letter-spacing:.55em;
+  font-weight:800;color:#22d3ee;
+  margin-bottom:6px;
+  text-shadow:0 0 26px rgba(34,211,238,.75);
+}
+.title{
+  text-align:center;
+  font-size:clamp(2rem,7vw,2.9rem);
+  font-weight:900;line-height:1;
+  letter-spacing:-1.2px;
+  margin:6px 0 8px;
+  background:linear-gradient(120deg,#22d3ee,#a78bfa,#f472b6,#22d3ee);
+  background-size:300% 300%;
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:grad 8s ease infinite;
+}
+@keyframes grad{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.sub{
+  text-align:center;
+  font-size:.82rem;letter-spacing:.16em;
+  text-transform:uppercase;
+  color:#94a3b8;
+  margin-bottom:28px;
+  font-weight:600;
+}
+.sub b{color:#fbbf24;letter-spacing:.05em}
+
+/* ============================ INPUT ============================ */
+.label{
+  display:block;
+  font-size:.68rem;letter-spacing:.16em;
+  text-transform:uppercase;font-weight:800;
+  color:#94a3b8;margin-bottom:10px;
+}
+.input-wrap{position:relative;margin-bottom:12px}
+.input{
+  width:100%;
+  padding:16px 44px 16px 18px;
+  border-radius:16px;
+  border:1.5px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.06);
+  color:#fff;
+  font-size:.92rem;
+  font-family:ui-monospace,'Cascadia Code',monospace;
+  outline:none;
+  transition:.25s;
+  letter-spacing:.02em;
+}
+.input:focus{
+  border-color:#22d3ee;
+  background:rgba(255,255,255,.09);
+  box-shadow:0 0 0 4px rgba(34,211,238,.16);
+}
+.input::placeholder{color:#475569}
+.clear-btn{
+  position:absolute;top:50%;right:10px;
+  transform:translateY(-50%);
+  width:28px;height:28px;border-radius:50%;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.15);
+  color:#e2e8f0;cursor:pointer;
+  font-size:15px;line-height:1;
+  display:none;align-items:center;justify-content:center;
+  transition:.2s;padding:0;font-family:inherit;
+}
+.clear-btn.show{display:flex}
+.clear-btn:hover{background:rgba(255,80,80,.8);border-color:rgba(255,255,255,.4)}
+
+/* ============================ EXAMPLES ============================ */
+.examples{
+  display:flex;gap:8px;flex-wrap:wrap;
+  margin-bottom:20px;
+}
+.ex-btn{
+  padding:7px 14px;
+  border-radius:20px;
+  border:1px solid rgba(34,211,238,.28);
+  background:rgba(34,211,238,.06);
+  color:#a5f3fc;
+  font-size:.72rem;font-weight:700;
+  cursor:pointer;
+  font-family:inherit;
+  transition:.2s;
+  letter-spacing:.02em;
+}
+.ex-btn:hover{
+  background:rgba(34,211,238,.16);
+  border-color:rgba(34,211,238,.5);
+  transform:translateY(-1px);
+}
+.ex-btn:active{transform:scale(.95)}
+
+/* ============================ BUTTON ============================ */
+.compress-btn{
+  width:100%;
+  padding:17px;
+  border:none;border-radius:16px;
+  cursor:pointer;
+  font-size:1rem;
+  font-weight:900;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#03131a;
+  background:linear-gradient(135deg,#22d3ee,#3b82f6,#a78bfa);
+  background-size:200% 200%;
+  box-shadow:
+    0 14px 40px rgba(34,211,238,.4),
+    inset 0 1px 0 rgba(255,255,255,.3);
+  transition:.25s;
+  font-family:inherit;
+  animation:grad 6s ease infinite;
+  position:relative;
+  overflow:hidden;
+}
+.compress-btn::before{
+  content:"";
+  position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);
+  transform:translateX(-100%);
+  transition:transform .7s;
+}
+.compress-btn:hover{
+  transform:translateY(-3px);
+  box-shadow:0 20px 50px rgba(34,211,238,.55);
+}
+.compress-btn:hover::before{transform:translateX(100%)}
+.compress-btn:active{transform:scale(.97)}
+
+/* ============================ ERROR ============================ */
+.error{
+  display:none;
+  margin-top:16px;
+  padding:14px 16px;
+  border-radius:12px;
+  background:rgba(239,68,68,.1);
+  border:1px solid rgba(239,68,68,.4);
+  color:#fca5a5;
+  font-size:.82rem;
+  font-weight:600;
+  line-height:1.5;
+  text-align:left;
+  animation:slideIn .35s ease;
+}
+.error.show{display:block}
+.error b{color:#fecaca}
+
+/* ============================ RESULT ============================ */
+.result{
+  display:none;
+  margin-top:22px;
+  padding:22px 20px;
+  border-radius:18px;
+  background:linear-gradient(160deg,rgba(34,211,238,.07),rgba(168,85,247,.05));
+  border:1.5px solid rgba(34,211,238,.32);
+  text-align:left;
+  animation:slideIn .45s cubic-bezier(.4,0,.2,1);
+  position:relative;
+}
+.result.show{display:block}
+.result::before{
+  content:"";
+  position:absolute;top:0;left:20%;right:20%;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(34,211,238,.7),transparent);
+}
+@keyframes slideIn{
+  from{opacity:0;transform:translateY(14px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+.res-label{
+  display:flex;align-items:center;gap:8px;
+  font-size:.68rem;letter-spacing:.16em;
+  text-transform:uppercase;
+  font-weight:800;
+  color:#22d3ee;
+  margin-bottom:12px;
+}
+.res-label::before{
+  content:"";
+  width:8px;height:8px;border-radius:50%;
+  background:#22c55e;
+  box-shadow:0 0 10px #22c55e;
+  animation:pulse 1.6s ease infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.8)}}
+
+.res-link{
+  width:100%;
+  padding:14px 16px;
+  border-radius:12px;
+  border:1.5px dashed rgba(34,211,238,.55);
+  background:rgba(0,0,0,.4);
+  color:#a5f3fc;
+  font-family:ui-monospace,'Cascadia Code',monospace;
+  font-size:.82rem;
+  word-break:break-all;
+  outline:none;
+  margin-bottom:14px;
+  letter-spacing:.02em;
+  cursor:text;
+  transition:.2s;
+}
+.res-link:focus{
+  border-color:#22d3ee;
+  border-style:solid;
+  box-shadow:0 0 0 3px rgba(34,211,238,.2);
+}
+
+.res-stats{
+  display:flex;gap:10px;flex-wrap:wrap;
+  font-size:.74rem;
+  margin-bottom:14px;
+  font-weight:600;
+}
+.stat{
+  display:flex;align-items:center;gap:5px;
+  padding:6px 12px;
+  border-radius:20px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.1);
+  color:#cbd5e1;
+}
+.stat b{color:#22c55e;font-weight:900}
+.stat.old b{color:#f87171}
+.stat.pct b{color:#fbbf24}
+
+.res-btns{display:flex;gap:10px;flex-wrap:wrap}
+.res-btn{
+  flex:1;min-width:130px;
+  padding:13px;
+  border-radius:12px;border:none;
+  cursor:pointer;
+  font-weight:900;font-size:.88rem;
+  letter-spacing:.03em;
+  transition:.2s;
+  font-family:inherit;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+}
+.copy-btn{
+  background:rgba(255,255,255,.12);
+  color:#e2e8f0;
+  border:1px solid rgba(255,255,255,.16);
+}
+.copy-btn:hover{background:rgba(255,255,255,.22);transform:translateY(-2px)}
+.copy-btn.copied{background:rgba(34,197,94,.2);border-color:rgba(34,197,94,.5);color:#86efac}
+.open-btn{
+  background:linear-gradient(135deg,#22c55e,#10b981);
+  color:#031a0f;
+  box-shadow:0 8px 24px rgba(34,197,94,.4);
+}
+.open-btn:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(34,197,94,.55)}
+
+/* ============================ PREVIEW ============================ */
+.preview{
+  margin-top:14px;
+  padding:14px 16px;
+  border-radius:12px;
+  background:rgba(0,0,0,.28);
+  border:1px solid rgba(255,255,255,.08);
+  font-size:.76rem;
+  line-height:1.7;
+  color:#94a3b8;
+  font-family:ui-monospace,monospace;
+}
+.preview-row{
+  display:flex;justify-content:space-between;gap:12px;
+  padding:2px 0;
+}
+.preview-row .k{
+  color:#64748b;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  font-size:.68rem;
+  font-weight:700;
+}
+.preview-row .v{
+  color:#fbbf24;
+  font-weight:800;
+  text-align:right;
+  word-break:break-all;
+}
+.preview-row .v.code{color:#22d3ee}
+
+/* ============================ HISTORY ============================ */
+.history{
+  margin-top:26px;
+  padding-top:22px;
+  border-top:1px solid rgba(255,255,255,.08);
+  display:none;
+}
+.history.show{display:block}
+.hist-head{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:12px;
+}
+.hist-title{
+  font-size:.68rem;letter-spacing:.16em;
+  text-transform:uppercase;
+  font-weight:800;
+  color:#94a3b8;
+}
+.hist-clear{
+  padding:4px 12px;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,.12);
+  background:transparent;
+  color:#94a3b8;
+  font-size:.68rem;
+  font-weight:700;
+  cursor:pointer;
+  font-family:inherit;
+  transition:.2s;
+}
+.hist-clear:hover{color:#fca5a5;border-color:rgba(239,68,68,.4)}
+.hist-list{display:flex;flex-direction:column;gap:8px}
+.hist-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;
+  border-radius:10px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+  font-size:.74rem;
+  cursor:pointer;
+  transition:.2s;
+}
+.hist-item:hover{background:rgba(255,255,255,.08);border-color:rgba(34,211,238,.3)}
+.hist-item .hi-code{
+  padding:2px 8px;
+  border-radius:6px;
+  background:rgba(34,211,238,.15);
+  color:#22d3ee;
+  font-weight:900;
+  font-size:.68rem;
+  letter-spacing:.05em;
+  flex-shrink:0;
+}
+.hist-item .hi-text{
+  flex:1;
+  color:#cbd5e1;
+  font-family:ui-monospace,monospace;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:.72rem;
+}
+.hist-item .hi-copy{
+  padding:4px 10px;
+  border-radius:6px;
+  background:transparent;
+  border:1px solid rgba(255,255,255,.15);
+  color:#94a3b8;
+  font-size:.68rem;
+  font-weight:700;
+  cursor:pointer;
+  font-family:inherit;
+  flex-shrink:0;
+  transition:.2s;
+}
+.hist-item .hi-copy:hover{color:#22d3ee;border-color:rgba(34,211,238,.5)}
+
+/* ============================ FOOTER ============================ */
+.footer{
+  text-align:center;
+  margin-top:22px;
+  font-size:.72rem;
+  color:#475569;
+  letter-spacing:.1em;
+}
+.footer b{color:#fbbf24;letter-spacing:.05em}
+
+/* ============================ TOAST ============================ */
+.toast{
+  position:fixed;left:50%;bottom:30px;
+  transform:translateX(-50%) translateY(20px);
+  background:rgba(15,23,42,.97);
+  color:#86efac;
+  padding:13px 24px;
+  border-radius:14px;
+  border:1px solid rgba(34,197,94,.4);
+  font-weight:700;font-size:.85rem;
+  box-shadow:0 14px 40px rgba(0,0,0,.7);
+  opacity:0;pointer-events:none;
+  transition:.3s;z-index:9999;
+  font-family:inherit;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.err{color:#fca5a5;border-color:rgba(239,68,68,.4)}
+
+/* ============================ RESPONSIVE ============================ */
+@media(max-width:520px){
+  body{padding:12px}
+  .card{padding:32px 20px 26px;border-radius:22px}
+  .input{padding:14px 40px 14px 14px;font-size:.86rem}
+  .compress-btn{padding:15px;font-size:.92rem}
+  .res-btn{min-width:100px;font-size:.82rem;padding:12px}
+  .res-link{font-size:.76rem;padding:12px}
+  .preview{font-size:.72rem}
+  .examples .ex-btn{font-size:.68rem;padding:6px 11px}
+}
+</style>
+</head>
+<body>
+
+<div class="bg"><div class="blob-mid"></div></div>
+
+<div class="card">
+  <div class="logo">LYRA</div>
+  <h1 class="title">LINK SHORTENER</h1>
+  <p class="sub">Compress game links · <b>by Muhammad Taqi</b></p>
+
+  <label class="label" for="input">Paste Long Link</label>
+  <div class="input-wrap">
+    <input class="input" id="input" type="text"
+      placeholder="https://yoursite.com/#L+13.21.8.1.13.13.1.4+20.1.17.9"
+      autocomplete="off" spellcheck="false" autocapitalize="off">
+    <button class="clear-btn" id="clearBtn" title="Clear">×</button>
+  </div>
+
+  <div class="examples">
+    <button class="ex-btn" data-ex="https://yoursite.com/#L+13.21.8.1.13.13.1.4+20.1.17.9">Ludo · MUHAMMAD / TAQI</button>
+    <button class="ex-btn" data-ex="https://yoursite.com/#FB+13.21.8.1.13.13.1.4+6.25.?.7.1.13.5">Flappy · MY GAME</button>
+    <button class="ex-btn" data-ex="https://yoursite.com/#TTT+20.1.17.9+20.9.3+20.1.3+20.15.5">TTT · TIC TAC TOE</button>
+  </div>
+
+  <button class="compress-btn" id="compressBtn">🚀 Compress Link</button>
+
+  <div class="error" id="error"></div>
+
+  <div class="result" id="result">
+    <div class="res-label">Short Link Ready</div>
+    <input class="res-link" id="resLink" readonly onclick="this.select()">
+    <div class="res-stats" id="resStats"></div>
+    <div class="res-btns">
+      <button class="res-btn copy-btn" id="copyBtn">📋 Copy</button>
+      <button class="res-btn open-btn" id="openBtn">▶ Open</button>
+    </div>
+    <div class="preview" id="preview"></div>
+  </div>
+
+  <div class="history" id="history">
+    <div class="hist-head">
+      <div class="hist-title">Recent</div>
+      <button class="hist-clear" id="histClear">Clear</button>
+    </div>
+    <div class="hist-list" id="histList"></div>
+  </div>
+
+  <div class="footer">Created by <b>MUHAMMAD TAQI</b></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ======================= CIPHER ======================= */
+  const SUBST = 'krxpvhzqcbyfnatmsjwegiluod';
+  const SUBST_MAP = {}, REVERSE_MAP = {};
+  for (let i = 0; i < 26; i++) {
+    const L = String.fromCharCode(65 + i);
+    SUBST_MAP[L] = SUBST[i];
+    REVERSE_MAP[SUBST[i]] = L;
+  }
+  function encodeCompact(str) {
+    const s = String(str || '').toUpperCase();
+    let out = '';
+    for (let i = 0; i < s.length; i++) {
+      const c = s.charCodeAt(i);
+      if (c === 32) out += '_';
+      else if (c >= 65 && c <= 90) out += SUBST_MAP[String.fromCharCode(c)];
+    }
+    return out;
+  }
+  function decodeOld(str) {
+    if (!str) return '';
+    return String(str).split('.').map(x => {
+      if (x === '?') return ' ';
+      const n = parseInt(x, 10);
+      return (n >= 1 && n <= 26) ? String.fromCharCode(n + 64) : '';
+    }).join('');
+  }
+  function decodeCompact(str) {
+    let out = '';
+    for (let i = 0; i < str.length; i++) {
+      const ch = str[i];
+      if (ch === '_') { out += ' '; continue; }
+      const up = ch.toUpperCase();
+      if (REVERSE_MAP[up]) out += REVERSE_MAP[up];
+    }
+    return out;
+  }
+  function decodeAny(str) {
+    if (!str) return '';
+    if (/[.?]/.test(str)) return decodeOld(str);
+    return decodeCompact(str);
+  }
+  function isLong(str) { return /[.?]/.test(String(str || '')); }
+
+  /* ======================= PARSING ======================= */
+  function parseHash(hash) {
+    const raw = String(hash || '').replace(/^#/, '');
+    const parts = raw.split('+');
+    if (parts.length < 3) return null;
+    return { code: parts[0], user: parts[1], game: parts.slice(2).join('+') };
+  }
+  function compressHash(hash) {
+    const p = parseHash(hash);
+    if (!p) return null;
+    if (!isLong(p.user) && !isLong(p.game)) {
+      return '#' + p.code + '+' + p.user + '+' + p.game;
+    }
+    return '#' + p.code + '+' + encodeCompact(decodeAny(p.user)) + '+' + encodeCompact(decodeAny(p.game));
+  }
+
+  /* ======================= NORMALIZE INPUT ======================= */
+  function normalize(raw) {
+    raw = String(raw || '').trim();
+    if (!raw) return null;
+    if (raw.indexOf('#') !== -1) {
+      const i = raw.indexOf('#');
+      return { base: raw.slice(0, i) || (location.origin + location.pathname), hash: '#' + raw.slice(i + 1) };
+    }
+    if (raw[0] === '#') return { base: location.origin + location.pathname, hash: raw };
+    if (/^[A-Z]{1,3}\+/.test(raw)) return { base: location.origin + location.pathname, hash: '#' + raw };
+    return null;
+  }
+
+  /* ======================= DOM REFS ======================= */
+  const inputEl = document.getElementById('input');
+  const clearBtn = document.getElementById('clearBtn');
+  const compressBtn = document.getElementById('compressBtn');
+  const errorBox = document.getElementById('error');
+  const resultBox = document.getElementById('result');
+  const resLink = document.getElementById('resLink');
+  const resStats = document.getElementById('resStats');
+  const preview = document.getElementById('preview');
+  const copyBtn = document.getElementById('copyBtn');
+  const openBtn = document.getElementById('openBtn');
+  const historyBox = document.getElementById('history');
+  const histList = document.getElementById('histList');
+  const histClear = document.getElementById('histClear');
+  const toastEl = document.getElementById('toast');
+
+  /* ======================= TOAST ======================= */
+  let toastTimer;
+  function toast(msg, isErr) {
+    toastEl.textContent = msg;
+    toastEl.className = 'toast show' + (isErr ? ' err' : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2200);
+  }
+
+  /* ======================= HISTORY ======================= */
+  const HIST_KEY = 'lyra_shortener_history';
+  function getHistory() {
+    try { return JSON.parse(localStorage.getItem(HIST_KEY) || '[]'); }
+    catch (e) { return []; }
+  }
+  function saveHistory(list) {
+    try { localStorage.setItem(HIST_KEY, JSON.stringify(list.slice(0, 5))); }
+    catch (e) {}
+  }
+  function addHistory(item) {
+    const list = getHistory().filter(x => x.short !== item.short);
+    list.unshift(item);
+    saveHistory(list);
+    renderHistory();
+  }
+  function renderHistory() {
+    const list = getHistory();
+    if (!list.length) { historyBox.classList.remove('show'); return; }
+    historyBox.classList.add('show');
+    histList.innerHTML = list.map((it, i) => (
+      '<div class="hist-item" data-i="' + i + '">' +
+        '<span class="hi-code">#' + escapeHtml(it.code) + '</span>' +
+        '<span class="hi-text">' + escapeHtml(it.short) + '</span>' +
+        '<button class="hi-copy" data-i="' + i + '">Copy</button>' +
+      '</div>'
+    )).join('');
+    histList.querySelectorAll('.hist-item').forEach(el => {
+      el.addEventListener('click', e => {
+        if (e.target.classList.contains('hi-copy')) return;
+        const it = getHistory()[+el.dataset.i];
+        if (it) fillResult(it);
+      });
+    });
+    histList.querySelectorAll('.hi-copy').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const it = getHistory()[+btn.dataset.i];
+        if (it) copyText(it.short);
+      });
+    });
+  }
+  histClear.addEventListener('click', () => {
+    saveHistory([]);
+    renderHistory();
+    toast('History cleared');
+  });
+
+  /* ======================= HELPERS ======================= */
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => (
+      { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+    ));
+  }
+  function copyText(txt) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(() => toast('✅ Copied!'))
+        .catch(() => { fallbackCopy(txt); });
+    } else {
+      fallbackCopy(txt);
+    }
+  }
+  function fallbackCopy(txt) {
+    const ta = document.createElement('textarea');
+    ta.value = txt;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); toast('✅ Copied!'); }
+    catch (e) { toast('Copy failed', true); }
+    document.body.removeChild(ta);
+  }
+
+  /* ======================= FILL RESULT ======================= */
+  let lastResult = null;
+  function fillResult(item) {
+    // item = { code, short, oldLen, newLen, user, game, oldHash }
+    lastResult = item;
+    errorBox.classList.remove('show');
+    resultBox.classList.add('show');
+    resLink.value = item.short;
+
+    const saved = item.oldLen - item.newLen;
+    const pct = item.oldLen > 0 ? Math.round((saved / item.oldLen) * 100) : 0;
+    let statsHtml = '';
+    if (saved > 0) {
+      statsHtml = (
+        '<span class="stat pct">📉 Saved <b>' + saved + '</b> chars (<b>' + pct + '%</b>)</span>' +
+        '<span class="stat old">Old <b>' + item.oldLen + '</b></span>' +
+        '<span class="stat">New <b>' + item.newLen + '</b></span>'
+      );
+    } else {
+      statsHtml = '<span class="stat">Already compact · <b>' + item.newLen + '</b> chars</span>';
+    }
+    resStats.innerHTML = statsHtml;
+
+    preview.innerHTML = (
+      '<div class="preview-row"><span class="k">Game</span><span class="v code">' + escapeHtml(item.code) + '</span></div>' +
+      '<div class="preview-row"><span class="k">Creator</span><span class="v">' + escapeHtml(item.user || '—') + '</span></div>' +
+      '<div class="preview-row"><span class="k">Game Name</span><span class="v">' + escapeHtml(item.game || '—') + '</span></div>'
+    );
+
+    copyBtn.classList.remove('copied');
+    copyBtn.innerHTML = '📋 Copy';
+  }
+
+  /* ======================= COMPRESS ACTION ======================= */
+  function doCompress() {
+    errorBox.classList.remove('show');
+    const norm = normalize(inputEl.value);
+    if (!norm) {
+      errorBox.innerHTML = '❌ <b>Invalid link.</b> Paste a full URL, a #hash, or a CODE+... string.';
+      errorBox.classList.add('show');
+      resultBox.classList.remove('show');
+      return;
+    }
+    const p = parseHash(norm.hash);
+    if (!p) {
+      errorBox.innerHTML = '❌ <b>Bad hash.</b> Must be <b>#CODE+user+game</b> (3 parts).';
+      errorBox.classList.add('show');
+      resultBox.classList.remove('show');
+      return;
+    }
+    const shortHash = compressHash(norm.hash);
+    if (!shortHash) {
+      errorBox.innerHTML = '❌ <b>Could not compress.</b> Please check the link format.';
+      errorBox.classList.add('show');
+      return;
+    }
+    const oldUrl = norm.base + norm.hash;
+    const shortUrl = norm.base + shortHash;
+
+    const item = {
+      code: p.code,
+      oldHash: norm.hash,
+      shortHash: shortHash,
+      short: shortUrl,
+      oldLen: oldUrl.length,
+      newLen: shortUrl.length,
+      user: decodeAny(p.user),
+      game: decodeAny(p.game)
+    };
+
+    fillResult(item);
+    addHistory({
+      code: p.code,
+      short: shortUrl,
+      oldHash: norm.hash,
+      shortHash: shortHash,
+      oldLen: oldUrl.length,
+      newLen: shortUrl.length,
+      user: item.user,
+      game: item.game
+    });
+    toast('✅ Link compressed!');
+  }
+
+  /* ======================= EVENTS ======================= */
+  compressBtn.addEventListener('click', doCompress);
+
+  inputEl.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); doCompress(); }
+  });
+  inputEl.addEventListener('input', () => {
+    clearBtn.classList.toggle('show', inputEl.value.length > 0);
+  });
+  clearBtn.addEventListener('click', () => {
+    inputEl.value = '';
+    clearBtn.classList.remove('show');
+    resultBox.classList.remove('show');
+    errorBox.classList.remove('show');
+    inputEl.focus();
+  });
+
+  document.querySelectorAll('.ex-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      inputEl.value = btn.dataset.ex;
+      clearBtn.classList.add('show');
+      doCompress();
+      inputEl.focus();
+    });
+  });
+
+  copyBtn.addEventListener('click', () => {
+    if (!lastResult) return;
+    const txt = lastResult.short;
+    const restore = () => {
+      copyBtn.classList.add('copied');
+      copyBtn.innerHTML = '✅ Copied!';
+      setTimeout(() => {
+        copyBtn.classList.remove('copied');
+        copyBtn.innerHTML = '📋 Copy';
+      }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(restore).catch(() => {
+        fallbackCopy(txt); restore();
+      });
+    } else {
+      fallbackCopy(txt); restore();
+    }
+  });
+
+  openBtn.addEventListener('click', () => {
+    if (!lastResult) return;
+    window.open(lastResult.short, '_blank', 'noopener');
+  });
+
+  /* ======================= ON LOAD ======================= */
+  renderHistory();
+
+  // If URL already has #hash, prefill and auto-compress
+  const startHash = location.hash;
+  if (startHash && startHash.length > 1) {
+    inputEl.value = location.origin + location.pathname + startHash;
+    clearBtn.classList.add('show');
+    setTimeout(doCompress, 100);
+  } else {
+    // Auto-focus the input
+    setTimeout(() => { try { inputEl.focus(); } catch (e) {} }, 200);
+  }
+
+})();
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"e3c1c9af36de41759418005494a48906","r":1,"spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>

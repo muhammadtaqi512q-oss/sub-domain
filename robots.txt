@@ -1,0 +1,68 @@
+# ==========================================================
+# robots.txt — AVELIA
+# Owner & Creator: Muhammad Taqi
+# Domain: https://avelia.oneapp.dev/
+# FULL ACCESS — EVERYTHING ALLOWED
+# ==========================================================
+
+User-agent: *
+Allow: /
+Disallow:
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Googlebot-Mobile
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: facebot
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: Pinterestbot
+Allow: /
+
+User-agent: WhatsApp
+Allow: /
+
+User-agent: TelegramBot
+Allow: /
+
+User-agent: Discordbot
+Allow: /
+
+Sitemap: https://avelia.oneapp.dev/sitemap.xml
+Sitemap: https://avelia.oneapp.dev/all.xml
+Sitemap: https://avelia.oneapp.dev/owner.xml
+
+Crawl-delay: 0
+
+# ==========================================================
+# END — All access granted
+# ==========================================================

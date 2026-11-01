@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#05050c">
+<meta name="description" content="LYRA — Two powerful tools, one hub. Game Builder + URL Shortener. Created by Muhammad Taqi.">
+<title>LYRA — by Muhammad Taqi</title>
+        <link rel="icon" type="image/png" href="data:image/jpeg;base64,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">
+<style>
+/* ===================== RESET ===================== */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',sans-serif;
+  background:#05050c;color:#e8ecf8;
+  min-height:100vh;overflow-x:hidden;
+  display:flex;align-items:center;justify-content:center;
+  padding:32px 20px;position:relative;
+}
+
+/* ===================== BACKGROUND LAYERS ===================== */
+.bg-layer{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.bg-layer::after{
+  content:"";position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+  opacity:.035;mix-blend-mode:overlay;
+}
+
+/* Animated gradient orbs */
+.orb{
+  position:absolute;border-radius:50%;
+  filter:blur(120px);opacity:.5;
+  animation:orbFloat 26s ease-in-out infinite;
+}
+.orb-1{
+  width:560px;height:560px;
+  background:radial-gradient(circle at 30% 30%,#7c3aed,#4c1d95 60%,transparent);
+  top:-220px;left:-200px;
+}
+.orb-2{
+  width:520px;height:520px;
+  background:radial-gradient(circle at 70% 70%,#0891b2,#155e75 60%,transparent);
+  bottom:-220px;right:-200px;
+  animation-delay:-9s;
+}
+.orb-3{
+  width:420px;height:420px;
+  background:radial-gradient(circle at 50% 50%,#db2777,#831843 60%,transparent);
+  top:38%;left:58%;
+  animation-delay:-17s;opacity:.38;
+}
+@keyframes orbFloat{
+  0%,100%{transform:translate(0,0) scale(1)}
+  33%{transform:translate(70px,-60px) scale(1.15)}
+  66%{transform:translate(-60px,70px) scale(.9)}
+}
+
+/* Grid pattern */
+.grid-pattern{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);
+  background-size:48px 48px;
+  mask-image:radial-gradient(ellipse 80% 70% at 50% 50%,#000 40%,transparent 100%);
+  -webkit-mask-image:radial-gradient(ellipse 80% 70% at 50% 50%,#000 40%,transparent 100%);
+}
+
+/* ===================== CONTAINER ===================== */
+.container{
+  position:relative;z-index:1;
+  width:100%;max-width:1100px;
+  display:flex;flex-direction:column;gap:52px;
+  animation:fadeUp .8s cubic-bezier(.4,0,.2,1);
+}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(28px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* ===================== BRAND HEADER ===================== */
+.brand{
+  display:flex;align-items:center;justify-content:center;gap:14px;
+  animation:fadeUp .8s cubic-bezier(.4,0,.2,1) .05s backwards;
+}
+.brand-mark{
+  width:52px;height:52px;border-radius:16px;
+  background:linear-gradient(135deg,#22d3ee,#3b82f6,#a78bfa);
+  background-size:200% 200%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.7rem;font-weight:900;color:#03131a;
+  letter-spacing:-1px;
+  box-shadow:
+    0 10px 32px rgba(34,211,238,.45),
+    inset 0 1px 0 rgba(255,255,255,.4);
+  animation:brandGrad 5s ease infinite, brandPulse 3s ease-in-out infinite;
+  position:relative;overflow:hidden;
+}
+.brand-mark::before{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.55) 50%,transparent 70%);
+  transform:translateX(-100%);
+  animation:brandShine 3.5s ease-in-out infinite;
+}
+@keyframes brandGrad{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes brandPulse{
+  0%,100%{box-shadow:0 10px 32px rgba(34,211,238,.45),inset 0 1px 0 rgba(255,255,255,.4)}
+  50%{box-shadow:0 14px 42px rgba(34,211,238,.7),inset 0 1px 0 rgba(255,255,255,.4)}
+}
+@keyframes brandShine{0%,70%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.brand-name{
+  font-size:1.1rem;font-weight:900;letter-spacing:.5em;
+  color:#e8ecf8;text-indent:.5em;
+  text-shadow:0 0 30px rgba(34,211,238,.4);
+}
+
+/* ===================== HERO ===================== */
+.hero{
+  text-align:center;
+  animation:fadeUp .8s cubic-bezier(.4,0,.2,1) .15s backwards;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 18px;border-radius:100px;
+  background:rgba(34,211,238,.08);
+  border:1px solid rgba(34,211,238,.28);
+  color:#a5f3fc;font-size:.72rem;font-weight:800;
+  letter-spacing:.14em;text-transform:uppercase;
+  margin-bottom:22px;
+  backdrop-filter:blur(10px);
+}
+.hero-badge .dot{
+  width:7px;height:7px;border-radius:50%;
+  background:#22c55e;
+  box-shadow:0 0 12px #22c55e;
+  animation:dotPulse 1.8s ease-in-out infinite;
+}
+@keyframes dotPulse{
+  0%,100%{transform:scale(1);opacity:1}
+  50%{transform:scale(.65);opacity:.55}
+}
+.hero-title{
+  font-size:clamp(2.4rem,8vw,4.4rem);
+  font-weight:900;line-height:.98;
+  letter-spacing:-2px;
+  margin-bottom:18px;
+  background:linear-gradient(120deg,#22d3ee 0%,#a78bfa 35%,#f472b6 65%,#22d3ee 100%);
+  background-size:300% 300%;
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:gradShift 8s ease infinite;
+  filter:drop-shadow(0 8px 40px rgba(34,211,238,.25));
+}
+@keyframes gradShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.hero-sub{
+  font-size:clamp(.95rem,2.2vw,1.15rem);
+  color:#94a3b8;
+  max-width:580px;margin:0 auto 14px;
+  line-height:1.55;
+  font-weight:500;
+}
+.hero-by{
+  font-size:.85rem;
+  color:#64748b;
+  letter-spacing:.1em;
+  font-weight:600;
+  text-transform:uppercase;
+}
+.hero-by b{
+  color:#fbbf24;
+  letter-spacing:.08em;
+  font-weight:900;
+  text-shadow:0 0 20px rgba(251,191,36,.4);
+}
+
+/* ===================== CARDS GRID ===================== */
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+  gap:22px;
+  animation:fadeUp .8s cubic-bezier(.4,0,.2,1) .28s backwards;
+}
+
+/* ===================== CARD ===================== */
+.card{
+  position:relative;
+  display:flex;flex-direction:column;
+  gap:22px;
+  padding:32px 28px 30px;
+  border-radius:26px;
+  background:rgba(255,255,255,.045);
+  backdrop-filter:blur(24px) saturate(1.4);
+  -webkit-backdrop-filter:blur(24px) saturate(1.4);
+  border:1px solid rgba(255,255,255,.1);
+  text-decoration:none;color:inherit;
+  overflow:hidden;
+  transition:transform .35s cubic-bezier(.4,0,.2,1),
+             border-color .35s,b
+             ox-shadow .35s;
+  cursor:pointer;
+  isolation:isolate;
+}
+.card::before{
+  content:"";position:absolute;inset:0;z-index:-1;
+  opacity:0;
+  transition:opacity .4s;
+  pointer-events:none;
+}
+.card:hover{
+  transform:translateY(-8px);
+  border-color:rgba(255,255,255,.22);
+}
+.card:hover::before{opacity:1}
+
+/* Card glow that matches its accent */
+.card-glow{
+  position:absolute;inset:-1px;z-index:-1;
+  border-radius:26px;
+  opacity:0;
+  transition:opacity .4s;
+  pointer-events:none;
+}
+.card:hover .card-glow{opacity:1}
+
+/* Game card accent (purple-pink) */
+.card-game::before{
+  background:radial-gradient(circle at 30% 20%,rgba(168,85,247,.28),transparent 65%);
+}
+.card-game .card-glow{
+  box-shadow:0 25px 60px rgba(168,85,247,.4),0 0 60px rgba(236,72,153,.2);
+}
+
+/* URL card accent (cyan-blue) */
+.card-url::before{
+  background:radial-gradient(circle at 70% 30%,rgba(34,211,238,.28),transparent 65%);
+}
+.card-url .card-glow{
+  box-shadow:0 25px 60px rgba(34,211,238,.4),0 0 60px rgba(59,130,246,.2);
+}
+
+/* Card icon */
+.card-icon{
+  width:76px;height:76px;border-radius:20px;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+  transition:transform .4s cubic-bezier(.4,0,.2,1);
+  flex-shrink:0;
+}
+.card:hover .card-icon{transform:scale(1.08) rotate(-4deg)}
+.card-icon svg{
+  width:38px;height:38px;
+  stroke-width:2.2;
+}
+
+/* Game icon gradient */
+.card-game .card-icon{
+  background:linear-gradient(135deg,#a855f7,#ec4899);
+  box-shadow:
+    0 12px 32px rgba(168,85,247,.5),
+    inset 0 1px 0 rgba(255,255,255,.35);
+  color:#fff;
+}
+/* URL icon gradient */
+.card-url .card-icon{
+  background:linear-gradient(135deg,#22d3ee,#3b82f6);
+  box-shadow:
+    0 12px 32px rgba(34,211,238,.5),
+    inset 0 1px 0 rgba(255,255,255,.35);
+  color:#04161f;
+}
+
+/* Card content */
+.card-content{display:flex;flex-direction:column;gap:6px}
+.card-tag{
+  font-size:.68rem;font-weight:900;
+  letter-spacing:.18em;text-transform:uppercase;
+}
+.card-game .card-tag{color:#c084fc}
+.card-url .card-tag{color:#67e8f9}
+.card-title{
+  font-size:1.5rem;font-weight:900;
+  letter-spacing:-.5px;line-height:1.15;
+  color:#f1f5f9;
+}
+.card-desc{
+  font-size:.9rem;color:#94a3b8;
+  line-height:1.55;font-weight:500;
+  margin-top:4px;
+}
+
+/* Arrow indicator */
+.card-arrow{
+  position:absolute;
+  top:32px;right:28px;
+  width:38px;height:38px;border-radius:50%;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.1);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.15rem;color:#cbd5e1;
+  transition:all .35s cubic-bezier(.4,0,.2,1);
+}
+.card:hover .card-arrow{
+  transform:translateX(6px) rotate(-8deg);
+  background:rgba(255,255,255,.15);
+  border-color:rgba(255,255,255,.3);
+  color:#fff;
+}
+.card-game:hover .card-arrow{
+  background:linear-gradient(135deg,#a855f7,#ec4899);
+  border-color:transparent;
+  box-shadow:0 8px 24px rgba(168,85,247,.5);
+}
+.card-url:hover .card-arrow{
+  background:linear-gradient(135deg,#22d3ee,#3b82f6);
+  border-color:transparent;
+  box-shadow:0 8px 24px rgba(34,211,238,.5);
+  color:#03131a;
+}
+
+/* Bottom accent bar */
+.card-bar{
+  height:3px;border-radius:2px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);
+  transition:.4s;
+}
+.card-game:hover .card-bar{
+  background:linear-gradient(90deg,transparent,#a855f7,#ec4899,transparent);
+  box-shadow:0 0 20px rgba(168,85,247,.7);
+}
+.card-url:hover .card-bar{
+  background:linear-gradient(90deg,transparent,#22d3ee,#3b82f6,transparent);
+  box-shadow:0 0 20px rgba(34,211,238,.7);
+}
+
+/* ===================== FOOTER ===================== */
+.footer{
+  text-align:center;
+  animation:fadeUp .8s cubic-bezier(.4,0,.2,1) .4s backwards;
+}
+.footer-line{
+  width:100px;height:1px;
+  margin:0 auto 22px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);
+}
+.footer p{
+  font-size:.82rem;
+  color:#64748b;
+  letter-spacing:.04em;
+  line-height:1.7;
+  font-weight:500;
+}
+.footer p b{
+  color:#fbbf24;
+  font-weight:900;
+  letter-spacing:.06em;
+}
+.footer .heart{
+  color:#f43f5e;
+  display:inline-block;
+  animation:heartBeat 1.6s ease-in-out infinite;
+}
+@keyframes heartBeat{
+  0%,100%{transform:scale(1)}
+  15%{transform:scale(1.2)}
+  30%{transform:scale(1)}
+  45%{transform:scale(1.15)}
+}
+.footer-copy{
+  margin-top:8px;
+  font-size:.72rem;
+  color:#475569;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  font-weight:600;
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media(max-width:520px){
+  body{padding:24px 14px}
+  .container{gap:38px}
+  .brand-mark{width:44px;height:44px;font-size:1.4rem;border-radius:13px}
+  .brand-name{font-size:.9rem;letter-spacing:.4em}
+  .hero-title{letter-spacing:-1.2px}
+  .hero-sub{font-size:.9rem}
+  .cards{grid-template-columns:1fr;gap:16px}
+  .card{padding:26px 22px 26px;border-radius:22px}
+  .card-icon{width:66px;height:66px;border-radius:18px}
+  .card-icon svg{width:32px;height:32px}
+  .card-title{font-size:1.3rem}
+  .card-arrow{top:26px;right:22px;width:34px;height:34px;font-size:1rem}
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== BACKGROUND ===================== -->
+<div class="bg-layer">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="grid-pattern"></div>
+</div>
+
+<!-- ===================== MAIN ===================== -->
+<main class="container">
+
+  <!-- Brand header -->
+  <header class="brand">
+    <div class="brand-mark">L</div>
+    <div class="brand-name">LYRA</div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-badge">
+      <span class="dot"></span>
+      Two Tools · One Hub
+    </div>
+    <h1 class="hero-title">Build. Share. Play.</h1>
+    <p class="hero-sub">
+      Your all-in-one creative hub — craft mini games, publish them instantly,
+      and share shortened links with the world.
+    </p>
+    <p class="hero-by">Created by <b>MUHAMMAD TAQI</b></p>
+  </section>
+
+  <!-- Cards -->
+  <section class="cards">
+
+    <!-- Card 1: Game Builder -->
+    <a href="https://nexura.dns.army/" class="card card-game" target="_blank" rel="noopener">
+      <div class="card-glow"></div>
+
+      <div class="card-icon">
+        <!-- Gamepad icon -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="6" y1="11" x2="10" y2="11"></line>
+          <line x1="8" y1="9" x2="8" y2="13"></line>
+          <line x1="15" y1="12" x2="15.01" y2="12"></line>
+          <line x1="18" y1="10" x2="18.01" y2="10"></line>
+          <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.544-.604-6.584-.685-7.258a4 4 0 0 0-3.995-3.742Z"></path>
+        </svg>
+      </div>
+
+      <div class="card-content">
+        <div class="card-tag">Game Builder</div>
+        <h2 class="card-title">LYRA Game Builder</h2>
+        <p class="card-desc">
+          Create, personalize & publish 9 handcrafted mini games — from Flappy Bird to Ludo — in seconds.
+        </p>
+      </div>
+
+      <div class="card-arrow">→</div>
+      <div class="card-bar"></div>
+    </a>
+
+    <!-- Card 2: URL Shortener -->
+    <a href="url.html" class="card card-url">
+      <div class="card-glow"></div>
+
+      <div class="card-icon">
+        <!-- Link icon -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+        </svg>
+      </div>
+
+      <div class="card-content">
+        <div class="card-tag">Link Shortener</div>
+        <h2 class="card-title">URL Shortener</h2>
+        <p class="card-desc">
+          Compress long game links into short, shareable URLs — with instant preview and copy.
+        </p>
+      </div>
+
+      <div class="card-arrow">→</div>
+      <div class="card-bar"></div>
+    </a>
+
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-line"></div>
+    <p>Crafted with <span class="heart">♥</span> by <b>MUHAMMAD TAQI</b></p>
+    <p class="footer-copy">© 2025 LYRA · All Rights Reserved</p>
+  </footer>
+
+</main>
+
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"e3c1c9af36de41759418005494a48906","r":1,"spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>

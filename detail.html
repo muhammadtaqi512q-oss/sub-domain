@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="DETAIL OF AVELIA — Official page of Muhammad Taqi. Web, AI, Game, Software & App Developer. Creator of Death and Nova programming languages." />
+<title>DETAIL OF AVELIA — Muhammad Taqi</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+
+<style>
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root{
+  --bg:        #07080d;
+  --bg-soft:   #0d0f17;
+  --card:      #11141f;
+  --card-2:    #151928;
+  --line:      rgba(255,255,255,.08);
+  --line-hi:   rgba(255,255,255,.18);
+  --txt:       #e9ecf5;
+  --txt-dim:   #9aa3b8;
+  --cyan:      #00e5ff;
+  --violet:    #a855f7;
+  --pink:      #ff2e88;
+  --green:     #22e6a1;
+  --amber:     #ffb020;
+  --radius:    16px;
+  --max:       1140px;
+}
+
+html { scroll-behavior: smooth; }
+
+body{
+  font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--txt);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+img, svg { display: block; max-width: 100%; }
+code{
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: .88em;
+  background: rgba(255,255,255,.06);
+  border: 1px solid var(--line);
+  padding: 1px 6px;
+  border-radius: 6px;
+  color: var(--cyan);
+}
+
+.container { width: 100%; max-width: var(--max); margin-inline: auto; padding-inline: 22px; }
+
+/* ============================================================
+   AMBIENT BACKGROUND
+   ============================================================ */
+.bg-glow{
+  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(900px 600px at 12% -8%,  rgba(0,229,255,.16), transparent 60%),
+    radial-gradient(800px 600px at 88% 4%,   rgba(168,85,247,.16), transparent 60%),
+    radial-gradient(900px 700px at 50% 108%, rgba(255,46,136,.12), transparent 60%),
+    var(--bg);
+}
+.bg-glow::after{
+  content:""; position:absolute; inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.028) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(circle at 50% 30%, #000 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(circle at 50% 30%, #000 30%, transparent 80%);
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.site-header{
+  position: sticky; top: 0; z-index: 50;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  background: rgba(7,8,13,.72);
+  border-bottom: 1px solid var(--line);
+}
+.nav{
+  display: flex; align-items: center; justify-content: space-between;
+  height: 68px;
+}
+.brand{ display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: .14em; }
+.brand-mark{
+  width: 34px; height: 34px; display: grid; place-items: center;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--cyan), var(--violet));
+  color: #05060a; font-weight: 900; font-size: 18px;
+  box-shadow: 0 0 22px rgba(0,229,255,.4);
+}
+.brand-text{ font-size: 15px; }
+
+.nav-links{ display: flex; gap: 26px; list-style: none; }
+.nav-links a{
+  font-size: 13.5px; font-weight: 600; letter-spacing: .06em;
+  color: var(--txt-dim); transition: color .2s;
+  position: relative;
+}
+.nav-links a::after{
+  content:""; position: absolute; left: 0; bottom: -6px;
+  width: 0; height: 2px; border-radius: 2px;
+  background: linear-gradient(90deg, var(--cyan), var(--violet));
+  transition: width .25s;
+}
+.nav-links a:hover{ color: #fff; }
+.nav-links a:hover::after{ width: 100%; }
+
+@media (max-width: 780px){
+  .nav-links{ display: none; }
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{ padding: 78px 22px 30px; text-align: center; }
+
+.hero-badge{
+  display: inline-block;
+  font-size: 11px; font-weight: 800; letter-spacing: .22em;
+  padding: 7px 16px; border-radius: 100px;
+  border: 1px solid rgba(0,229,255,.35);
+  color: var(--cyan);
+  background: rgba(0,229,255,.07);
+  box-shadow: 0 0 26px rgba(0,229,255,.16);
+  margin-bottom: 26px;
+}
+
+.hero-title{
+  font-size: clamp(2.1rem, 6vw, 4.2rem);
+  font-weight: 900;
+  letter-spacing: -.02em;
+  line-height: 1.06;
+  text-transform: uppercase;
+}
+.grad-text{
+  background: linear-gradient(100deg, var(--cyan) 0%, var(--violet) 48%, var(--pink) 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+  filter: drop-shadow(0 0 26px rgba(168,85,247,.45));
+}
+
+.hero-sub{
+  margin-top: 20px;
+  color: var(--txt-dim);
+  font-size: clamp(.95rem, 2vw, 1.08rem);
+  max-width: 640px; margin-inline: auto;
+}
+.hero-sub strong{ color: var(--txt); }
+
+/* owner card */
+.owner-card{
+  margin: 44px auto 0;
+  max-width: 720px;
+  display: flex; align-items: center; gap: 26px;
+  text-align: left;
+  padding: 24px 28px;
+  border-radius: var(--radius);
+  background: linear-gradient(160deg, rgba(21,25,40,.95), rgba(13,15,23,.95));
+  border: 1px solid var(--line);
+  box-shadow: 0 30px 70px -30px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.05);
+}
+.owner-avatar{
+  flex: none;
+  width: 84px; height: 84px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 27px; font-weight: 900; letter-spacing: .04em;
+  color: #05060a;
+  background: linear-gradient(135deg, var(--cyan), var(--violet) 60%, var(--pink));
+  box-shadow: 0 0 34px rgba(0,229,255,.35);
+}
+.owner-info{ flex: 1; display: grid; gap: 8px; }
+.owner-row{
+  display: flex; justify-content: space-between; gap: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed rgba(255,255,255,.07);
+  font-size: 14px;
+}
+.owner-row:last-child{ border-bottom: 0; padding-bottom: 0; }
+.owner-row .label{
+  color: var(--txt-dim); font-size: 11.5px; font-weight: 800;
+  letter-spacing: .16em; padding-top: 2px;
+}
+.owner-row .value{ font-weight: 700; text-align: right; }
+
+@media (max-width: 560px){
+  .owner-card{ flex-direction: column; text-align: center; }
+  .owner-row{ flex-direction: column; align-items: center; gap: 2px; }
+  .owner-row .value{ text-align: center; }
+}
+
+/* buttons */
+.hero-actions{
+  display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+  margin-top: 38px;
+}
+.btn{
+  display: inline-block;
+  padding: 13px 30px;
+  border-radius: 100px;
+  font-size: 14px; font-weight: 800; letter-spacing: .04em;
+  transition: transform .18s, box-shadow .25s, background .25s, border-color .25s;
+  border: 1px solid transparent;
+}
+.btn-primary{
+  background: linear-gradient(100deg, var(--cyan), var(--violet));
+  color: #05060a;
+  box-shadow: 0 12px 34px -12px rgba(0,229,255,.7);
+}
+.btn-primary:hover{ transform: translateY(-2px); box-shadow: 0 18px 40px -12px rgba(168,85,247,.85); }
+.btn-ghost{
+  border-color: var(--line-hi);
+  color: var(--txt);
+  background: rgba(255,255,255,.03);
+}
+.btn-ghost:hover{ border-color: var(--cyan); color: var(--cyan); transform: translateY(-2px); }
+
+/* ============================================================
+   SECTIONS
+   ============================================================ */
+.section{ padding: 76px 22px 10px; }
+
+.section-title{
+  display: flex; align-items: center; gap: 14px;
+  font-size: clamp(1.35rem, 3.4vw, 1.9rem);
+  font-weight: 900; letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.section-title .num{
+  font-size: 12px; font-weight: 800; letter-spacing: .1em;
+  color: var(--cyan);
+  border: 1px solid rgba(0,229,255,.35);
+  background: rgba(0,229,255,.07);
+  padding: 4px 10px; border-radius: 8px;
+}
+.section-sub{ color: var(--txt-dim); margin-top: 10px; font-size: 14.5px; }
+
+.mini-title{
+  margin: 44px 0 18px;
+  font-size: 12.5px; font-weight: 900; letter-spacing: .18em;
+  color: var(--txt-dim); text-transform: uppercase;
+}
+
+/* ============================================================
+   GRIDS & CARDS
+   ============================================================ */
+.grid{ display: grid; gap: 18px; margin-top: 28px; }
+
+.grid-skills{ grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.grid-services{ grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.grid-langs{ grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.grid-links{ grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+
+.card{
+  position: relative;
+  padding: 24px;
+  border-radius: var(--radius);
+  background: linear-gradient(160deg, var(--card), var(--bg-soft));
+  border: 1px solid var(--line);
+  transition: transform .22s, border-color .22s, box-shadow .3s;
+  overflow: hidden;
+}
+.card::before{
+  content:""; position: absolute; inset: 0;
+  background: radial-gradient(400px 140px at 50% -10%, rgba(0,229,255,.16), transparent 70%);
+  opacity: 0; transition: opacity .3s;
+  pointer-events: none;
+}
+.card:hover{
+  transform: translateY(-5px);
+  border-color: var(--line-hi);
+  box-shadow: 0 26px 50px -28px rgba(0,229,255,.45);
+}
+.card:hover::before{ opacity: 1; }
+
+.card h3{
+  font-size: 15px; font-weight: 800; letter-spacing: .06em;
+  text-transform: uppercase; margin-bottom: 8px;
+}
+.card p{ color: var(--txt-dim); font-size: 13.6px; }
+
+.card-icon{
+  width: 46px; height: 46px; display: grid; place-items: center;
+  font-size: 22px; border-radius: 12px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid var(--line);
+  margin-bottom: 16px;
+}
+.skill-card.wide{ grid-column: span 2; }
+@media (max-width: 620px){ .skill-card.wide{ grid-column: auto; } }
+
+/* chips */
+.chips{ display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+.chip{
+  font-size: 12.5px; font-weight: 800; letter-spacing: .1em;
+  padding: 9px 18px; border-radius: 100px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--line);
+  color: var(--txt);
+  transition: all .2s;
+}
+.chip:hover{
+  border-color: var(--cyan); color: var(--cyan);
+  background: rgba(0,229,255,.08);
+  box-shadow: 0 0 22px rgba(0,229,255,.18);
+}
+
+/* language cards */
+.lang-card{ display: flex; flex-direction: column; gap: 6px; }
+.lang-top{ display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.lang-sym{ font-size: 26px; line-height: 1; }
+.lang-tag{
+  font-size: 9.5px; font-weight: 900; letter-spacing: .16em;
+  padding: 4px 10px; border-radius: 100px;
+  border: 1px solid var(--line-hi); color: var(--txt-dim);
+}
+.lang-card.death:hover{ border-color: rgba(255,46,136,.6); box-shadow: 0 26px 50px -28px rgba(255,46,136,.5); }
+.lang-card.death .lang-sym{ color: var(--pink); }
+.lang-card.nova:hover{ border-color: rgba(34,230,161,.6); box-shadow: 0 26px 50px -28px rgba(34,230,161,.5); }
+.lang-card.nova .lang-sym{ color: var(--green); }
+.lang-link{
+  margin-top: 14px; font-size: 12.5px; font-weight: 800; letter-spacing: .06em;
+  color: var(--cyan);
+}
+.lang-card:hover .lang-link{ text-decoration: underline; text-underline-offset: 4px; }
+
+/* services status */
+.services-status{
+  margin-top: 22px;
+  font-size: 13.5px; color: var(--txt-dim);
+  padding: 12px 18px;
+  border-left: 3px solid var(--cyan);
+  background: rgba(0,229,255,.05);
+  border-radius: 0 10px 10px 0;
+}
+.services-status.error{ border-left-color: var(--pink); background: rgba(255,46,136,.06); color: #ffb3cd; }
+.services-status.hidden{ display: none; }
+
+/* service card extra */
+.service-card{ display: flex; flex-direction: column; }
+.service-card .svc-id{
+  position: absolute; top: 16px; right: 18px;
+  font-size: 10px; font-weight: 900; letter-spacing: .14em;
+  color: rgba(255,255,255,.22);
+}
+.service-card .svc-tags{
+  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px;
+}
+.service-card .svc-tags span{
+  font-size: 10px; font-weight: 800; letter-spacing: .1em;
+  padding: 4px 9px; border-radius: 6px;
+  color: var(--cyan);
+  background: rgba(0,229,255,.08);
+  border: 1px solid rgba(0,229,255,.22);
+}
+
+/* contact links */
+.link-card{
+  display: flex; align-items: center; gap: 16px;
+  padding: 18px 22px;
+}
+.link-icon{
+  flex: none;
+  width: 44px; height: 44px; border-radius: 12px;
+  display: grid; place-items: center;
+  font-size: 19px; font-weight: 900;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.05);
+}
+.link-icon.yt{ color: #ff3b3b; background: rgba(255,59,59,.09); border-color: rgba(255,59,59,.28); }
+.link-icon.fb{ color: #4d8bff; background: rgba(77,139,255,.09); border-color: rgba(77,139,255,.28); }
+.link-meta{ display: flex; flex-direction: column; min-width: 0; }
+.link-meta strong{ font-size: 14px; letter-spacing: .02em; }
+.link-meta small{ font-size: 12px; color: var(--txt-dim); }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.site-footer{
+  margin-top: 90px;
+  border-top: 1px solid var(--line);
+  background: rgba(10,12,19,.7);
+  padding: 44px 0 24px;
+}
+.footer-inner{
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 28px; flex-wrap: wrap;
+}
+.footer-brand{ display: flex; align-items: center; gap: 12px; }
+.footer-brand div{ display: flex; flex-direction: column; }
+.footer-brand strong{ font-size: 14px; letter-spacing: .14em; }
+.footer-brand small{ font-size: 12px; color: var(--txt-dim); }
+
+.footer-links{ display: flex; gap: 22px; list-style: none; flex-wrap: wrap; }
+.footer-links a{ font-size: 13px; color: var(--txt-dim); transition: color .2s; }
+.footer-links a:hover{ color: var(--cyan); }
+
+.copyright{
+  margin-top: 30px; padding-top: 22px;
+  border-top: 1px solid var(--line);
+  text-align: center; font-size: 12.5px; color: var(--txt-dim);
+}
+
+/* reveal animation */
+.reveal{ opacity: 0; transform: translateY(18px); animation: rise .55s ease forwards; }
+@keyframes rise{ to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body>
+
+<div class="bg-glow" aria-hidden="true"></div>
+
+<!-- ================= HEADER ================= -->
+<header class="site-header">
+  <nav class="nav container">
+    <a class="brand" href="#about">
+      <span class="brand-mark">A</span>
+      <span class="brand-text">AVELIA</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#languages">Languages</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ================= HERO / ABOUT ================= -->
+  <section class="hero container" id="about">
+    <div class="hero-badge">⚡ OFFICIAL PROFILE</div>
+
+    <h1 class="hero-title">DETAIL OF <span class="grad-text">AVELIA</span></h1>
+
+    <p class="hero-sub">
+      Full Stack Developer • AI Engineer • Game &amp; Software Builder<br />
+      Creator of the <strong>DEATH</strong> and <strong>NOVA</strong> programming languages.
+    </p>
+
+    <div class="owner-card">
+      <div class="owner-avatar">MT</div>
+      <div class="owner-info">
+        <div class="owner-row">
+          <span class="label">OWNER</span>
+          <span class="value">MUHAMMAD TAQI</span>
+        </div>
+        <div class="owner-row">
+          <span class="label">DATE OF BIRTH</span>
+          <span class="value">25 NOVEMBER 2009</span>
+        </div>
+        <div class="owner-row">
+          <span class="label">BRAND</span>
+          <span class="value">AVELIA</span>
+        </div>
+        <div class="owner-row">
+          <span class="label">ROLE</span>
+          <span class="value">FULL STACK DEVELOPER</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#services">View Services</a>
+      <a class="btn btn-ghost" href="#contact">Official Channels</a>
+    </div>
+  </section>
+
+  <!-- ================= SKILLS ================= -->
+  <section class="section container" id="skills">
+    <h2 class="section-title"><span class="num">01</span> SKILLS</h2>
+    <p class="section-sub">What AVELIA builds and ships.</p>
+
+    <div class="grid grid-skills">
+      <article class="card skill-card">
+        <div class="card-icon">🌐</div>
+        <h3>Web Development</h3>
+        <p>Modern, responsive and fast websites &amp; web apps.</p>
+      </article>
+
+      <article class="card skill-card">
+        <div class="card-icon">🤖</div>
+        <h3>AI Development</h3>
+        <p>AI tools, chatbots, automation and smart integrations.</p>
+      </article>
+
+      <article class="card skill-card">
+        <div class="card-icon">🎮</div>
+        <h3>Game Development</h3>
+        <p>2D/3D game logic, mechanics and gameplay systems.</p>
+      </article>
+
+      <article class="card skill-card">
+        <div class="card-icon">💻</div>
+        <h3>Software</h3>
+        <p>Desktop software, tools and utility applications.</p>
+      </article>
+
+      <article class="card skill-card">
+        <div class="card-icon">📱</div>
+        <h3>App Development</h3>
+        <p>Cross-platform mobile &amp; web applications.</p>
+      </article>
+
+      <article class="card skill-card">
+        <div class="card-icon">🧠</div>
+        <h3>HuggingFace AI Models</h3>
+        <p>Building, training and deploying AI models.</p>
+      </article>
+
+      <article class="card skill-card wide">
+        <div class="card-icon">🚀</div>
+        <h3>Full Stack Developer</h3>
+        <p>Frontend + Backend + Database + AI — complete end-to-end products.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ================= LANGUAGES ================= -->
+  <section class="section container" id="languages">
+    <h2 class="section-title"><span class="num">02</span> LANGUAGES</h2>
+    <p class="section-sub">Programming languages known &amp; created by Muhammad Taqi.</p>
+
+    <div class="chips">
+      <span class="chip">HTML</span>
+      <span class="chip">CSS</span>
+      <span class="chip">JS</span>
+      <span class="chip">PYTHON</span>
+      <span class="chip">REACT</span>
+      <span class="chip">.JSON</span>
+      <span class="chip">DATABASE</span>
+      <span class="chip">C</span>
+      <span class="chip">C#</span>
+      <span class="chip">PHP</span>
+      <span class="chip">.BAT</span>
+    </div>
+
+    <h3 class="mini-title">⭐ Custom Languages (Created by Muhammad Taqi)</h3>
+
+    <div class="grid grid-langs">
+      <a class="card lang-card death" href="death.html">
+        <div class="lang-top">
+          <span class="lang-sym">☠</span>
+          <span class="lang-tag">CUSTOM LANGUAGE</span>
+        </div>
+        <h3>Death Language</h3>
+        <p>A programming language created by Muhammad Taqi.</p>
+        <span class="lang-link">Open Documentation →</span>
+      </a>
+
+      <a class="card lang-card nova" href="nova.html">
+        <div class="lang-top">
+          <span class="lang-sym">✦</span>
+          <span class="lang-tag">CUSTOM LANGUAGE</span>
+        </div>
+        <h3>Nova Language</h3>
+        <p>A programming language created by Muhammad Taqi.</p>
+        <span class="lang-link">Open Documentation →</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ================= SERVICES (100% EXTERNAL FETCH) ================= -->
+  <section class="section container" id="services">
+    <h2 class="section-title"><span class="num">03</span> SERVICES</h2>
+    <p class="section-sub">Loaded 100% from the external <code>service.json</code> URL. No data is embedded in this page.</p>
+
+    <p id="services-status" class="services-status">⏳ Fetching services from remote URL…</p>
+    <div id="services-grid" class="grid grid-services" aria-live="polite"></div>
+  </section>
+
+  <!-- ================= CONTACT ================= -->
+  <section class="section container" id="contact">
+    <h2 class="section-title"><span class="num">04</span> OFFICIAL CHANNELS</h2>
+    <p class="section-sub">Only these are official. Verify before trusting anything else.</p>
+
+    <h3 class="mini-title">▶ YouTube</h3>
+    <div class="grid grid-links">
+      <a class="card link-card" href="https://www.youtube.com/@AVELIA.S" target="_blank" rel="noopener">
+        <span class="link-icon yt">▶</span>
+        <span class="link-meta">
+          <strong>@AVELIA.S</strong>
+          <small>Official YouTube Channel</small>
+        </span>
+      </a>
+
+      <a class="card link-card" href="https://www.youtube.com/@LYRAMOON-STUDIO" target="_blank" rel="noopener">
+        <span class="link-icon yt">▶</span>
+        <span class="link-meta">
+          <strong>@LYRAMOON-STUDIO</strong>
+          <small>Official YouTube Channel</small>
+        </span>
+      </a>
+
+      <a class="card link-card" href="https://www.youtube.com/@M.TAQI-STUDIO" target="_blank" rel="noopener">
+        <span class="link-icon yt">▶</span>
+        <span class="link-meta">
+          <strong>@M.TAQI-STUDIO</strong>
+          <small>Official YouTube Channel</small>
+        </span>
+      </a>
+    </div>
+
+    <h3 class="mini-title">f Facebook</h3>
+    <div class="grid grid-links">
+      <a class="card link-card" href="https://www.facebook.com/profile.php?id=61563069383023" target="_blank" rel="noopener">
+        <span class="link-icon fb">f</span>
+        <span class="link-meta">
+          <strong>Muhammad Taqi</strong>
+          <small>Official Facebook Profile</small>
+        </span>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <span class="brand-mark">A</span>
+      <div>
+        <strong>AVELIA</strong>
+        <small>Owned by Muhammad Taqi • Since 25 November 2009</small>
+      </div>
+    </div>
+    <ul class="footer-links">
+      <li><a href="#about">Home</a></li>
+      <li><a href="death.html">Death Language</a></li>
+      <li><a href="nova.html">Nova Language</a></li>
+      <li><a href="#services">Services</a></li>
+    </ul>
+  </div>
+  <div class="container copyright">
+    © <span id="year"></span> AVELIA — Muhammad Taqi. All rights reserved.
+  </div>
+</footer>
+
+<!-- ============================================================
+     SERVICE FETCHING SCRIPT
+     - 100% external: No fallback data embedded.
+     - If fetch fails, an error message is shown.
+     ============================================================ -->
+<script>
+(function () {
+  "use strict";
+
+  var SERVICE_URL = "https://muhammadtaqi512q-oss.github.io/AVELIA/service.json";
+  var GRID   = document.getElementById("services-grid");
+  var STATUS = document.getElementById("services-status");
+
+  function escapeHTML(str) {
+    return String(str == null ? "" : str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function renderServices(list) {
+    GRID.innerHTML = "";
+
+    list.forEach(function (svc, i) {
+      var card = document.createElement("article");
+      card.className = "card service-card reveal";
+      card.style.animationDelay = (i * 70) + "ms";
+
+      var tags = (svc.tags || []).map(function (t) {
+        return "<span>" + escapeHTML(t) + "</span>";
+      }).join("");
+
+      card.innerHTML =
+        '<span class="svc-id">' + escapeHTML(svc.id || String(i + 1).padStart(2, "0")) + '</span>' +
+        '<div class="card-icon">' + escapeHTML(svc.icon || "⚡") + '</div>' +
+        '<h3>' + escapeHTML(svc.title || "Untitled Service") + '</h3>' +
+        '<p>' + escapeHTML(svc.description || "") + '</p>' +
+        (tags ? '<div class="svc-tags">' + tags + '</div>' : "");
+
+      GRID.appendChild(card);
+    });
+  }
+
+  function setStatus(message, isError) {
+    STATUS.textContent = message;
+    STATUS.classList.toggle("error", !!isError);
+    if (!isError && message === "") STATUS.classList.add("hidden");
+  }
+
+  function loadServices() {
+    fetch(SERVICE_URL, { cache: "no-store" })
+      .then(function (res) {
+        if (!res.ok) throw new Error("HTTP " + res.status + " — file may not be uploaded yet");
+        return res.json();
+      })
+      .then(function (data) {
+        var list = Array.isArray(data) ? data : (data.services || []);
+        if (!list.length) throw new Error("The JSON file is empty or has no 'services' array");
+
+        renderServices(list);
+        STATUS.classList.add("hidden");
+        STATUS.textContent = "";
+      })
+      .catch(function (err) {
+        console.warn("Failed to fetch " + SERVICE_URL, err);
+        GRID.innerHTML = "";
+        setStatus(
+          "❌ Could not load services from the remote URL.\n" +
+          "URL: " + SERVICE_URL + "\n" +
+          "Error: " + err.message + "\n\n" +
+          "Make sure the file 'service.json' is uploaded to your GitHub Pages repository.",
+          true
+        );
+      });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", loadServices);
+  } else {
+    loadServices();
+  }
+
+  var y = document.getElementById("year");
+  if (y) y.textContent = new Date().getFullYear();
+})();
+</script>
+
+</body>
+</html>

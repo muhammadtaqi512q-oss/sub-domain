@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CloudCode Studio - NextGen Web Runner</title>
+  <!-- Font Awesome Icons & Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-main: #090d16;
+      --card-bg: rgba(17, 24, 39, 0.7);
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --accent-glow: rgba(99, 102, 241, 0.35);
+      --border: rgba(255, 255, 255, 0.08);
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg-main);
+      color: var(--text-main);
+      height: 100vh;
+      overflow: hidden;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.12) 0px, transparent 50%);
+    }
+
+    /* Modal for First Time User */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(5, 8, 15, 0.85);
+      backdrop-filter: blur(12px);
+      display: flex; justify-content: center; align-items: center;
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+    .modal-card {
+      background: rgba(23, 31, 48, 0.95);
+      border: 1px solid var(--border);
+      padding: 32px; border-radius: 20px;
+      width: 90%; max-width: 420px;
+      text-align: center;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 30px var(--accent-glow);
+    }
+    .modal-card h2 { font-size: 1.6rem; margin-bottom: 8px; color: #fff; }
+    .modal-card p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px; }
+    .modal-card input {
+      width: 100%; padding: 14px 16px;
+      background: #0d1322; border: 1px solid var(--border);
+      border-radius: 10px; color: #fff; font-size: 1rem;
+      margin-bottom: 20px; outline: none;
+      transition: border-color 0.2s;
+    }
+    .modal-card input:focus { border-color: var(--accent); }
+    .modal-card button {
+      width: 100%; padding: 14px;
+      background: var(--accent); color: white;
+      border: none; border-radius: 10px;
+      font-weight: 600; font-size: 1rem; cursor: pointer;
+      box-shadow: 0 4px 14px var(--accent-glow);
+      transition: background 0.2s;
+    }
+    .modal-card button:hover { background: var(--accent-hover); }
+
+    /* Main App Layout */
+    .app-header {
+      height: 60px; padding: 0 24px;
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid var(--border);
+      background: rgba(13, 19, 34, 0.6);
+      backdrop-filter: blur(10px);
+    }
+    .brand { font-weight: 700; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; color: #fff; }
+    .brand i { color: var(--accent); }
+    .user-badge {
+      font-size: 0.85rem; padding: 6px 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border); border-radius: 20px;
+      color: var(--text-muted); display: flex; align-items: center; gap: 8px;
+    }
+    .user-badge strong { color: #fff; }
+
+    .main-container {
+      display: flex; gap: 16px; padding: 16px;
+      height: calc(100vh - 60px);
+    }
+    .panel {
+      flex: 1; display: flex; flex-direction: column;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden;
+      backdrop-filter: blur(16px);
+    }
+    .panel-header {
+      padding: 14px 18px; background: rgba(255,255,255,0.02);
+      border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      font-weight: 600; font-size: 0.9rem; color: var(--text-muted);
+    }
+    .panel-header i { margin-right: 6px; color: var(--accent); }
+
+    /* Editor Controls */
+    .file-input-wrapper { padding: 12px 18px; border-bottom: 1px solid var(--border); background: #0b101d; }
+    .file-input-wrapper input {
+      width: 100%; padding: 10px 14px;
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+      border-radius: 8px; color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;
+      outline: none;
+    }
+    .file-input-wrapper input:focus { border-color: var(--accent); }
+
+    textarea {
+      flex: 1; padding: 18px;
+      background: transparent; border: none; outline: none;
+      color: #e2e8f0; font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem; line-height: 1.6; resize: none;
+    }
+
+    .action-bar { padding: 14px 18px; border-top: 1px solid var(--border); background: #0b101d; }
+    .btn-submit {
+      width: 100%; padding: 12px;
+      background: var(--accent); color: white; border: none;
+      border-radius: 8px; font-weight: 600; font-size: 0.9rem;
+      cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;
+      box-shadow: 0 4px 12px var(--accent-glow); transition: all 0.2s;
+    }
+    .btn-submit:hover { background: var(--accent-hover); transform: translateY(-1px); }
+
+    .toast-msg {
+      margin-top: 10px; padding: 10px; text-align: center;
+      background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #34d399; font-size: 0.85rem; border-radius: 8px; display: none;
+    }
+
+    /* Frame Preview */
+    iframe { width: 100%; flex: 1; border: none; background: #ffffff; }
+
+    /* Fullscreen Preview Mode Style */
+    body.fullscreen-mode {
+      background: #fff;
+    }
+    body.fullscreen-mode .app-header,
+    body.fullscreen-mode .editor-panel,
+    body.fullscreen-mode .modal-overlay,
+    body.fullscreen-mode .panel-header {
+      display: none !important;
+    }
+    body.fullscreen-mode .main-container {
+      padding: 0; margin: 0; height: 100vh; gap: 0;
+    }
+    body.fullscreen-mode .preview-panel {
+      border: none; border-radius: 0; width: 100vw; height: 100vh;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- First Time User Welcome Modal -->
+  <div class="modal-overlay" id="userModal" style="display: none;">
+    <div class="modal-card">
+      <div style="font-size: 2.5rem; margin-bottom: 12px; color: var(--accent);"><i class="fa-solid fa-code"></i></div>
+      <h2>Welcome to CodeStudio</h2>
+      <p>Apna Naam Enter Karein (Yeh Sirf Pehli Dafa Pucha Jayega):</p>
+      <input type="text" id="modalUsername" placeholder="e.g. taqi" autofocus>
+      <button onclick="saveUserAndStart()">Continue Workspace <i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="brand"><i class="fa-solid fa-bolt"></i> CloudCode Studio</div>
+    <div class="user-badge"><i class="fa-solid fa-user-circle"></i> Developer: <strong id="userDisplay">...</strong></div>
+  </header>
+
+  <!-- Workspace Container -->
+  <main class="main-container">
+    <!-- Left Editor Panel -->
+    <section class="panel editor-panel">
+      <div class="panel-header">
+        <span><i class="fa-solid fa-code"></i> Editor & File Saver</span>
+      </div>
+      <div class="file-input-wrapper">
+        <input type="text" id="fileName" placeholder="File Name (e.g. index.html, style.css, script.js, data.json)">
+      </div>
+      <textarea id="codeContent" placeholder="<!-- Apna HTML/CSS/JS Code Yahan Paste Karein... -->"></textarea>
+      <div class="action-bar">
+        <button class="btn-submit" onclick="commitAndGenerateURL()"><i class="fa-solid fa-copy"></i> Commit Code & Copy URL</button>
+        <div id="toast" class="toast-msg"><i class="fa-solid fa-check"></i> Live Project URL copied to clipboard!</div>
+      </div>
+    </section>
+
+    <!-- Right Live Preview Panel -->
+    <section class="panel preview-panel">
+      <div class="panel-header">
+        <span id="previewTitle"><i class="fa-solid fa-desktop"></i> Live Preview</span>
+      </div>
+      <iframe id="previewFrame"></iframe>
+    </section>
+  </main>
+
+  <script>
+    let activeUsername = "";
+
+    // Application Load Event
+    document.addEventListener('DOMContentLoaded', () => {
+      // Pehle check karein ke kya URL mein project hash mojud hai
+      const hash = window.location.hash;
+      if (hash && hash.includes('?file=')) {
+        // Shared URL open hui hai: direct Fullscreen Preview render karein
+        document.body.classList.add('fullscreen-mode');
+        parseURLAndLoadProject();
+        return;
+      }
+
+      // Normal Editor mode
+      const storedUser = localStorage.getItem('app_saved_username');
+      if (!storedUser) {
+        document.getElementById('userModal').style.display = 'flex';
+      } else {
+        activeUsername = storedUser;
+        document.getElementById('userDisplay').innerText = activeUsername;
+      }
+    });
+
+    // Save First Time User Name
+    function saveUserAndStart() {
+      const nameInput = document.getElementById('modalUsername').value.trim();
+      if (!nameInput) {
+        alert("Barae meherbani apna naam enter karein!");
+        return;
+      }
+      activeUsername = nameInput;
+      localStorage.setItem('app_saved_username', activeUsername);
+      document.getElementById('userDisplay').innerText = activeUsername;
+      document.getElementById('userModal').style.display = 'none';
+    }
+
+    // Commit Code, Copy URL Automatically, & Update Preview
+    function commitAndGenerateURL() {
+      const fileName = document.getElementById('fileName').value.trim();
+      const codeContent = document.getElementById('codeContent').value;
+
+      if (!fileName || !codeContent) {
+        alert("File Name aur Code dono likhna lazmi hain!");
+        return;
+      }
+
+      // Extension Extract
+      const extMatch = fileName.match(/\.(html|css|js|json)$/i);
+      const ext = extMatch ? extMatch[1].toLowerCase() : 'html';
+
+      // Safe Base64 Encoding
+      const encodedCode = encodeURIComponent(btoa(unescape(encodeURIComponent(codeContent))));
+
+      // Custom Hash URL Structure
+      const customHash = `#${activeUsername}?file=${ext}=${encodeURIComponent(fileName)}&code=${encodedCode}`;
+      
+      window.location.hash = customHash;
+      const fullURL = window.location.href;
+
+      // Automatically Copy URL to Clipboard
+      navigator.clipboard.writeText(fullURL).then(() => {
+        const toast = document.getElementById('toast');
+        toast.style.display = 'block';
+        setTimeout(() => { toast.style.display = 'none'; }, 3000);
+      }).catch(err => {
+        console.error("Copy failed: ", err);
+      });
+
+      // Local Frame Preview Render
+      renderPreview(codeContent, ext, fileName);
+    }
+
+    // Parse URL Hash
+    function parseURLAndLoadProject() {
+      const hash = window.location.hash;
+      if (!hash || !hash.includes('?file=')) return;
+
+      try {
+        const hashContent = hash.substring(1);
+        const [userPart, queryPart] = hashContent.split('?');
+        const params = new URLSearchParams(queryPart);
+
+        const fileParam = params.get('file');
+        const encodedCode = params.get('code');
+
+        if (fileParam && encodedCode) {
+          const [ext, ...nameParts] = fileParam.split('=');
+          const fileName = nameParts.join('=');
+          const decodedCode = decodeURIComponent(escape(atob(decodeURIComponent(encodedCode))));
+
+          renderPreview(decodedCode, ext, fileName, userPart);
+        }
+      } catch (e) {
+        console.error("Invalid URL Hash structure", e);
+      }
+    }
+
+    // Render Preview Frame
+    function renderPreview(code, ext, fileName, creator = activeUsername) {
+      document.getElementById('previewTitle').innerHTML = `<i class="fa-solid fa-desktop"></i> Live Preview: <span style="color:#fff;">${fileName}</span> <small>(by ${creator})</small>`;
+      const iframe = document.getElementById('previewFrame');
+      const doc = iframe.contentDocument || iframe.contentWindow.document;
+
+      doc.open();
+      if (ext === 'html') {
+        doc.write(code);
+      } else if (ext === 'css') {
+        doc.write(`<style>${code}</style><h2 style="font-family:sans-serif; padding:20px;">CSS Preview Applied</h2>`);
+      } else if (ext === 'js') {
+        doc.write(`<script>${code}<\/script><h2 style="font-family:sans-serif; padding:20px;">JavaScript Executed</h2>`);
+      } else if (ext === 'json') {
+        doc.write(`<pre style="font-family:monospace; padding:20px;">${code}</pre>`);
+      }
+      doc.close();
+    }
+
+    window.addEventListener('hashchange', () => {
+      if (window.location.hash.includes('?file=')) {
+        document.body.classList.add('fullscreen-mode');
+        parseURLAndLoadProject();
+      }
+    });
+  </script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"e3c1c9af36de41759418005494a48906","r":1,"spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>

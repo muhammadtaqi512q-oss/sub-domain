@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>IRIS — Created by Muhammad Taqi</title>
+<link rel="icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmr0hV3s2HmcHs4061jVxiWxtde4ZkU6WIPJZxFfbfBg&amp;s=10" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: #07050f;
+    color: #fff;
+    font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* ---------- Animated background blobs ---------- */
+  .bg-blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(95px);
+    opacity: .55;
+    z-index: 0;
+    pointer-events: none;
+    animation: float 16s ease-in-out infinite;
+  }
+  .b1 { width: 430px; height: 430px; background: #7c3aed; top: -130px; left: -110px; }
+  .b2 { width: 380px; height: 380px; background: #0ea5e9; bottom: -140px; right: -100px; animation-delay: -5s; }
+  .b3 { width: 320px; height: 320px; background: #ec4899; top: 48%; left: 58%; animation-delay: -9s; }
+
+  @keyframes float {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    50%      { transform: translate3d(34px, -42px, 0) scale(1.12); }
+  }
+
+  /* ---------- Card ---------- */
+  .card {
+    position: relative;
+    z-index: 1;
+    width: min(560px, 100%);
+    padding: 42px 30px 34px;
+    text-align: center;
+    border-radius: 28px;
+    background: rgba(255, 255, 255, .05);
+    border: 1px solid rgba(255, 255, 255, .12);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, .65),
+                inset 0 1px 0 rgba(255, 255, 255, .16);
+    animation: pop .6s cubic-bezier(.2, .9, .3, 1.3) both;
+  }
+
+  @keyframes pop {
+    from { opacity: 0; transform: translateY(24px) scale(.96); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  /* ---------- Icon ---------- */
+  .icon-wrap {
+    position: relative;
+    width: 122px;
+    height: 122px;
+    margin: 0 auto 24px;
+  }
+  .icon-wrap::before {
+    content: "";
+    position: absolute;
+    inset: -7px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, #a855f7, #38bdf8, #f472b6, #a855f7);
+    filter: blur(3px);
+    animation: spin 7s linear infinite;
+  }
+  .icon {
+    position: relative;
+    width: 122px;
+    height: 122px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #0d0a1a;
+    background: #1a1130;
+    display: block;
+  }
+  .icon-wrap.no-img::after {
+    content: "IRIS";
+    position: absolute;
+    inset: 4px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7c3aed, #0ea5e9);
+    font-weight: 800;
+    letter-spacing: 2px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ---------- Texts ---------- */
+  .title {
+    font-size: 46px;
+    font-weight: 800;
+    letter-spacing: 6px;
+    line-height: 1;
+    background: linear-gradient(100deg, #c084fc, #60a5fa, #f472b6);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 6px 24px rgba(139, 92, 246, .45));
+  }
+
+  .by {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #a9a3c2;
+    letter-spacing: .4px;
+  }
+  .by span {
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .desc {
+    margin: 20px auto 26px;
+    max-width: 420px;
+    font-size: 15px;
+    line-height: 1.65;
+    color: #d8d4ea;
+  }
+  .desc .small {
+    display: block;
+    margin-top: 6px;
+    font-size: 12.5px;
+    color: #8e88a8;
+  }
+
+  /* ---------- Live URL area ---------- */
+  .live-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 2.2px;
+    text-transform: uppercase;
+    color: #8e88a8;
+  }
+  .live-label .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 10px #4ade80;
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse { 50% { opacity: .3; transform: scale(.8); } }
+
+  .main-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 17px 20px;
+    border: none;
+    border-radius: 16px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+    word-break: break-all;
+    line-height: 1.45;
+    text-align: center;
+    background: linear-gradient(135deg, #8b5cf6, #6366f1 48%, #0ea5e9);
+    box-shadow: 0 14px 32px rgba(99, 102, 241, .45),
+                inset 0 1px 0 rgba(255, 255, 255, .28);
+    transition: transform .16s ease, box-shadow .28s ease, filter .28s ease;
+  }
+  .main-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 44px rgba(99, 102, 241, .62),
+                inset 0 1px 0 rgba(255, 255, 255, .34);
+  }
+  .main-btn:active { transform: translateY(0) scale(.988); }
+  .main-btn:disabled { cursor: progress; filter: saturate(.7) brightness(.95); }
+  .main-btn.has-url {
+    background: linear-gradient(135deg, #16a34a, #0ea5e9 55%, #6366f1);
+    font-size: 13.5px;
+    font-weight: 600;
+    letter-spacing: .2px;
+  }
+
+  .spinner {
+    width: 18px;
+    height: 18px;
+    flex: none;
+    border: 2.5px solid rgba(255, 255, 255, .35);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+  }
+
+  /* ---------- Mini buttons ---------- */
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 12px;
+  }
+  .mini-btn {
+    flex: 1 1 0;
+    min-width: 110px;
+    padding: 11px 14px;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: #ddd8f0;
+    cursor: pointer;
+    background: rgba(255, 255, 255, .07);
+    border: 1px solid rgba(255, 255, 255, .14);
+    transition: background .2s, transform .15s, color .2s;
+  }
+  .mini-btn:hover {
+    background: rgba(255, 255, 255, .15);
+    color: #fff;
+    transform: translateY(-1px);
+  }
+  .mini-btn:active { transform: translateY(0) scale(.98); }
+
+  .status {
+    margin-top: 16px;
+    min-height: 17px;
+    font-size: 12px;
+    color: #7d779a;
+    letter-spacing: .3px;
+  }
+
+  /* ---------- Toast ---------- */
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 28px;
+    transform: translate(-50%, 24px);
+    padding: 11px 20px;
+    border-radius: 12px;
+    background: rgba(20, 16, 36, .95);
+    border: 1px solid rgba(255, 255, 255, .16);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s, transform .25s;
+    z-index: 9;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 420px) {
+    .card { padding: 34px 20px 28px; border-radius: 22px; }
+    .title { font-size: 38px; letter-spacing: 5px; }
+    .icon-wrap, .icon { width: 100px; height: 100px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="bg-blob b1"></div>
+  <div class="bg-blob b2"></div>
+  <div class="bg-blob b3"></div>
+
+  <main class="card">
+    <div class="icon-wrap">
+      <img
+        class="icon"
+        alt="IRIS icon"
+        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmr0hV3s2HmcHs4061jVxiWxtde4ZkU6WIPJZxFfbfBg&s=10"
+        onerror="this.remove(); this.closest('.icon-wrap').classList.add('no-img');"
+      >
+    </div>
+
+    <h1 class="title">IRIS</h1>
+    <p class="by">Created by <span>MUHAMMAD TAQI</span></p>
+
+    <p class="desc">
+      Check all software and give likes.
+      <span class="small">The most-liked software automatically rises to the top of the list.</span>
+    </p>
+
+    <div class="live-label"><span class="dot"></span> Live URL</div>
+
+    <button id="mainBtn" class="main-btn" type="button">
+      <span class="btn-ic">🚀</span>
+      <span id="btnText">Get Live URL</span>
+    </button>
+
+    <div class="actions" id="actions" hidden>
+      <button class="mini-btn" id="openBtn" type="button">Open ↗</button>
+      <button class="mini-btn" id="copyBtn" type="button">Copy ⧉</button>
+      <button class="mini-btn" id="refreshBtn" type="button">Refresh ⟳</button>
+    </div>
+
+    <p class="status" id="status"></p>
+  </main>
+
+  <div class="toast" id="toast">Copied!</div>
+
+<script>
+  /* ================== CONFIG ================== */
+  const README_URL =
+    "https://raw.githubusercontent.com/mustjabking/SIMPLILEARN/refs/heads/main/README.md";
+
+  /* ================== ELEMENTS ================== */
+  const mainBtn  = document.getElementById("mainBtn");
+  const btnText  = document.getElementById("btnText");
+  const btnIc    = document.querySelector(".btn-ic");
+  const actions  = document.getElementById("actions");
+  const statusEl = document.getElementById("status");
+  const openBtn  = document.getElementById("openBtn");
+  const copyBtn  = document.getElementById("copyBtn");
+  const refreshBtn = document.getElementById("refreshBtn");
+  const toast    = document.getElementById("toast");
+
+  let currentUrl = null;
+  let busy = false;
+
+  /* ================== FETCH + PARSE ================== */
+  async function getLiveUrl() {
+    // cache-bust: har click par fresh README (link har 10 min mein badalta hai)
+    const res = await fetch(README_URL + "?nocache=" + Date.now(), {
+      cache: "no-store",
+      headers: { "Accept": "text/plain" }
+    });
+
+    if (!res.ok) throw new Error("Fetch failed (HTTP " + res.status + ")");
+
+    const text = await res.text();
+    const urls = text.match(/https?:\/\/[^\s`'"<>)\]]+/g) || [];
+
+    // pehle trycloudflare link dhoondo, warna koi bhi pehla link
+    return urls.find(u => /trycloudflare\.com/i.test(u)) || urls[0] || null;
+  }
+
+  /* ================== UI STATES ================== */
+  function showLoading() {
+    mainBtn.disabled = true;
+    mainBtn.classList.remove("has-url");
+    btnIc.innerHTML = '<span class="spinner"></span>';
+    btnText.textContent = "Fetching live URL...";
+    statusEl.textContent = "";
+  }
+
+  function showUrl(url) {
+    currentUrl = url;
+    mainBtn.disabled = false;
+    mainBtn.classList.add("has-url");
+    btnIc.textContent = "🌐";
+    btnText.textContent = url;
+    actions.hidden = false;
+    statusEl.textContent =
+      "Updated: " + new Date().toLocaleTimeString() + " — tap button again to open";
+  }
+
+  function showError(msg) {
+    currentUrl = null;
+    mainBtn.disabled = false;
+    mainBtn.classList.remove("has-url");
+    btnIc.textContent = "⚠️";
+    btnText.textContent = "Failed — tap to retry";
+    actions.hidden = true;
+    statusEl.textContent = msg;
+  }
+
+  /* ================== LOADER ================== */
+  async function loadUrl() {
+    if (busy) return false;
+    busy = true;
+    showLoading();
+
+    try {
+      const url = await getLiveUrl();
+      if (!url) throw new Error("No live URL found in README");
+      showUrl(url);
+      return true;
+    } catch (err) {
+      showError(err.message || "Something went wrong");
+      return false;
+    } finally {
+      busy = false;
+    }
+  }
+
+  /* ================== EVENTS ================== */
+  // Har click par fresh fetch. Agar pehle se link mojood hai to
+  // fresh fetch ke baad naya tab bhi khul jayega.
+  mainBtn.addEventListener("click", async () => {
+    const wasReady = !!currentUrl;
+    const ok = await loadUrl();
+    if (ok && wasReady && currentUrl) {
+      window.open(currentUrl, "_blank", "noopener");
+    }
+  });
+
+  openBtn.addEventListener("click", () => {
+    if (currentUrl) window.open(currentUrl, "_blank", "noopener");
+  });
+
+  refreshBtn.addEventListener("click", async () => {
+    await loadUrl();
+  });
+
+  copyBtn.addEventListener("click", async () => {
+    if (!currentUrl) return;
+    try {
+      await navigator.clipboard.writeText(currentUrl);
+      showToast("Link copied!");
+    } catch {
+      showToast("Copy failed");
+    }
+  });
+
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add("show");
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => toast.classList.remove("show"), 1600);
+  }
+
+  /* ================== AUTO LOAD ON ENTER ================== */
+  window.addEventListener("load", () => {
+    // page khulte hi ek dafa link le aao (optional)
+    loadUrl();
+  });
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"e3c1c9af36de41759418005494a48906","r":1,"spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>
