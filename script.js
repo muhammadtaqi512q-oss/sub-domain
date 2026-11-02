@@ -535,6 +535,14 @@
             <p>NOVA LANGUAGE CREATED BY MUHAMMAD TAQI VERY SIMPLE AND MODREN</p>
             <span class="card-link">View DETAIL →</span>
           </a>
+
+           <a class="card c-owner" href="https://muhammadtaqi512q-oss.github.io/we/lyra">
+            <div class="card-icon">🦁</div>
+            <h3>LYRA SOFTWARE BUILDER Creator — Muhammad Taqi</h3>
+            <p>CREATE YOUR OWN WEB BUILDER IN SECOND USING LYRA SOFTWARE BUILDER</p>
+            <span class="card-link">View DETAIL →</span>
+          </a>
+          
         </div>
       </div>
     </section>
