@@ -446,6 +446,7 @@
           <a href="#tools">AI Builder</a>
           <a href="owner.html">Owner</a>
           <a class="nav-cta" href="https://muhammadtaqi512q-oss.github.io/we/" target="_blank" rel="noopener">Launch App</a>
+          <a class="nav-cta" href="https://avelia.duckdns.org/donate" target="_blank" rel="noopener">DONATE</a>
         </nav>
       </div>
     </header>
