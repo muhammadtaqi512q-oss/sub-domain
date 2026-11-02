@@ -475,61 +475,61 @@
         </div>
 
         <div class="grid">
-          <a class="card c-iris" href="iris">
+          <a class="card c-iris" href="https://avelia.duckdns.org/iris">
             <div class="card-icon">🔍</div>
             <h3>Compare Softwares</h3>
             <p>Compare top AI and software tools side by side — features, speed, pricing and more in one clean view.</p>
             <span class="card-link">Open Iris →</span>
           </a>
 
-          <a class="card c-game" href="gamebuilder">
+          <a class="card c-game" href="https://avelia.duckdns.org/gamebuilder">
             <div class="card-icon">🎮</div>
             <h3>Game Builder</h3>
             <p>Create your own browser games in minutes. Drag, drop, customise and play — no coding needed.</p>
             <span class="card-link">Open Game Builder →</span>
           </a>
 
-          <a class="card c-ai" href="aibuilder">
+          <a class="card c-ai" href="https://avelia.duckdns.org/aibuilder">
             <div class="card-icon">🤖</div>
             <h3>AI Builder — Download Your AI In Seconds</h3>
             <p>Design your own ChatGPT-style assistant, train it on your content and download it ready to use.</p>
             <span class="card-link">Open AI Builder →</span>
           </a>
 
-          <a class="card c-web" href="webbuilder">
+          <a class="card c-web" href="https://avelia.duckdns.org/webbuilder">
             <div class="card-icon">🌐</div>
             <h3>Web Builder — Create Your Own Web In Seconds</h3>
             <p>Build a professional website from scratch with ready-made sections and instant live preview.</p>
             <span class="card-link">Open Web Builder →</span>
           </a>
 
-          <a class="card c-cloud" href="cloud">
+          <a class="card c-cloud" href="https://avelia.duckdns.org/cloud">
             <div class="card-icon">☁️</div>
             <h3>Cloud — Publish Your Web In Seconds</h3>
             <p>Deploy your AI and websites to the cloud with one click and get a live shareable link instantly.</p>
             <span class="card-link">Open Cloud →</span>
           </a>
 
-          <a class="card c-owner" href="owner">
+          <a class="card c-owner" href="https://avelia.duckdns.org/owner">
             <div class="card-icon">👑</div>
             <h3>Owner &amp; Creator — Muhammad Taqi</h3>
             <p>Meet the mind behind AVELIA. Learn about the creator, the vision and how to get in touch.</p>
             <span class="card-link">View Owner →</span>
           </a>
 
-          <a class="card c-owner" href="detail">
+          <a class="card c-owner" href="https://avelia.duckdns.org/detail">
             <div class="card-icon">👑</div>
             <h3>DETAILS OF AVELIA &amp; Creator — Muhammad Taqi</h3>
             <p>Meet the mind behind AVELIA. Learn about the creator, the vision and how to get in touch.</p>
             <span class="card-link">View DETAIL →</span>
           </a>
-          <a class="card c-owner" href="death">
+          <a class="card c-owner" href="https://avelia.duckdns.org/death">
             <div class="card-icon">👑</div>
             <h3>DEATH LANGUAGE Creator — Muhammad Taqi</h3>
             <p>DEATH LANGUAGE CREATED BY MUHAMMAD TAQI VERY SIMPLE AND MODREN</p>
             <span class="card-link">View DETAIL →</span>
           </a>
-          <a class="card c-owner" href="nova">
+          <a class="card c-owner" href="https://avelia.duckdns.org/nova">
             <div class="card-icon">👑</div>
             <h3>NOVA LANGUAGE Creator — Muhammad Taqi</h3>
             <p>NOVA LANGUAGE CREATED BY MUHAMMAD TAQI VERY SIMPLE AND MODREN</p>
