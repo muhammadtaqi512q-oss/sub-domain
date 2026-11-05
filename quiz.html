@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MT KING - Pro Quiz Studio</title>
+    <style>
+        :root { --p: #2563eb; --bg: #f8fafc; --gemini: #8e75ff; }
+        body { font-family: sans-serif; margin: 0; background: var(--bg); display: flex; flex-direction: column; min-height: 100vh; }
+        header { background: #1e293b; color: white; padding: 1rem; text-align: center; }
+        .main-layout { display: flex; flex: 1; overflow: hidden; height: 85vh; }
+        .editor-sidebar { width: 380px; background: white; border-right: 1px solid #ddd; padding: 20px; overflow-y: auto; }
+        .control-group { margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.85rem; color: #444; }
+        input, button { width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        .preview-area { flex: 1; padding: 20px; display: flex; flex-direction: column; background: #e2e8f0; }
+        #preview-frame { flex: 1; background: white; border: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .gemini-btn { background: var(--gemini); color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .gemini-btn:hover { background: #7c62e6; transform: scale(1.02); }
+        .download-btn { background: #059669; color: white; font-weight: bold; border: none; padding: 15px; cursor: pointer; margin-top: 10px; }
+        footer { background: #1e293b; color: white; text-align: center; padding: 15px; font-weight: bold; }
+        #q-list { max-height: 200px; overflow-y: auto; background: #f1f5f9; padding: 10px; border-radius: 6px; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+<header><h1>MT KING Quiz Studio</h1></header>
+
+<div class="main-layout">
+    <div class="editor-sidebar">
+        <div class="control-group">
+            <label>Game Title</label>
+            <input type="text" id="game-title" value="MT KING Challenge" oninput="updatePreview()">
+            <label>Theme Color</label>
+            <input type="color" id="game-color" value="#2563eb" oninput="updatePreview()">
+        </div>
+
+        <div class="control-group">
+            <label>AI Automation</label>
+            <button class="gemini-btn" onclick="generate100Stages()">✨ Help with Gemini (50 Math + 50 Eng)</button>
+        </div>
+
+        <div class="control-group">
+            <label>Add Question Manually</label>
+            <input type="text" id="manual-q" placeholder="Enter Question">
+            <input type="text" id="manual-a" placeholder="Option1, Option2, Option3">
+            <input type="number" id="manual-correct" placeholder="Correct Index (0, 1, or 2)">
+            <button onclick="addManual()" style="background:#1e293b; color:white;">Add Question</button>
+        </div>
+
+        <label>Total Stages: <span id="count">0</span></label>
+        <div id="q-list">No questions added yet.</div>
+        
+        <button class="download-btn" onclick="downloadGame()">Download Full App</button>
+    </div>
+
+    <div class="preview-area">
+        <h3 style="margin-top:0;">Live Preview</h3>
+        <iframe id="preview-frame"></iframe>
+    </div>
+</div>
+
+<footer>MT KING</footer>
+
+<script>
+    let questions = [];
+
+    const engBank = [
+        {q: "Which is a noun?", a: ["Run", "Happiness", "Quickly"], c: 1},
+        {q: "Plural of 'Mouse'?", a: ["Mouses", "Mice", "Mices"], c: 1},
+        {q: "Correct spelling?", a: ["Calender", "Calendar", "Colander"], c: 1},
+        {q: "Opposite of 'Huge'?", a: ["Tiny", "Large", "Wide"], c: 0},
+        {q: "Past tense of 'Speak'?", a: ["Speaked", "Spoke", "Spoken"], c: 1},
+        {q: "She ___ to the store.", a: ["go", "goes", "going"], c: 1},
+        {q: "Which is an adjective?", a: ["Beautiful", "Beauty", "Beautify"], c: 0},
+        {q: "I ___ finished my work.", a: ["has", "have", "am"], c: 1},
+        {q: "Opposite of 'Win'?", a: ["Lose", "Loose", "Lost"], c: 0},
+        {q: "A person who cooks is a...", a: ["Cooker", "Chef", "Baker"], c: 1},
+        {q: "They ___ playing football.", a: ["is", "am", "are"], c: 2},
+        {q: "Which is a pronoun?", a: ["John", "He", "Running"], c: 1},
+        {q: "Synonym of 'Fast'?", a: ["Slow", "Quick", "Lazy"], c: 1},
+        {q: "It's ___ apple.", a: ["a", "an", "the"], c: 1},
+        {q: "I live ___ London.", a: ["on", "at", "in"], c: 2},
+        {q: "The sun ___ in the East.", a: ["rise", "rises", "rising"], c: 1},
+        {q: "Plural of 'Tooth'?", a: ["Tooths", "Teeth", "Teeths"], c: 1},
+        {q: "Which is a verb?", a: ["Table", "Dance", "Quiet"], c: 1},
+        {q: "Yesterday, I ___ a bird.", a: ["see", "saw", "seen"], c: 1},
+        {q: "Opposite of 'Dark'?", a: ["Bright", "Night", "Black"], c: 0},
+        {q: "The cat is ___ the mat.", a: ["on", "in", "under"], c: 0},
+        {q: "Comparative of 'Good'?", a: ["Gooder", "Best", "Better"], c: 2},
+        {q: "Which is a fruit?", a: ["Carrot", "Mango", "Potato"], c: 1},
+        {q: "A ___ of wolves.", a: ["Herd", "Pack", "Flock"], c: 1},
+        {q: "Do you like ___ coffee?", a: ["a", "an", "some"], c: 2},
+        {q: "Superlative of 'Tall'?", a: ["Taller", "Tallest", "Most Tall"], c: 1},
+        {q: "___ you speak English?", a: ["Does", "Do", "Is"], c: 1},
+        {q: "Synonym of 'Smart'?", a: ["Intelligent", "Stupid", "Brave"], c: 0},
+        {q: "A doctor works in a...", a: ["School", "Hospital", "Office"], c: 1},
+        {q: "He is afraid ___ dogs.", a: ["of", "at", "with"], c: 0},
+        {q: "Which is a conjunction?", a: ["But", "Fast", "Apple"], c: 0},
+        {q: "I have ___ money.", a: ["any", "many", "some"], c: 2},
+        {q: "Plural of 'Knife'?", a: ["Knifes", "Knive", "Knives"], c: 2},
+        {q: "Opposite of 'Old'?", a: ["New", "Ancient", "Dirty"], c: 0},
+        {q: "She is the ___ girl in class.", a: ["smart", "smarter", "smartest"], c: 2},
+        {q: "We ___ watching TV now.", a: ["am", "are", "is"], c: 1},
+        {q: "What is the capital of UK?", a: ["Paris", "London", "Berlin"], c: 1},
+        {q: "A baby cat is called a...", a: ["Puppy", "Kitten", "Cub"], c: 1},
+        {q: "Choose the verb:", a: ["Sing", "Song", "Singer"], c: 0},
+        {q: "Opposite of 'Early'?", a: ["Soon", "Late", "Fast"], c: 1},
+        {q: "Which is a day?", a: ["January", "Monday", "Winter"], c: 1},
+        {q: "I ___ a new car last week.", a: ["buy", "buys", "bought"], c: 2},
+        {q: "He writes ___ a pen.", a: ["with", "by", "in"], c: 0},
+        {q: "Which is a liquid?", a: ["Rock", "Water", "Air"], c: 1},
+        {q: "Antonym of 'Rich'?", a: ["Poor", "Wealthy", "Gold"], c: 0},
+        {q: "The ___ are flying.", a: ["Bird", "Birds", "Birdes"], c: 1},
+        {q: "Listen ___ the music.", a: ["to", "at", "on"], c: 0},
+        {q: "Which is a color?", a: ["Table", "Purple", "Happy"], c: 1},
+        {q: "Opposite of 'Hard'?", a: ["Soft", "Difficult", "Strong"], c: 0},
+        {q: "I am interested ___ Art.", a: ["on", "in", "at"], c: 1}
+    ];
+
+    function generate100Stages() {
+        let aiQ = [];
+        for(let i=1; i<=50; i++) {
+            let n1 = Math.floor(Math.random()*100);
+            let n2 = Math.floor(Math.random()*100);
+            let ans = n1 + n2;
+            let opts = [ans, ans+5, ans-3].sort(() => Math.random() - 0.5);
+            aiQ.push({type: 'Math', q: `What is ${n1} + ${n2}?`, a: opts, correct: opts.indexOf(ans)});
+        }
+        engBank.forEach((item) => {
+            aiQ.push({type: 'English', q: item.q, a: item.a, correct: item.c});
+        });
+        questions = aiQ;
+        updatePreview();
+        renderList();
+    }
+
+    function addManual() {
+        const q = document.getElementById('manual-q').value;
+        const a = document.getElementById('manual-a').value.split(',').map(x => x.trim());
+        const c = parseInt(document.getElementById('manual-correct').value);
+        if(q && a.length > 0) {
+            questions.push({type: 'Custom', q, a, correct: c});
+            updatePreview();
+            renderList();
+        }
+    }
+
+    function renderList() {
+        document.getElementById('count').innerText = questions.length;
+        document.getElementById('q-list').innerHTML = questions.map((x, i) => `<div>${i+1}. ${x.q}</div>`).join('');
+    }
+
+    function generateHTML() {
+        const title = document.getElementById('game-title').value;
+        const color = document.getElementById('game-color').value;
+        const dataStr = JSON.stringify(questions.length ? questions : [{q:"Add questions to start!", a:["OK"], correct:0}]);
+        
+        return `<html><head><style>
+            body { font-family: sans-serif; text-align: center; background: #f8fafc; margin:0; }
+            .header { background: ${color}; color: white; padding: 20px; }
+            .card { background: white; padding: 30px; border-radius: 15px; max-width: 400px; margin: 40px auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+            button { display: block; width: 100%; margin: 10px 0; padding: 15px; border: 2px solid #eee; border-radius: 10px; cursor: pointer; background: white; font-size: 1rem; transition: 0.2s; }
+            button:hover { border-color: ${color}; background: #f0f7ff; }
+            .lose-screen h1 { color: #dc2626; margin-top: 0; }
+            .retry-btn { background: ${color}; color: white !important; font-weight: bold; border: none; }
+        </style></head><body>
+            <div id="game-container">
+                <div class="header"><h1>${title}</h1><p id="stat"></p></div>
+                <div class="card" id="quiz-card">
+                    <h2 id="q"></h2>
+                    <div id="btns"></div>
+                </div>
+            </div>
+            <script>
+                const data = ${dataStr};
+                let idx = 0, score = 0;
+
+                function show() {
+                    const card = document.getElementById('quiz-card');
+                    if(idx >= data.length) { 
+                        card.innerHTML = "<h1>🏆 Victory!</h1><p>Final Score: " + score + "</p><button class='retry-btn' onclick='location.reload()'>Play Again</button>"; 
+                        return; 
+                    }
+                    document.getElementById('stat').innerText = "Level " + (idx+1) + " / " + data.length;
+                    document.getElementById('q').innerText = data[idx].q;
+                    const b = document.getElementById('btns'); b.innerHTML = "";
+                    data[idx].a.forEach((opt, i) => {
+                        const btn = document.createElement('button');
+                        btn.innerText = opt;
+                        btn.onclick = () => { 
+                            if(i === data[idx].correct) {
+                                score++; idx++; show();
+                            } else {
+                                showLose();
+                            }
+                        };
+                        b.appendChild(btn);
+                    });
+                }
+
+                function showLose() {
+                    const card = document.getElementById('quiz-card');
+                    card.innerHTML = \`
+                        <div class="lose-screen">
+                            <h1>❌ LOSE</h1>
+                            <p>Wrong Answer! Try again to continue.</p>
+                            <button class="retry-btn" onclick="retry()">Try Stage Again</button>
+                            <button onclick="location.reload()">Restart from Beginning</button>
+                        </div>\`;
+                }
+
+                function retry() {
+                    document.getElementById('quiz-card').innerHTML = '<h2 id="q"></h2><div id="btns"></div>';
+                    show();
+                }
+                show();
+            <\/script></body></html>`;
+    }
+
+    function updatePreview() { document.getElementById('preview-frame').srcdoc = generateHTML(); }
+    function downloadGame() {
+        const blob = new Blob([generateHTML()], {type: 'text/html'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'MT_KING_Quiz.html';
+        a.click();
+    }
+    updatePreview();
+</script>
+</body>
+</html>
