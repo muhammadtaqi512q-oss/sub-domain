@@ -497,6 +497,13 @@
             <span class="card-link">Open Game Builder →</span>
           </a>
 
+           <a class="card c-game" href="https://avelia.duckdns.org/quiz">
+            <div class="card-icon">🎮</div>
+            <h3>Quiz Game Builder pro</h3>
+            <p>Create your own browser games in minutes. Drag, drop, customise and play — no coding needed.</p>
+            <span class="card-link">Open Game Builder →</span>
+          </a>
+
           <a class="card c-ai" href="https://avelia.duckdns.org/aibuilder">
             <div class="card-icon">🤖</div>
             <h3>AI Builder — Download Your AI In Seconds</h3>
