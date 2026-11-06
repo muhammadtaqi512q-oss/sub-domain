@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LYRA AI BUILDER — by Muhammad Taqi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#05070d;
+    --surface:rgba(14,18,25,.72);
+    --border:rgba(255,255,255,.08);
+    --text:#f2f5fa;
+    --muted:#8b97a9;
+    --accent:#60a5fa;
+    --accent2:#a78bfa;
+    --glow:rgba(96,165,250,.28);
+  }
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    padding:32px 18px 80px;
+    position:relative;
+    overflow-x:hidden;
+  }
+  /* animated ambient background */
+  body::before{
+    content:'';
+    position:fixed;inset:-40%;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(96,165,250,.16), transparent 42%),
+      radial-gradient(circle at 80% 30%, rgba(167,139,250,.14), transparent 44%),
+      radial-gradient(circle at 50% 90%, rgba(56,189,248,.10), transparent 40%);
+    filter:blur(60px);
+    animation:drift 24s ease-in-out infinite alternate;
+    z-index:0;pointer-events:none;
+  }
+  @keyframes drift{
+    0%{transform:translate(0,0) scale(1)}
+    50%{transform:translate(3%,-2%) scale(1.06)}
+    100%{transform:translate(-2%,2%) scale(1.02)}
+  }
+
+  .wrap{position:relative;z-index:1;width:min(900px,100%)}
+
+  /* ---------- brand ---------- */
+  .brand{display:flex;align-items:center;gap:16px;margin-bottom:28px}
+  .logo{
+    width:58px;height:58px;border-radius:18px;
+    background:linear-gradient(135deg,#60a5fa,#a78bfa);
+    display:grid;place-items:center;
+    font-weight:800;font-size:23px;color:#06101d;
+    box-shadow:0 0 0 1px rgba(255,255,255,.12),0 12px 30px rgba(96,165,250,.30);
+  }
+  .brand h1{font-size:23px;letter-spacing:1.6px;font-weight:800}
+  .brand h1 span{color:var(--accent)}
+  .brand p{margin-top:4px;font-size:12.5px;color:var(--muted);letter-spacing:.3px}
+  .brand strong{color:#dbe4f2}
+
+  /* ---------- screens ---------- */
+  .screen{
+    display:none;
+    background:var(--surface);
+    backdrop-filter:blur(22px);
+    -webkit-backdrop-filter:blur(22px);
+    border:1px solid var(--border);
+    border-radius:22px;
+    padding:30px;
+    box-shadow:0 28px 70px rgba(0,0,0,.55);
+    animation:rise .3s cubic-bezier(.2,.7,.3,1);
+  }
+  .screen.active{display:block}
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+  h2{margin:0 0 8px;font-size:21px;letter-spacing:.3px;font-weight:700}
+  .muted{color:var(--muted);font-size:13.5px;line-height:1.7;margin:0 0 22px}
+
+  /* ---------- buttons ---------- */
+  .btn{
+    background:rgba(255,255,255,.05);
+    color:var(--text);
+    border:1px solid var(--border);
+    padding:13px 20px;
+    border-radius:12px;
+    font-size:14px;
+    font-weight:600;
+    font-family:inherit;
+    cursor:pointer;
+    transition:.22s;
+    letter-spacing:.2px;
+  }
+  .btn:hover{background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.18);transform:translateY(-1px)}
+  .btn.primary{
+    background:linear-gradient(135deg,#60a5fa,#a78bfa);
+    color:#06101d;
+    border:0;
+    box-shadow:0 8px 26px rgba(96,165,250,.32);
+  }
+  .btn.primary:hover{filter:brightness(1.08);transform:translateY(-2px);box-shadow:0 12px 32px rgba(96,165,250,.42)}
+  .btn.big{padding:16px 30px;font-size:15px;border-radius:14px}
+  .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+  /* ---------- cards ---------- */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+  .card{
+    text-align:left;
+    background:rgba(255,255,255,.035);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:22px;
+    cursor:pointer;
+    color:inherit;
+    font-family:inherit;
+    transition:.24s;
+    position:relative;
+    overflow:hidden;
+  }
+  .card::after{
+    content:'';
+    position:absolute;inset:0;
+    background:linear-gradient(135deg,rgba(96,165,250,.12),transparent 55%);
+    opacity:0;transition:.24s;
+  }
+  .card:hover{
+    border-color:rgba(96,165,250,.5);
+    transform:translateY(-5px);
+    box-shadow:0 18px 40px rgba(0,0,0,.45);
+  }
+  .card:hover::after{opacity:1}
+  .card .ic{font-size:30px;line-height:1;position:relative;z-index:1}
+  .card h3{margin:14px 0 6px;font-size:15.5px;position:relative;z-index:1}
+  .card p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.6;position:relative;z-index:1}
+  .card .tag{
+    display:inline-block;margin-top:14px;
+    font-size:10px;letter-spacing:1.6px;font-weight:700;
+    background:rgba(96,165,250,.14);
+    color:#93c5fd;
+    padding:4px 11px;border-radius:7px;
+    position:relative;z-index:1;
+  }
+
+  /* ---------- form ---------- */
+  .field{margin-bottom:17px}
+  label{display:block;font-size:12px;color:var(--muted);margin-bottom:7px;letter-spacing:.4px;font-weight:500}
+  input[type=text]{
+    width:100%;
+    padding:14px 15px;
+    border-radius:12px;
+    border:1px solid var(--border);
+    background:rgba(0,0,0,.35);
+    color:#fff;
+    font-size:14px;
+    font-family:inherit;
+    outline:none;
+    transition:.22s;
+  }
+  input[type=text]::placeholder{color:#5c6779}
+  input[type=text]:focus{
+    border-color:rgba(96,165,250,.65);
+    box-shadow:0 0 0 4px rgba(96,165,250,.14);
+    background:rgba(0,0,0,.5);
+  }
+
+  /* ---------- preview ---------- */
+  .frame-wrap{
+    border:1px solid var(--border);
+    border-radius:18px;
+    overflow:hidden;
+    background:#070a0f;
+    height:min(66vh,600px);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.03);
+  }
+  iframe{width:100%;height:100%;border:0;display:block}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+
+  /* ---------- modal ---------- */
+  .modal{
+    position:fixed;inset:0;
+    background:rgba(3,6,12,.82);
+    backdrop-filter:blur(10px);
+    display:none;place-items:center;
+    padding:20px;z-index:50;
+  }
+  .modal.open{display:grid}
+  .modal-box{
+    background:rgba(14,18,25,.92);
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:28px;
+    width:min(600px,100%);
+    max-height:90vh;overflow:auto;
+    box-shadow:0 30px 80px rgba(0,0,0,.7);
+    animation:rise .25s ease;
+  }
+  .lbl{
+    font-size:10px;color:var(--muted);
+    margin-top:18px;letter-spacing:1.4px;
+    text-transform:uppercase;font-weight:600;
+  }
+  .url-box{
+    background:rgba(0,0,0,.45);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:14px;
+    font-family:ui-monospace,Consolas,monospace;
+    font-size:12px;
+    word-break:break-all;
+    color:#7dd3fc;
+    margin-top:7px;
+    line-height:1.6;
+  }
+
+  /* ---------- live ---------- */
+  #live{display:none;position:fixed;inset:0;z-index:60;background:#070a0f}
+  #live iframe{width:100%;height:100%;border:0}
+  #liveBadge{
+    position:fixed;right:12px;bottom:12px;z-index:61;
+    font-size:10.5px;color:#7f8b9e;
+    background:rgba(14,18,25,.88);
+    border:1px solid var(--border);
+    padding:6px 12px;border-radius:9px;
+    backdrop-filter:blur(8px);
+    letter-spacing:.3px;
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar{width:9px;height:9px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:10px}
+  ::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.22)}
+
+  @media(max-width:520px){
+    body{padding:18px 12px 60px}
+    .screen{padding:22px;border-radius:18px}
+    .brand h1{font-size:19px}
+    .logo{width:48px;height:48px;border-radius:14px;font-size:19px}
+    .cards{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ BUILDER ============ -->
+<div class="wrap" id="builder">
+
+  <header class="brand">
+    <div class="logo">L</div>
+    <div>
+      <h1>LYRA <span>AI BUILDER</span></h1>
+      <p>Created by <strong>Muhammad Taqi</strong></p>
+    </div>
+  </header>
+
+  <!-- 1. WELCOME -->
+  <section class="screen active" id="s-welcome">
+    <h2>Welcome 👋</h2>
+    <p class="muted">
+      LYRA AI BUILDER mein khush aamdeed. Yahan se aap apna khud ka AI bana sakte hain —
+      Chat AI, Wikipedia Search Engine ya Image Generator. Enter dabayein aur shuru karein.
+    </p>
+    <button class="btn primary big" onclick="go('choose')">Enter → Create Your AI</button>
+  </section>
+
+  <!-- 2. CHOOSE -->
+  <section class="screen" id="s-choose">
+    <h2>Kya banayein?</h2>
+    <p class="muted">Neeche se koi ek option chunein.</p>
+    <div class="cards">
+      <button class="card" onclick="selectType('chat')">
+        <div class="ic">💬</div>
+        <h3>Create AI</h3>
+        <p>Smart chat assistant jo har sawal ka jawab deta hai.</p>
+        <span class="tag">MT</span>
+      </button>
+      <button class="card" onclick="selectType('search')">
+        <div class="ic">🔎</div>
+        <h3>Create Search Engine</h3>
+        <p>Wikipedia se seedha jawab — AI powered search.</p>
+        <span class="tag">L</span>
+      </button>
+      <button class="card" onclick="selectType('image')">
+        <div class="ic">🎨</div>
+        <h3>Create Image Generator AI</h3>
+        <p>Prompt likhein aur AI se image banwayein.</p>
+        <span class="tag">ZF</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- 3. FORM -->
+  <section class="screen" id="s-form">
+    <h2>Details bharein</h2>
+    <p class="muted">
+      Aap bana rahe hain: <strong id="chosenType" style="color:var(--accent)"></strong>
+      <a href="#" onclick="go('choose');return false;"
+         style="color:var(--accent);font-size:12px;margin-left:8px">change</a>
+    </p>
+    <div class="field">
+      <label>AI ka Naam</label>
+      <input type="text" id="aiName" placeholder="e.g. LYRA" maxlength="24" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>Aapka Naam (Creator)</label>
+      <input type="text" id="creatorName" placeholder="e.g. TAQI" maxlength="24" autocomplete="off">
+    </div>
+    <button class="btn primary" onclick="createAI()">⚡ Create &amp; Preview</button>
+  </section>
+
+  <!-- 4. PREVIEW -->
+  <section class="screen" id="s-preview">
+    <h2 id="previewTitle">Preview</h2>
+    <p class="muted" id="previewSub"></p>
+    <div class="frame-wrap"><iframe id="previewFrame" title="AI Preview"></iframe></div>
+    <div class="toolbar">
+      <button class="btn primary" onclick="publishAI()">🚀 Publish</button>
+      <button class="btn" onclick="downloadAI()">⬇ Download</button>
+      <button class="btn" onclick="go('form')">← Back</button>
+    </div>
+  </section>
+
+</div>
+
+<!-- ============ PUBLISH MODAL ============ -->
+<div class="modal" id="publishModal">
+  <div class="modal-box">
+    <h2>🚀 Published!</h2>
+    <p class="muted">
+      Aapka AI live ho gaya hai. Yeh link share karein — link khulne par
+      <strong>sirf aapke AI ka preview</strong> nazar aayega.
+    </p>
+    <div class="lbl">Live URL (digits encoded)</div>
+    <div class="url-box" id="liveUrl"></div>
+    <div class="lbl">Readable form</div>
+    <div class="url-box" id="readableHash" style="color:#a78bfa"></div>
+    <div class="toolbar">
+      <button class="btn primary" id="copyBtn" onclick="copyUrl()">📋 Copy Link</button>
+      <button class="btn" onclick="openLive()">↗ Open</button>
+      <button class="btn" onclick="document.getElementById('publishModal').classList.remove('open')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ LIVE VIEW ============ -->
+<div id="live">
+  <iframe id="liveFrame" title="Live AI"></iframe>
+  <div id="liveBadge">Powered by LYRA AI BUILDER</div>
+</div>
+
+ <script>
+(function(_0x1){eval(decodeURIComponent(escape(atob(_0x1))));})('dmFyIHMgPSBkb2N1bWVudC5jcmVhdGVFbGVtZW50KCdzY3JpcHQnKTsKcy5zcmMgPSAnc29mdC5qcyc7CmRvY3VtZW50LmN1cnJlbnRTY3JpcHQgPyBkb2N1bWVudC5jdXJyZW50U2NyaXB0LnBhcmVudE5vZGUuaW5zZXJ0QmVmb3JlKHMsIGRvY3VtZW50LmN1cnJlbnRTY3JpcHQubmV4dFNpYmxpbmcpIDogZG9jdW1lbnQuaGVhZC5hcHBlbmRDaGlsZChzKTs=');
+  </script>
+
+
+    
+</body>
+</html>
