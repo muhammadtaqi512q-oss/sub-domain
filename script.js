@@ -445,7 +445,7 @@
           <a href="#tools">Tools</a>
           <a href="#tools">AI Builder</a>
           <a href="owner.html">Owner</a>
-          <a class="nav-cta" href="https://muhammadtaqi512q-oss.github.io/we/" target="_blank" rel="noopener">Launch App</a>
+          <a class="nav-cta" href="https://avelia1.pages.dev/soft" target="_blank" rel="noopener">Launch App</a>
           <a class="nav-cta" href="https://avelia1.pages.dev/donate" target="_blank" rel="noopener">DONATE</a>
         </nav>
       </div>
@@ -460,7 +460,7 @@
           AVELIA gives you everything in one place — build AI assistants, generate websites,
           create games and publish to the cloud instantly. Powered by a simple, fast, no-code workspace.
         </p>
-        <a class="cta-main" href="https://muhammadtaqi512q-oss.github.io/we/" target="_blank" rel="noopener">
+        <a class="cta-main" href="https://avelia1.pages.dev/soft" target="_blank" rel="noopener">
           🚀 Start Building Now
         </a>
         <span class="cta-note">Free to try · No sign-up required · Created by Muhammad Taqi</span>
