@@ -483,26 +483,13 @@
             <span class="card-link">Open Iris →</span>
           </a>
 
-          <a class="card c-game" href="https://avelia1.pages.dev/gamebuilder">
+          <a class="card c-game" href="https://avelia1.pages.dev/lyra">
             <div class="card-icon">🎮</div>
-            <h3>Game Builder</h3>
-            <p>Create your own browser games in minutes. Drag, drop, customise and play — no coding needed.</p>
+            <h3>LYRA Game Builder 50+ GAMES</h3>
+            <p>Create your own 50+ games in minutes. Drag, drop, customise and play — no coding needed.</p>
             <span class="card-link">Open Game Builder →</span>
           </a>
 
-           <a class="card c-game" href="https://avelia1.pages.dev/game-studio">
-            <div class="card-icon">🎮</div>
-            <h3>QUIZ Game Builder</h3>
-            <p>Create your own browser games in minutes. Drag, drop, customise and play — no coding needed.</p>
-            <span class="card-link">Open Game Builder →</span>
-          </a>
-
-           <a class="card c-game" href="https://avelia1.pages.dev/quiz">
-            <div class="card-icon">🎮</div>
-            <h3>Quiz Game Builder pro</h3>
-            <p>Create your own browser games in minutes. Drag, drop, customise and play — no coding needed.</p>
-            <span class="card-link">Open Game Builder →</span>
-          </a>
 
           <a class="card c-ai" href="https://avelia1.pages.dev/aibuilder">
             <div class="card-icon">🤖</div>
