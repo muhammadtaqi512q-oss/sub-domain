@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LYRA GAME STUDIO — Create Your Own Game</title>
+  <meta name="description" content="Lyra Game Studio — Build 50+ games, create your own, and explore a universe of interactive experiences. Created by Muhammad Taqi.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================================
+       RESET & ROOT
+    ============================================================ */
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-void: #04040a;
+      --bg-deep: #080812;
+      --bg-card: rgba(14, 14, 28, 0.55);
+
+      --neon-cyan: #22d3ee;
+      --neon-violet: #a855f7;
+      --neon-magenta: #ec4899;
+      --neon-lime: #a3e635;
+
+      --text-bright: #f4f4ff;
+      --text-muted: #9d9db8;
+      --text-dim: #5e5e7a;
+
+      --border-glass: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(168, 85, 247, 0.35);
+
+      --font-display: 'Orbitron', sans-serif;
+      --font-heading: 'Space Grotesk', sans-serif;
+      --font-body: 'Inter', sans-serif;
+
+      --radius-card: 20px;
+      --radius-pill: 999px;
+      --transition-smooth: 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      background-color: var(--bg-void);
+      color: var(--text-bright);
+      font-family: var(--font-body);
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::selection {
+      background: var(--neon-violet);
+      color: #fff;
+    }
+
+    /* ============================================================
+       ANIMATED MESH GRADIENT BACKGROUND (fixed layer)
+    ============================================================ */
+    .mesh-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .mesh-bg::before,
+    .mesh-bg::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.55;
+      will-change: transform;
+    }
+
+    .mesh-bg::before {
+      width: 60vw;
+      height: 60vw;
+      max-width: 850px;
+      max-height: 850px;
+      top: -18%;
+      left: -12%;
+      background: radial-gradient(circle, var(--neon-violet) 0%, transparent 68%);
+      animation: driftA 18s ease-in-out infinite alternate;
+    }
+
+    .mesh-bg::after {
+      width: 55vw;
+      height: 55vw;
+      max-width: 800px;
+      max-height: 800px;
+      bottom: -20%;
+      right: -10%;
+      background: radial-gradient(circle, var(--neon-cyan) 0%, transparent 68%);
+      animation: driftB 22s ease-in-out infinite alternate;
+    }
+
+    .mesh-bg .blob-magenta {
+      position: absolute;
+      width: 40vw;
+      height: 40vw;
+      max-width: 600px;
+      max-height: 600px;
+      top: 38%;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--neon-magenta) 0%, transparent 70%);
+      filter: blur(140px);
+      opacity: 0.22;
+      animation: driftC 26s ease-in-out infinite alternate;
+    }
+
+    @keyframes driftA {
+      0%   { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(8%, 10%) scale(1.15); }
+    }
+    @keyframes driftB {
+      0%   { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(-10%, -8%) scale(1.12); }
+    }
+    @keyframes driftC {
+      0%   { transform: translateX(-50%) translateY(0) scale(1); }
+      100% { transform: translateX(-45%) translateY(-6%) scale(1.2); }
+    }
+
+    /* ============================================================
+       PARTICLE CANVAS
+    ============================================================ */
+    #particle-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    /* ============================================================
+       GLOBAL LAYOUT
+    ============================================================ */
+    .page-wrap {
+      position: relative;
+      z-index: 2;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 clamp(1.25rem, 4vw, 2.5rem);
+    }
+
+    section {
+      padding: clamp(4rem, 10vw, 8rem) 0;
+      position: relative;
+    }
+
+    /* ============================================================
+       SCROLL REVEAL
+    ============================================================ */
+    .reveal {
+      opacity: 0;
+      transform: translateY(36px);
+      transition: opacity 0.8s cubic-bezier(0.23, 1, 0.32, 1),
+                  transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.08s; }
+    .reveal-delay-2 { transition-delay: 0.16s; }
+    .reveal-delay-3 { transition-delay: 0.24s; }
+
+    /* ============================================================
+       NAVIGATION
+    ============================================================ */
+    .nav {
+      position: fixed;
+      top: 1.25rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(94%, 1180px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.65rem 1.25rem 0.65rem 0.75rem;
+      border-radius: var(--radius-pill);
+      background: rgba(8, 8, 20, 0.55);
+      border: 1px solid var(--border-glass);
+      backdrop-filter: blur(22px) saturate(160%);
+      -webkit-backdrop-filter: blur(22px) saturate(160%);
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      transition: background 0.4s ease, border-color 0.4s ease;
+    }
+
+    .nav.is-scrolled {
+      background: rgba(6, 6, 16, 0.82);
+      border-color: rgba(168, 85, 247, 0.2);
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      text-decoration: none;
+      color: var(--text-bright);
+      flex-shrink: 0;
+    }
+
+    .nav-brand img {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(168, 85, 247, 0.5);
+      box-shadow: 0 0 18px rgba(168, 85, 247, 0.4);
+    }
+
+    .nav-brand span {
+      font-family: var(--font-display);
+      font-size: 0.92rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-violet), var(--neon-magenta));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      white-space: nowrap;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-family: var(--font-heading);
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      padding: 0.5rem 0.9rem;
+      border-radius: var(--radius-pill);
+      transition: color 0.3s ease, background 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .nav-links a:hover,
+    .nav-links a:focus-visible {
+      color: var(--text-bright);
+      background: rgba(168, 85, 247, 0.12);
+      outline: none;
+    }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.6rem 1.3rem;
+      border-radius: var(--radius-pill);
+      background: linear-gradient(135deg, var(--neon-violet), var(--neon-cyan));
+      color: #fff !important;
+      font-family: var(--font-heading);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 0 22px rgba(168, 85, 247, 0.35);
+      white-space: nowrap;
+    }
+
+    .nav-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 34px rgba(168, 85, 247, 0.6);
+    }
+
+    .nav-cta svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.5;
+    }
+
+    .nav-toggle {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.4rem;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .nav-toggle span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--text-bright);
+      border-radius: 2px;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    /* ============================================================
+       HERO
+    ============================================================ */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding-top: 8rem;
+      padding-bottom: 4rem;
+      position: relative;
+    }
+
+    .hero-logo {
+      width: clamp(90px, 14vw, 140px);
+      height: clamp(90px, 14vw, 140px);
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid rgba(168, 85, 247, 0.6);
+      box-shadow:
+        0 0 30px rgba(168, 85, 247, 0.5),
+        0 0 70px rgba(34, 211, 238, 0.25),
+        inset 0 0 20px rgba(168, 85, 247, 0.2);
+      margin-bottom: 2rem;
+      animation: logoPulse 4s ease-in-out infinite;
+    }
+
+    @keyframes logoPulse {
+      0%, 100% { box-shadow: 0 0 30px rgba(168, 85, 247, 0.5), 0 0 70px rgba(34, 211, 238, 0.25); }
+      50%      { box-shadow: 0 0 50px rgba(168, 85, 247, 0.8), 0 0 110px rgba(34, 211, 238, 0.4); }
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 1rem;
+      border-radius: var(--radius-pill);
+      background: rgba(168, 85, 247, 0.1);
+      border: 1px solid rgba(168, 85, 247, 0.25);
+      font-family: var(--font-heading);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--neon-cyan);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--neon-cyan);
+      box-shadow: 0 0 10px var(--neon-cyan);
+      animation: dotBlink 1.8s ease-in-out infinite;
+    }
+
+    @keyframes dotBlink {
+      0%, 100% { opacity: 1; }
+      50%      { opacity: 0.3; }
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.6rem, 7.5vw, 6.2rem);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.2rem;
+      max-width: 14ch;
+      background: linear-gradient(135deg, #ffffff 0%, var(--neon-cyan) 35%, var(--neon-violet) 65%, var(--neon-magenta) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 30px rgba(168, 85, 247, 0.35));
+    }
+
+    .hero-title .line-accent {
+      display: block;
+      font-size: 0.42em;
+      font-weight: 600;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      margin-top: 0.8rem;
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-lime));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-family: var(--font-heading);
+      font-size: clamp(1rem, 2.2vw, 1.3rem);
+      font-weight: 400;
+      color: var(--text-muted);
+      max-width: 52ch;
+      margin: 0 auto 2.5rem;
+      line-height: 1.7;
+    }
+
+    .hero-sub strong {
+      color: var(--text-bright);
+      font-weight: 600;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 3.5rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.85rem 1.8rem;
+      border-radius: var(--radius-pill);
+      font-family: var(--font-heading);
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.35s cubic-bezier(0.23, 1, 0.32, 1),
+                  box-shadow 0.35s ease,
+                  background 0.35s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.5;
+      transition: transform 0.3s ease;
+    }
+
+    .btn:hover svg {
+      transform: translateX(3px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--neon-violet), var(--neon-cyan));
+      color: #fff;
+      box-shadow: 0 0 26px rgba(168, 85, 247, 0.35);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 42px rgba(168, 85, 247, 0.65);
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-bright);
+      border: 1px solid var(--border-glass);
+      backdrop-filter: blur(10px);
+    }
+
+    .btn-ghost:hover {
+      transform: translateY(-3px);
+      background: rgba(255, 255, 255, 0.09);
+      border-color: rgba(34, 211, 238, 0.4);
+      box-shadow: 0 0 26px rgba(34, 211, 238, 0.15);
+    }
+
+    .hero-stats {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: clamp(1.5rem, 5vw, 4rem);
+      margin-top: 1rem;
+    }
+
+    .hero-stat {
+      text-align: center;
+    }
+
+    .hero-stat .num {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+      font-weight: 800;
+      background: linear-gradient(180deg, #fff, var(--neon-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: block;
+      line-height: 1.2;
+    }
+
+    .hero-stat .label {
+      font-family: var(--font-heading);
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    /* ============================================================
+       SECTION HEADERS
+    ============================================================ */
+    .section-header {
+      text-align: center;
+      max-width: 680px;
+      margin: 0 auto clamp(2.5rem, 6vw, 4rem);
+    }
+
+    .section-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-heading);
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--neon-cyan);
+      margin-bottom: 1rem;
+    }
+
+    .section-tag::before,
+    .section-tag::after {
+      content: '';
+      width: 28px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--neon-cyan));
+    }
+
+    .section-tag::after {
+      background: linear-gradient(90deg, var(--neon-cyan), transparent);
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 4.2vw, 3rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.9rem;
+      background: linear-gradient(135deg, #fff 20%, var(--neon-violet) 80%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .section-desc {
+      font-size: clamp(0.9rem, 1.8vw, 1.05rem);
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    /* ============================================================
+       CREATE YOUR OWN GAME — FEATURE CARDS
+    ============================================================ */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .feature-card {
+      position: relative;
+      padding: 2rem 1.75rem;
+      border-radius: var(--radius-card);
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      backdrop-filter: blur(18px) saturate(150%);
+      -webkit-backdrop-filter: blur(18px) saturate(150%);
+      overflow: hidden;
+      transition: transform var(--transition-smooth),
+                  border-color var(--transition-smooth),
+                  box-shadow var(--transition-smooth);
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg, transparent 40%, rgba(168, 85, 247, 0.3), rgba(34, 211, 238, 0.3));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity var(--transition-smooth);
+      pointer-events: none;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-8px);
+      border-color: transparent;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5),
+                  0 0 30px rgba(168, 85, 247, 0.12);
+    }
+
+    .feature-card:hover::before {
+      opacity: 1;
+    }
+
+    .feature-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.4rem;
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(34, 211, 238, 0.1));
+      border: 1px solid rgba(168, 85, 247, 0.2);
+      font-size: 1.5rem;
+    }
+
+    .feature-card h3 {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+      letter-spacing: -0.01em;
+    }
+
+    .feature-card p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    /* ============================================================
+       GAME BUILDER SHOWCASE
+    ============================================================ */
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .game-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      padding: 1.6rem 1.5rem;
+      border-radius: var(--radius-card);
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      text-decoration: none;
+      color: inherit;
+      overflow: hidden;
+      transition: transform var(--transition-smooth),
+                  border-color var(--transition-smooth),
+                  box-shadow var(--transition-smooth);
+      transform-style: preserve-3d;
+    }
+
+    .game-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
+      transform: skewX(-20deg);
+      transition: left 0.7s ease;
+      pointer-events: none;
+    }
+
+    .game-card:hover::after {
+      left: 130%;
+    }
+
+    .game-card:hover {
+      transform: translateY(-6px) rotateX(2deg);
+      border-color: rgba(168, 85, 247, 0.35);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45),
+                  0 0 28px rgba(168, 85, 247, 0.1);
+    }
+
+    .game-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .game-badge {
+      font-family: var(--font-heading);
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.65rem;
+      border-radius: var(--radius-pill);
+      background: rgba(34, 211, 238, 0.1);
+      color: var(--neon-cyan);
+      border: 1px solid rgba(34, 211, 238, 0.2);
+    }
+
+    .game-badge.violet {
+      background: rgba(168, 85, 247, 0.1);
+      color: var(--neon-violet);
+      border-color: rgba(168, 85, 247, 0.2);
+    }
+
+    .game-badge.magenta {
+      background: rgba(236, 72, 153, 0.1);
+      color: var(--neon-magenta);
+      border-color: rgba(236, 72, 153, 0.2);
+    }
+
+    .game-badge.lime {
+      background: rgba(163, 230, 53, 0.1);
+      color: var(--neon-lime);
+      border-color: rgba(163, 230, 53, 0.2);
+    }
+
+    .game-arrow {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-glass);
+      transition: background 0.3s ease, transform 0.3s ease;
+    }
+
+    .game-card:hover .game-arrow {
+      background: var(--neon-violet);
+      transform: rotate(-45deg);
+    }
+
+    .game-arrow svg {
+      width: 13px;
+      height: 13px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.5;
+    }
+
+    .game-card h3 {
+      font-family: var(--font-heading);
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.01em;
+    }
+
+    .game-card p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+      flex-grow: 1;
+    }
+
+    .game-card-footer {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 1rem;
+      padding-top: 0.8rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      font-family: var(--font-heading);
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      color: var(--text-dim);
+    }
+
+    .game-card-footer span {
+      color: var(--neon-cyan);
+    }
+
+    /* ============================================================
+       ABOUT / CREATOR
+    ============================================================ */
+    .about-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1.3fr;
+      gap: clamp(2rem, 5vw, 4rem);
+      align-items: center;
+    }
+
+    .about-visual {
+      position: relative;
+      display: flex;
+      justify-content: center;
+    }
+
+    .about-orb {
+      width: min(320px, 70vw);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, var(--neon-violet), var(--neon-cyan), var(--neon-magenta), var(--neon-violet));
+      filter: blur(40px);
+      opacity: 0.4;
+      animation: orbSpin 12s linear infinite;
+    }
+
+    .about-orb-inner {
+      position: absolute;
+      inset: 12%;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(8, 8, 20, 0.6);
+      backdrop-filter: blur(20px);
+    }
+
+    .about-orb-inner img {
+      width: 46%;
+      border-radius: 50%;
+      border: 2px solid rgba(168, 85, 247, 0.5);
+    }
+
+    @keyframes orbSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    .about-content h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #fff, var(--neon-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .about-content p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+      margin-bottom: 1rem;
+    }
+
+    .about-content p strong {
+      color: var(--text-bright);
+      font-weight: 600;
+    }
+
+    .about-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .about-tag {
+      padding: 0.4rem 0.9rem;
+      border-radius: var(--radius-pill);
+      background: rgba(168, 85, 247, 0.08);
+      border: 1px solid rgba(168, 85, 247, 0.2);
+      font-family: var(--font-heading);
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--neon-violet);
+    }
+
+    /* ============================================================
+       CTA BANNER
+    ============================================================ */
+    .cta-banner {
+      position: relative;
+      padding: clamp(2.5rem, 6vw, 4.5rem);
+      border-radius: 28px;
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.12), rgba(34, 211, 238, 0.08));
+      border: 1px solid rgba(168, 85, 247, 0.2);
+      backdrop-filter: blur(20px);
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .cta-banner::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -20%;
+      width: 60%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(34, 211, 238, 0.12), transparent 70%);
+      pointer-events: none;
+    }
+
+    .cta-banner h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 3.8vw, 2.6rem);
+      font-weight: 800;
+      margin-bottom: 0.8rem;
+      background: linear-gradient(135deg, #fff, var(--neon-lime));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .cta-banner p {
+      color: var(--text-muted);
+      max-width: 50ch;
+      margin: 0 auto 1.8rem;
+      font-size: 0.95rem;
+    }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    .footer {
+      padding: 2.5rem 0 2rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      margin-top: 2rem;
+    }
+
+    .footer-inner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .footer-brand img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid rgba(168, 85, 247, 0.4);
+    }
+
+    .footer-brand span {
+      font-family: var(--font-display);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-violet));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .footer-credit {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      text-align: center;
+    }
+
+    .footer-credit a {
+      color: var(--neon-cyan);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .footer-credit a:hover {
+      color: var(--neon-violet);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.25rem;
+    }
+
+    .footer-links a {
+      font-family: var(--font-heading);
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .footer-links a:hover {
+      color: var(--neon-cyan);
+    }
+
+    /* ============================================================
+       BACK TO TOP
+    ============================================================ */
+    .back-top {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(8, 8, 20, 0.7);
+      border: 1px solid var(--border-glass);
+      backdrop-filter: blur(16px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 90;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(12px);
+      transition: opacity 0.4s ease, transform 0.4s ease, background 0.3s ease;
+    }
+
+    .back-top.visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .back-top:hover {
+      background: rgba(168, 85, 247, 0.2);
+      border-color: rgba(168, 85, 247, 0.4);
+    }
+
+    .back-top svg {
+      width: 16px;
+      height: 16px;
+      stroke: var(--text-bright);
+      fill: none;
+      stroke-width: 2.5;
+    }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width: 900px) {
+      .about-wrap {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+
+      .about-visual {
+        order: -1;
+      }
+
+      .about-tags {
+        justify-content: center;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .nav-toggle {
+        display: flex;
+      }
+
+      .nav-cta {
+        display: none;
+      }
+
+      .nav.mobile-open .nav-links {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: calc(100% + 0.6rem);
+        left: 0;
+        right: 0;
+        padding: 1rem;
+        border-radius: 20px;
+        background: rgba(6, 6, 16, 0.95);
+        border: 1px solid var(--border-glass);
+        backdrop-filter: blur(24px);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+        animation: menuDrop 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+      }
+
+      @keyframes menuDrop {
+        from { opacity: 0; transform: translateY(-10px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      .nav-links a {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+      }
+
+      .nav.mobile-open .nav-toggle span:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+      }
+      .nav.mobile-open .nav-toggle span:nth-child(2) {
+        opacity: 0;
+      }
+      .nav.mobile-open .nav-toggle span:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .hero-actions {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        max-width: 320px;
+      }
+
+      .btn {
+        justify-content: center;
+      }
+
+      .hero-stats {
+        gap: 1.2rem;
+      }
+
+      .footer-inner {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+
+      .reveal {
+        opacity: 1;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ANIMATED BACKGROUND -->
+  <div class="mesh-bg" aria-hidden="true">
+    <div class="blob-magenta"></div>
+  </div>
+  <canvas id="particle-canvas" aria-hidden="true"></canvas>
+
+  <!-- NAV -->
+  <nav class="nav" id="nav">
+    <a href="#" class="nav-brand">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSp_Mphk_txa5h3J1u3wziMXYm0CVTD2g3VaExOKHyNVg&s=10" alt="Lyra Game Studio logo" loading="lazy">
+      <span>LYRA STUDIO</span>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="#create">Create</a></li>
+      <li><a href="#games">Games</a></li>
+      <li><a href="#about">About</a></li>
+    </ul>
+
+    <a href="#games" class="nav-cta">
+      BUILD NOW
+      <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </nav>
+
+  <main class="page-wrap">
+
+    <!-- HERO -->
+    <section class="hero" id="home">
+      <div class="container">
+        <img
+          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSp_Mphk_txa5h3J1u3wziMXYm0CVTD2g3VaExOKHyNVg&s=10"
+          alt="Lyra Game Studio emblem"
+          class="hero-logo reveal"
+          width="140" height="140"
+        >
+
+        <span class="hero-eyebrow reveal reveal-delay-1">Next-Gen Game Creation Platform</span>
+
+        <h1 class="hero-title reveal reveal-delay-2">
+          LYRA GAME STUDIO
+          <span class="line-accent">Create Your Own Game</span>
+        </h1>
+
+        <p class="hero-sub reveal reveal-delay-3">
+          Build <strong>50+ games</strong> — from arcade classics to AI-powered quizzes.
+          No coding required. Publish, share, and play in seconds.
+          <br>Created by <strong>Muhammad Taqi</strong>.
+        </p>
+
+        <div class="hero-actions reveal reveal-delay-3">
+          <a href="#games" class="btn btn-primary">
+            Start Building
+            <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          <a href="#create" class="btn btn-ghost">
+            Explore Features
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          </a>
+        </div>
+
+        <div class="hero-stats reveal">
+          <div class="hero-stat">
+            <span class="num" data-count="50">0</span>
+            <span class="label">Games</span>
+          </div>
+          <div class="hero-stat">
+            <span class="num" data-count="9">0</span>
+            <span class="label">Builders</span>
+          </div>
+          <div class="hero-stat">
+            <span class="num" data-count="100">0</span>
+            <span class="label">% Free</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CREATE YOUR OWN GAME -->
+    <section id="create">
+      <div class="container">
+        <div class="section-header reveal">
+          <span class="section-tag">Your Canvas</span>
+          <h2 class="section-title">Create Your Own Game</h2>
+          <p class="section-desc">
+            Everything you need to turn an idea into a playable experience — instantly, in your browser.
+          </p>
+        </div>
+
+        <div class="features-grid">
+          <article class="feature-card reveal">
+            <div class="feature-icon">🎮</div>
+            <h3>No-Code Builder</h3>
+            <p>Drag, drop, and customise. Build full games with zero programming knowledge — just your imagination.</p>
+          </article>
+
+          <article class="feature-card reveal reveal-delay-1">
+            <div class="feature-icon">⚡</div>
+            <h3>Instant Publish</h3>
+            <p>Go from prototype to live link in seconds. Share your creation with a shortened URL and let the world play.</p>
+          </article>
+
+          <article class="feature-card reveal reveal-delay-2">
+            <div class="feature-icon">🤖</div>
+            <h3>AI-Powered</h3>
+            <p>Generate quiz questions, game logic, and content with built-in AI assistance. Smarter building, faster.</p>
+          </article>
+
+          <article class="feature-card reveal reveal-delay-3">
+            <div class="feature-icon">🎨</div>
+            <h3>Deep Personalisation</h3>
+            <p>Customise themes, colours, characters, and difficulty. Every game you build is uniquely yours.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- GAME BUILDERS SHOWCASE -->
+    <section id="games">
+      <div class="container">
+        <div class="section-header reveal">
+          <span class="section-tag">The Arsenal</span>
+          <h2 class="section-title">Build 50+ Games</h2>
+          <p class="section-desc">
+            Choose your engine. Each builder is tuned for a different experience — pick one and start creating.
+          </p>
+        </div>
+
+        <div class="games-grid">
+          <!-- 1 -->
+          <a href="https://avelia1.pages.dev/gamebuilder" target="_blank" rel="noopener" class="game-card reveal">
+            <div class="game-card-top">
+              <span class="game-badge">9 Games</span>
+              <span class="game-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+            </div>
+            <h3>Game Builder</h3>
+            <p>The all-in-one hub. Craft mini games, publish them, and shorten links — your creative command centre.</p>
+            <div class="game-card-footer"><span>●</span> gamebuilder</div>
+          </a>
+
+          <!-- 2 -->
+          <a href="https://avelia1.pages.dev/game-studio" target="_blank" rel="noopener" class="game-card reveal reveal-delay-1">
+            <div class="game-card-top">
+              <span class="game-badge violet">Quiz Engine</span>
+              <span class="game-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+            </div>
+            <h3>Game Studio</h3>
+            <p>Build engaging quiz games with staged questions, live previews, and downloadable apps.</p>
+            <div class="game-card-footer"><span>●</span> game-studio</div>
+          </a>
+
+          <!-- 3 -->
+          <a href="https://avelia1.pages.dev/quiz" target="_blank" rel="noopener" class="game-card reveal reveal-delay-2">
+            <div class="game-card-top">
+              <span class="game-badge magenta">AI Powered</span>
+              <span class="game-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+            </div>
+            <h3>AI Quiz Builder</h3>
+            <p>Generate 50+ questions across maths, English, and more with Gemini AI. Add your own and go live.</p>
+            <div class="game-card-footer"><span>●</span> quiz</div>
+          </a>
+
+          <!-- 4 -->
+          <a href="https://avelia1.pages.dev/game/13" target="_blank" rel="noopener" class="game-card reveal">
+            <div class="game-card-top">
+              <span class="game-badge lime">13 Premium</span>
+              <span class="game-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+            </div>
+            <h3>13 Premium Games</h3>
+            <p>A curated collection of thirteen handcrafted premium games — ready to play and remix.</p>
+            <div class="game-card-footer"><span>●</span> game/13</div>
+          </a>
+
+          <!-- 5 -->
+          <a href="https://avelia1.pages.dev/game/2" target="_blank" rel="noopener" class="game-card reveal reveal-delay-1">
+            <div class="game-card-top">
+              <span class="game-badge">2 Games</span>
+              <span class="game-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+            </div>
+            <h3>2 Game Pack</h3>
+            <p>A focused duo of games — perfect for quick sessions and instant fun.</p>
+            <div class="game-card-footer"><span>●</span> game/2</div>
+          </a>
+
+          <!-- 6 -->
+          <a href="https://avelia1.pages.dev/game/20" target="_blank" rel="noopener" class="game-card reveal reveal-delay-2">
+            <div class="game-card-top">
+              <span class="game-badge violet">20 Games</span>
+              <span class="game-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+            </div>
+            <h3>20 Game Vault</h3>
+            <p>Twenty games across genres — arcade, puzzle, strategy, and more. A full library at your fingertips.</p>
+            <div class="game-card-footer"><span>●</span> game/20</div>
+          </a>
+
+          <!-- 7 -->
+          <a href="https://avelia1.pages.dev/game/3-pro" target="_blank" rel="noopener" class="game-card reveal">
+            <div class="game-card-top">
+              <span class="game-badge magenta">Pro</span>
+              <span class="game-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+            </div>
+            <h3>3 Pro Games</h3>
+            <p>Three premium, polished experiences built for players who expect more.</p>
+            <div class="game-card-footer"><span>●</span> game/3-pro</div>
+          </a>
+
+          <!-- 8 -->
+          <a href="https://avelia1.pages.dev/game/4" target="_blank" rel="noopener" class="game-card reveal reveal-delay-1">
+            <div class="game-card-top">
+              <span class="game-badge lime">4 Games</span>
+              <span class="game-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+            </div>
+            <h3>4 Game Mix</h3>
+            <p>Four distinct games bundled together — variety is the spice of play.</p>
+            <div class="game-card-footer"><span>●</span> game/4</div>
+          </a>
+
+          <!-- 9 -->
+          <a href="https://avelia1.pages.dev/game/5" target="_blank" rel="noopener" class="game-card reveal reveal-delay-2">
+            <div class="game-card-top">
+              <span class="game-badge">5 Games</span>
+              <span class="game-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+            </div>
+            <h3>5 Game Starter</h3>
+            <p>Five games to get you started — quick to learn, hard to put down.</p>
+            <div class="game-card-footer"><span>●</span> game/5</div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT CREATOR -->
+     <a href="https://taqi.ddns.net/"> 
+    <section id="about">
+      <div class="container">
+        <div class="about-wrap">
+          <div class="about-visual reveal">
+            <div class="about-orb"></div>
+            <div class="about-orb-inner">
+              <img
+                src="https://taqi.ddns.net/icon.png"
+                alt="Muhammad Taqi — creator of Lyra Game Studio"
+                loading="lazy"
+              >
+            </div>
+          </div>
+           </a>
+          <div class="about-content reveal reveal-delay-1">
+           
+           <span class="section-tag" style="margin-bottom:0.8rem;">The Architect</span>
+           <a href="https://taqi.ddns.net/">
+            <h2>Created by Muhammad Taqi</h2>
+            </a>
+            <p>
+              <strong>Muhammad Taqi</strong> is a game developer and creative technologist who believes
+              everyone should be able to build the games they imagine. Lyra Game Studio is his answer —
+              a universe of builders, templates, and AI tools that turn ideas into playable realities.
+            </p>
+            <p>
+              From rapid prototypes to polished releases, his work focuses on removing friction between
+              <strong>creativity and execution</strong>. Every builder in Lyra is designed to feel
+              powerful yet effortless.
+            </p>
+            <div class="about-tags">
+              <span class="about-tag">Game Development</span>
+              <span class="about-tag">AI Integration</span>
+              <span class="about-tag">No-Code Tools</span>
+              <span class="about-tag">Web Experiences</span>
+              <span class="about-tag">Unity &amp; C#</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section>
+      <div class="container">
+        <div class="cta-banner reveal">
+          <h2>Your Game. Your Rules.</h2>
+          <p>
+            Stop waiting for the perfect moment. Pick a builder, create something unforgettable,
+            and share it with the world — right now.
+          </p>
+          <a href="#games" class="btn btn-primary">
+            Choose Your Builder
+            <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-inner">
+          <div class="footer-brand">
+            <img
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSp_Mphk_txa5h3J1u3wziMXYm0CVTD2g3VaExOKHyNVg&s=10"
+              alt="Lyra Game Studio logo"
+              loading="lazy"
+            >
+            <span>LYRA GAME STUDIO</span>
+          </div>
+
+          <p class="footer-credit">
+            © 2026 Lyra Game Studio · Created by
+            <a href="https://avelia1.pages.dev" target="_blank" rel="noopener">Muhammad Taqi</a>
+          </p>
+
+          <div class="footer-links">
+            <a href="#create">Create</a>
+            <a href="#games">Games</a>
+            <a href="#about">About</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- BACK TO TOP -->
+  <button class="back-top" id="backTop" aria-label="Back to top">
+    <svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+  </button>
+
+  <script>
+    (function() {
+      'use strict';
+
+      /* ============================================================
+         NAVIGATION — scroll state + mobile toggle
+      ============================================================ */
+      const nav = document.getElementById('nav');
+      const navToggle = document.getElementById('navToggle');
+
+      function updateNav() {
+        if (window.scrollY > 40) {
+          nav.classList.add('is-scrolled');
+        } else {
+          nav.classList.remove('is-scrolled');
+        }
+      }
+
+      navToggle.addEventListener('click', function() {
+        const isOpen = nav.classList.toggle('mobile-open');
+        navToggle.setAttribute('aria-expanded', isOpen);
+      });
+
+      // Close mobile menu when a link is clicked
+      document.querySelectorAll('.nav-links a').forEach(function(link) {
+        link.addEventListener('click', function() {
+          nav.classList.remove('mobile-open');
+          navToggle.setAttribute('aria-expanded', 'false');
+        });
+      });
+
+      window.addEventListener('scroll', updateNav, { passive: true });
+      updateNav();
+
+      /* ============================================================
+         SCROLL REVEAL — IntersectionObserver
+      ============================================================ */
+      const revealElements = document.querySelectorAll('.reveal');
+
+      if ('IntersectionObserver' in window) {
+        const revealObserver = new IntersectionObserver(function(entries) {
+          entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              revealObserver.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+        revealElements.forEach(function(el) { revealObserver.observe(el); });
+      } else {
+        revealElements.forEach(function(el) { el.classList.add('is-visible'); });
+      }
+
+      /* ============================================================
+         COUNTER ANIMATION
+      ============================================================ */
+      const counters = document.querySelectorAll('[data-count]');
+      let countersAnimated = false;
+
+      function animateCounters() {
+        if (countersAnimated) return;
+        const heroStats = document.querySelector('.hero-stats');
+        if (!heroStats) return;
+
+        const rect = heroStats.getBoundingClientRect();
+        if (rect.top < window.innerHeight && rect.bottom > 0) {
+          countersAnimated = true;
+          counters.forEach(function(counter) {
+            const target = parseInt(counter.getAttribute('data-count'), 10);
+            const duration = 1600;
+            const startTime = performance.now();
+
+            function step(currentTime) {
+              const elapsed = currentTime - startTime;
+              const progress = Math.min(elapsed / duration, 1);
+              // easeOutExpo
+              const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+              counter.textContent = Math.round(target * eased);
+              if (progress < 1) {
+                requestAnimationFrame(step);
+              } else {
+                counter.textContent = target;
+              }
+            }
+
+            requestAnimationFrame(step);
+          });
+        }
+      }
+
+      window.addEventListener('scroll', animateCounters, { passive: true });
+      animateCounters();
+
+      /* ============================================================
+         BACK TO TOP
+      ============================================================ */
+      const backTop = document.getElementById('backTop');
+
+      window.addEventListener('scroll', function() {
+        if (window.scrollY > 600) {
+          backTop.classList.add('visible');
+        } else {
+          backTop.classList.remove('visible');
+        }
+      }, { passive: true });
+
+      backTop.addEventListener('click', function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      /* ============================================================
+         PARTICLE CANVAS — constellation network
+      ============================================================ */
+      const canvas = document.getElementById('particle-canvas');
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      let animationId = null;
+      let mouseX = -9999;
+      let mouseY = -9999;
+
+      const PARTICLE_COUNT_BASE = 70;
+      const MAX_LINK_DISTANCE = 140;
+      const COLORS = ['168, 85, 247', '34, 211, 238', '236, 72, 153'];
+
+      function resizeCanvas() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = window.innerWidth * dpr;
+        canvas.height = window.innerHeight * dpr;
+        canvas.style.width = window.innerWidth + 'px';
+        canvas.style.height = window.innerHeight + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        initParticles();
+      }
+
+      function initParticles() {
+        const area = window.innerWidth * window.innerHeight;
+        const count = Math.min(
+          PARTICLE_COUNT_BASE + Math.floor(area / 18000),
+          140
+        );
+
+        particles = [];
+        for (let i = 0; i < count; i++) {
+          particles.push({
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            vx: (Math.random() - 0.5) * 0.35,
+            vy: (Math.random() - 0.5) * 0.35,
+            r: Math.random() * 1.8 + 0.6,
+            color: COLORS[Math.floor(Math.random() * COLORS.length)],
+            alpha: Math.random() * 0.5 + 0.25
+          });
+        }
+      }
+
+      function drawParticles() {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+
+        ctx.clearRect(0, 0, w, h);
+
+        // Draw links
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < MAX_LINK_DISTANCE) {
+              const opacity = (1 - dist / MAX_LINK_DISTANCE) * 0.18;
+              ctx.beginPath();
+              ctx.strokeStyle = 'rgba(168, 85, 247, ' + opacity + ')';
+              ctx.lineWidth = 0.6;
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+
+        // Draw particles
+        particles.forEach(function(p) {
+          // Mouse repulsion / attraction
+          const dx = p.x - mouseX;
+          const dy = p.y - mouseY;
+          const mouseDist = Math.sqrt(dx * dx + dy * dy);
+          if (mouseDist < 160 && mouseDist > 0.1) {
+            const force = (160 - mouseDist) / 160;
+            p.vx += (dx / mouseDist) * force * 0.015;
+            p.vy += (dy / mouseDist) * force * 0.015;
+          }
+
+          // Update position
+          p.x += p.vx;
+          p.y += p.vy;
+
+          // Damping
+          p.vx *= 0.998;
+          p.vy *= 0.998;
+
+          // Wrap around edges
+          if (p.x < -20) p.x = w + 20;
+          if (p.x > w + 20) p.x = -20;
+          if (p.y < -20) p.y = h + 20;
+          if (p.y > h + 20) p.y = -20;
+
+          // Draw glow
+          ctx.beginPath();
+          const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 6);
+          gradient.addColorStop(0, 'rgba(' + p.color + ', ' + p.alpha + ')');
+          gradient.addColorStop(1, 'rgba(' + p.color + ', 0)');
+          ctx.fillStyle = gradient;
+          ctx.arc(p.x, p.y, p.r * 6, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Draw core
+          ctx.beginPath();
+          ctx.fillStyle = 'rgba(' + p.color + ', ' + (p.alpha + 0.35) + ')';
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        animationId = requestAnimationFrame(drawParticles);
+      }
+
+      window.addEventListener('resize', resizeCanvas);
+      window.addEventListener('mousemove', function(e) {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+      }, { passive: true });
+      window.addEventListener('mouseleave', function() {
+        mouseX = -9999;
+        mouseY = -9999;
+      });
+
+      // Respect reduced motion
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      if (!prefersReducedMotion.matches) {
+        resizeCanvas();
+        drawParticles();
+      } else {
+        resizeCanvas();
+        // Draw one static frame
+        particles.forEach(function(p) {
+          ctx.beginPath();
+          ctx.fillStyle = 'rgba(' + p.color + ', ' + p.alpha + ')';
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      }
+
+      /* ============================================================
+         GAME CARD 3D TILT (desktop only)
+      ============================================================ */
+      if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        document.querySelectorAll('.game-card').forEach(function(card) {
+          card.addEventListener('mousemove', function(e) {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = ((y - centerY) / centerY) * -3;
+            const rotateY = ((x - centerX) / centerX) * 3;
+            card.style.transform =
+              'translateY(-6px) rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg)';
+          });
+
+          card.addEventListener('mouseleave', function() {
+            card.style.transform = '';
+          });
+        });
+      }
+
+    })();
+  </script>
+</body>
+</html>
