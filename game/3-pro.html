@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LYRA GAME BUILDER — Created by MUHAMMAD TAQI</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  font-family:'Plus Jakarta Sans',sans-serif;
+  background: radial-gradient(circle at 15% 10%, #1e1b4b 0%, #0b1020 45%, #04060d 100%);
+  background-attachment:fixed;
+  color:#e2e8f0;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  overflow-x:hidden;
+}
+body::before,body::after{
+  content:'';position:fixed;border-radius:50%;filter:blur(90px);z-index:0;pointer-events:none;
+}
+body::before{
+  width:55vw;height:55vw;top:-20%;left:-15%;
+  background:radial-gradient(circle, rgba(99,102,241,0.55) 0%, transparent 70%);
+  animation: floatA 22s ease-in-out infinite;
+}
+body::after{
+  width:55vw;height:55vw;bottom:-20%;right:-15%;
+  background:radial-gradient(circle, rgba(168,85,247,0.45) 0%, transparent 70%);
+  animation: floatB 26s ease-in-out infinite;
+}
+@keyframes floatA{0%,100%{transform:translate(0,0)}50%{transform:translate(8%,12%)}}
+@keyframes floatB{0%,100%{transform:translate(0,0)}50%{transform:translate(-10%,-8%)}}
+
+#lyraRoot{position:relative;z-index:1;width:100%;max-width:700px;}
+
+.screen{display:none;}
+.screen.active{display:block;animation:slideIn .5s cubic-bezier(.2,.8,.2,1);}
+@keyframes slideIn{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:none}}
+
+.card{
+  background: rgba(11,18,35,0.72);
+  border:1px solid rgba(139,143,255,0.18);
+  border-radius:28px;
+  padding:40px 34px;
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  box-shadow: 0 40px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.02) inset;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg, transparent, #6366f1, #a855f7, transparent);
+  opacity:.8;
+}
+
+.badge{
+  display:inline-block;
+  font-size:10px;
+  letter-spacing:.28em;
+  padding:8px 16px;
+  border-radius:100px;
+  background:linear-gradient(90deg, rgba(99,102,241,.25), rgba(168,85,247,.25));
+  border:1px solid rgba(139,143,255,.3);
+  font-weight:800;
+  color:#c7d2fe;
+}
+
+h1{
+  font-family:'Cinzel',serif;
+  font-size:3rem;
+  font-weight:900;
+  line-height:1.02;
+  letter-spacing:-.02em;
+  margin:22px 0 10px;
+}
+h1 span{
+  background:linear-gradient(135deg,#818cf8 0%, #c084fc 50%, #f472b6 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.byline{
+  color:#94a3b8;
+  font-size:.92rem;
+  margin-bottom:32px;
+}
+.byline b{color:#fff;letter-spacing:.06em;}
+
+h2{
+  font-family:'Cinzel',serif;
+  font-size:1.7rem;
+  font-weight:800;
+  letter-spacing:.01em;
+  margin:14px 0 8px;
+}
+.sub{
+  color:#94a3b8;
+  font-size:.9rem;
+  line-height:1.65;
+  margin-bottom:26px;
+}
+
+.step{
+  display:inline-block;
+  font-size:9px;
+  letter-spacing:.28em;
+  font-weight:800;
+  color:#a5b4fc;
+  background:rgba(99,102,241,.15);
+  border:1px solid rgba(99,102,241,.3);
+  padding:5px 12px;
+  border-radius:100px;
+  margin-bottom:6px;
+}
+
+.cta{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;
+  border:none;cursor:pointer;
+  font-family:inherit;
+  font-weight:800;
+  font-size:14px;
+  letter-spacing:.08em;
+  padding:18px 28px;
+  border-radius:16px;
+  color:#fff;
+  background:linear-gradient(135deg,#6366f1 0%, #a855f7 100%);
+  box-shadow:0 15px 35px rgba(99,102,241,.4), inset 0 1px 0 rgba(255,255,255,.15);
+  transition:transform .18s, box-shadow .18s;
+  margin-top:8px;
+}
+.cta:hover{transform:translateY(-2px);box-shadow:0 20px 45px rgba(99,102,241,.55), inset 0 1px 0 rgba(255,255,255,.2);}
+.cta:active{transform:translateY(0);}
+
+.ghost{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  flex:1;
+  font-family:inherit;
+  font-weight:700;
+  font-size:12px;
+  letter-spacing:.06em;
+  padding:14px 20px;
+  border-radius:13px;
+  color:#e2e8f0;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12);
+  cursor:pointer;
+  transition:.18s;
+}
+.ghost:hover{background:rgba(255,255,255,.12);transform:translateY(-1px);}
+
+.back{
+  display:inline-flex;align-items:center;gap:6px;
+  margin-top:16px;
+  background:transparent;border:none;color:#94a3b8;
+  cursor:pointer;
+  font-family:inherit;
+  font-size:12px;font-weight:600;
+  padding:8px 12px;
+  border-radius:8px;
+  transition:.18s;
+}
+.back:hover{color:#fff;background:rgba(255,255,255,.05);}
+
+.version{
+  font-size:10px;color:#475569;letter-spacing:.2em;
+  margin-top:26px;
+  padding-top:18px;
+  border-top:1px solid rgba(255,255,255,.06);
+}
+
+/* Game Choose Cards */
+.game-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin:22px 0;
+}
+@media (max-width:640px){
+  .game-grid{grid-template-columns:1fr;}
+}
+.game-card{
+  padding:24px 14px;
+  background:linear-gradient(160deg, rgba(30,41,59,.7), rgba(15,23,42,.5));
+  border:1.5px solid rgba(139,143,255,.18);
+  border-radius:20px;
+  cursor:pointer;
+  transition:.24s cubic-bezier(.2,.8,.2,1);
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.game-card::before{
+  content:'';
+  position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 0%, rgba(99,102,241,.25), transparent 60%);
+  opacity:0;
+  transition:.3s;
+}
+.game-card:hover{
+  border-color:rgba(139,143,255,.6);
+  transform:translateY(-6px) scale(1.02);
+  box-shadow:0 25px 50px rgba(99,102,241,.3);
+}
+.game-card:hover::before{opacity:1;}
+.game-icon{
+  font-size:46px;
+  line-height:1;
+  margin-bottom:10px;
+  filter:drop-shadow(0 6px 14px rgba(0,0,0,.4));
+  position:relative;z-index:1;
+}
+.game-card h3{
+  font-family:'Cinzel',serif;
+  font-size:1.1rem;
+  letter-spacing:.12em;
+  color:#fff;
+  margin-bottom:6px;
+  position:relative;z-index:1;
+}
+.game-card p{
+  font-size:10px;
+  color:#94a3b8;
+  line-height:1.5;
+  position:relative;z-index:1;
+}
+.game-card .arrow{
+  margin-top:10px;
+  color:#a5b4fc;
+  font-size:18px;
+  font-weight:800;
+  position:relative;z-index:1;
+}
+
+.chosen-game{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:10px 18px;
+  border-radius:100px;
+  background:rgba(99,102,241,.15);
+  border:1px solid rgba(99,102,241,.35);
+  margin-bottom:22px;
+  font-weight:800;
+  letter-spacing:.15em;
+  font-size:12px;
+  color:#c7d2fe;
+}
+.chosen-game .icon{font-size:20px;}
+
+label{
+  display:block;
+  text-align:left;
+  font-size:10px;
+  letter-spacing:.22em;
+  font-weight:800;
+  color:#94a3b8;
+  margin:18px 0 8px;
+}
+.inp{
+  width:100%;
+  background:#050914;
+  border:1.5px solid #1e293b;
+  border-radius:12px;
+  padding:15px 16px;
+  color:#fff;
+  font-size:14px;
+  font-family:inherit;
+  outline:none;
+  transition:.2s;
+}
+.inp:focus{
+  border-color:#6366f1;
+  box-shadow:0 0 0 4px rgba(99,102,241,.18);
+}
+.hash-wrap{
+  display:flex;
+  align-items:center;
+  background:#050914;
+  border:1.5px solid #1e293b;
+  border-radius:12px;
+  overflow:hidden;
+  transition:.2s;
+}
+.hash-wrap:focus-within{
+  border-color:#6366f1;
+  box-shadow:0 0 0 4px rgba(99,102,241,.18);
+}
+.hash-wrap span{
+  padding-left:16px;
+  color:#a855f7;
+  font-weight:900;
+  font-size:14px;
+}
+.hash-wrap .inp{
+  border:none;
+  background:transparent;
+  box-shadow:none!important;
+}
+
+.grid-options{
+  display:flex;gap:8px;
+}
+.grid-btn{
+  flex:1;
+  padding:13px 8px;
+  border-radius:11px;
+  background:rgba(255,255,255,.05);
+  border:1.5px solid rgba(255,255,255,.12);
+  color:#e2e8f0;
+  cursor:pointer;
+  font-family:inherit;
+  font-weight:800;
+  font-size:13px;
+  letter-spacing:.04em;
+  transition:.18s;
+}
+.grid-btn:hover{background:rgba(255,255,255,.12);}
+.grid-btn.active{
+  background:linear-gradient(135deg,#6366f1,#a855f7);
+  border-color:#a855f7;
+  color:#fff;
+  box-shadow:0 8px 20px rgba(99,102,241,.4);
+}
+
+.preview{
+  margin-top:20px;
+  padding:12px 16px;
+  background:#020617;
+  border:1px solid rgba(16,185,129,.35);
+  border-radius:10px;
+  font-family:ui-monospace,Menlo,monospace;
+  font-size:11px;
+  color:#10b981;
+  word-break:break-all;
+  text-align:left;
+  line-height:1.6;
+  min-height:38px;
+  opacity:.75;
+}
+.preview .hash{color:#c084fc;font-weight:800;}
+.preview .domain{color:#f8fafc;}
+
+.tick{
+  width:72px;height:72px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#10b981,#059669);
+  display:flex;align-items:center;justify-content:center;
+  font-size:34px;font-weight:900;color:#fff;
+  margin:0 auto 16px;
+  box-shadow:0 15px 35px rgba(16,185,129,.5), inset 0 2px 0 rgba(255,255,255,.2);
+  animation:popIn .5s cubic-bezier(.2,.8,.2,1);
+}
+@keyframes popIn{0%{transform:scale(0)}80%{transform:scale(1.1)}100%{transform:scale(1)}}
+
+.url-display{
+  margin:18px 0 24px;
+  padding:16px;
+  background:#020617;
+  border:1px solid rgba(16,185,129,.4);
+  border-radius:12px;
+  font-family:ui-monospace,Menlo,monospace;
+  font-size:11.5px;
+  color:#10b981;
+  word-break:break-all;
+  line-height:1.7;
+  text-align:left;
+}
+.url-display .hash{color:#c084fc;font-weight:800;}
+.url-display .domain{color:#f8fafc;}
+
+.rows{display:flex;gap:10px;margin-top:12px;}
+.rows .ghost{flex:1;}
+
+.meta{
+  font-size:11px;
+  color:#64748b;
+  line-height:1.7;
+  margin-top:6px;
+}
+
+@media (max-width: 520px){
+  h1{font-size:2.2rem;}
+  .card{padding:30px 22px;border-radius:22px;}
+  .game-icon{font-size:38px;}
+}
+</style>
+</head>
+<body>
+
+<div id="lyraRoot"></div>
+
+<!-- ======================= CARROM TEMPLATE ======================= -->
+<script type="text/template" id="tpl-carrom">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>%%GAME_NAME%% — LYRA GAME BUILDER</title>
+    <script src="https://cdn.tailwindcss.com"><\/script>
+    <script src="https://unpkg.com/lucide@latest"><\/script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: radial-gradient(circle at center, #1b2838 0%, #0d121d 100%); touch-action: none; user-select: none; -webkit-user-select: none; overflow: hidden; }
+        .font-cinzel { font-family: 'Cinzel', serif; }
+        .glass-panel { background: rgba(22, 32, 50, 0.75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 215, 0, 0.15); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5); }
+        .board-container { width: min(88vw, 82vh); height: min(88vw, 82vh); max-width: 680px; max-height: 680px; }
+        canvas { width: 100%; height: 100%; display: block; border-radius: 12px; box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8), 0 10px 30px rgba(0, 0, 0, 0.6); }
+        input[type=range] { -webkit-appearance: none; background: rgba(255, 255, 255, 0.1); border-radius: 8px; height: 8px; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 22px; width: 22px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #fef08a, #ca8a04); cursor: pointer; box-shadow: 0 0 10px rgba(234, 179, 8, 0.5); }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col justify-between items-center p-2 sm:p-4 text-slate-100 overflow-hidden">
+    <header class="w-full max-w-4xl flex justify-between items-center px-4 py-2 glass-panel rounded-2xl z-10 my-1">
+        <div class="flex items-center space-x-3">
+            <div class="p-2 bg-amber-500/10 rounded-xl border border-amber-500/20 text-amber-400"><i data-lucide="trophy" class="w-6 h-6"></i></div>
+            <div>
+                <h1 class="font-cinzel text-lg sm:text-2xl font-bold tracking-wider text-amber-300">%%GAME_NAME%%</h1>
+                <p class="text-xs text-slate-400 hidden sm:block">#%%GAME_ID%% · @%%USERNAME%%</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-2 sm:space-x-4">
+            <button id="audioToggle" class="p-2 sm:px-3 sm:py-2 bg-slate-800/80 hover:bg-slate-700 rounded-xl border border-slate-700 text-slate-300 flex items-center space-x-1 text-xs transition"><i data-lucide="volume-2" id="soundIcon" class="w-4 h-4"></i><span class="hidden sm:inline">Sound</span></button>
+            <button id="restartBtn" class="p-2 sm:px-3 sm:py-2 bg-amber-600/80 hover:bg-amber-500 rounded-xl text-white font-medium flex items-center space-x-1 text-xs transition shadow-lg shadow-amber-900/30"><i data-lucide="rotate-ccw" class="w-4 h-4"></i><span class="hidden sm:inline">Reset</span></button>
+            <button id="modeBtn" class="p-2 sm:px-3 sm:py-2 bg-indigo-600/80 hover:bg-indigo-500 rounded-xl text-white font-medium flex items-center space-x-1 text-xs transition shadow-lg shadow-indigo-900/30"><i data-lucide="users" class="w-4 h-4"></i><span id="modeText" class="hidden sm:inline">vs AI</span></button>
+        </div>
+    </header>
+    <main class="w-full flex-1 flex flex-col items-center justify-center relative">
+        <div class="w-full max-w-xl flex justify-between items-center px-4 py-2 my-1 glass-panel rounded-xl text-xs sm:text-sm">
+            <div id="p1Card" class="flex items-center space-x-2 p-1.5 px-3 rounded-lg border border-amber-500/40 bg-amber-500/10 transition-all">
+                <div class="w-3 h-3 rounded-full bg-amber-400"></div>
+                <div><span class="font-semibold text-slate-200">Player 1</span><span id="p1Score" class="ml-2 font-bold text-amber-300 text-sm">0 pts</span></div>
+            </div>
+            <div class="flex flex-col items-center">
+                <span class="text-[10px] text-slate-400 uppercase tracking-widest">Queen</span>
+                <div id="queenStatus" class="flex items-center space-x-1 text-rose-400 font-medium text-xs"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block animate-pulse"></span><span>In Play</span></div>
+            </div>
+            <div id="p2Card" class="flex items-center space-x-2 p-1.5 px-3 rounded-lg border border-transparent transition-all">
+                <div class="w-3 h-3 rounded-full bg-slate-400"></div>
+                <div><span id="p2Name" class="font-semibold text-slate-200">AI Bot</span><span id="p2Score" class="ml-2 font-bold text-amber-300 text-sm">0 pts</span></div>
+            </div>
+        </div>
+        <div class="board-container relative my-auto">
+            <canvas id="carromCanvas"></canvas>
+            <div id="turnBanner" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/80 border border-amber-500/50 backdrop-blur-md px-6 py-2.5 rounded-2xl pointer-events-none opacity-0 transition-opacity duration-300 flex items-center space-x-2 shadow-2xl"><i data-lucide="zap" class="w-5 h-5 text-amber-400"></i><span id="turnText" class="font-cinzel text-sm sm:text-lg text-amber-200 font-bold tracking-wide">Player 1's Turn</span></div>
+        </div>
+        <div class="w-full max-w-md glass-panel p-3 rounded-2xl my-1 flex flex-col items-center space-y-2">
+            <div class="flex justify-between w-full px-2 text-xs text-slate-300 font-medium"><span class="flex items-center gap-1"><i data-lucide="move-horizontal" class="w-3.5 h-3.5 text-amber-400"></i> Position Striker</span><span id="dragHint" class="text-amber-300/80">Pull back striker to aim & shoot</span></div>
+            <input type="range" id="strikerSlider" min="0" max="100" value="50" class="w-full cursor-pointer">
+        </div>
+    </main>
+    <footer class="w-full max-w-xl glass-panel py-2 px-4 rounded-xl flex items-center justify-between text-xs z-10">
+        <span class="text-slate-400 font-medium">Pocketed:</span>
+        <div id="pocketedTray" class="flex items-center space-x-1.5 overflow-x-auto py-1"><span class="text-slate-500 italic text-[11px]">None</span></div>
+    </footer>
+    <div id="gameOverModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 hidden">
+        <div class="glass-panel p-6 sm:p-8 rounded-3xl max-w-sm w-full mx-4 text-center border border-amber-500/30 shadow-2xl flex flex-col items-center">
+            <div class="w-16 h-16 bg-amber-500/20 rounded-full flex items-center justify-center text-amber-400 mb-4 border border-amber-500/40"><i data-lucide="award" class="w-8 h-8"></i></div>
+            <h2 id="winnerText" class="font-cinzel text-2xl font-bold text-amber-300 mb-1">PLAYER 1 WINS!</h2>
+            <p id="winnerScore" class="text-sm text-slate-300 mb-6">Final Score: 450 pts</p>
+            <button id="modalPlayAgain" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl shadow-lg shadow-amber-500/20 transition transform active:scale-95">Play Again</button>
+        </div>
+    </div>
+    <script>
+        lucide.createIcons();
+        class SoundFX{constructor(){this.ctx=null;this.muted=false;}init(){if(!this.ctx){const AC=window.AudioContext||window.webkitAudioContext;this.ctx=new AC();}}playHit(v=1){if(this.muted)return;this.init();if(!this.ctx)return;const o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type='triangle';o.frequency.setValueAtTime(120+Math.random()*60,this.ctx.currentTime);o.frequency.exponentialRampToValueAtTime(30,this.ctx.currentTime+0.08);g.gain.setValueAtTime(Math.min(v,1)*0.8,this.ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.01,this.ctx.currentTime+0.08);o.connect(g);g.connect(this.ctx.destination);o.start();o.stop(this.ctx.currentTime+0.08);}playPocket(){if(this.muted)return;this.init();if(!this.ctx)return;const o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type='sine';o.frequency.setValueAtTime(300,this.ctx.currentTime);o.frequency.exponentialRampToValueAtTime(100,this.ctx.currentTime+0.2);g.gain.setValueAtTime(0.5,this.ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.01,this.ctx.currentTime+0.2);o.connect(g);g.connect(this.ctx.destination);o.start();o.stop(this.ctx.currentTime+0.2);}playFoul(){if(this.muted)return;this.init();if(!this.ctx)return;const o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type='sawtooth';o.frequency.setValueAtTime(180,this.ctx.currentTime);o.frequency.setValueAtTime(110,this.ctx.currentTime+0.1);g.gain.setValueAtTime(0.4,this.ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.01,this.ctx.currentTime+0.25);o.connect(g);g.connect(this.ctx.destination);o.start();o.stop(this.ctx.currentTime+0.25);}}
+        const audio=new SoundFX();
+        const CANVAS_SIZE=800, FRAME_MARGIN=64, BOARD_INNER=CANVAS_SIZE-FRAME_MARGIN*2, POCKET_RADIUS=32, BASELINE_OFFSET=110;
+        const PIECE_TYPES={WHITE:{color:'#fef3c7',edge:'#d97706',pts:100,radius:16,mass:1},BLACK:{color:'#1e293b',edge:'#475569',pts:50,radius:16,mass:1},QUEEN:{color:'#e11d48',edge:'#fb7185',pts:300,radius:16,mass:1},STRIKER:{color:'#38bdf8',edge:'#0284c7',pts:0,radius:21,mass:1.8}};
+        const FRICTION=0.982, BOUNCE_RESTITUTION=0.82;
+        let canvas,ctx,pieces=[],striker=null,isVsAI=true,currentPlayer=1,scores={1:0,2:0},queenState='IN_PLAY',queenPocketedBy=null,turnPocketedPieces=[],isAiming=false,aimStart={x:0,y:0},dragCurrent={x:0,y:0},isMoving=false,gameOver=false;
+        class Piece{constructor(x,y,type){this.x=x;this.y=y;this.vx=0;this.vy=0;this.type=type;this.radius=type.radius;this.mass=type.mass;this.isPocketed=false;}update(){if(this.isPocketed)return;this.x+=this.vx;this.y+=this.vy;this.vx*=FRICTION;this.vy*=FRICTION;if(Math.abs(this.vx)<0.04)this.vx=0;if(Math.abs(this.vy)<0.04)this.vy=0;const minX=FRAME_MARGIN+this.radius,maxX=CANVAS_SIZE-FRAME_MARGIN-this.radius,minY=FRAME_MARGIN+this.radius,maxY=CANVAS_SIZE-FRAME_MARGIN-this.radius;if(this.x<minX){this.x=minX;this.vx*=-BOUNCE_RESTITUTION;audio.playHit(0.4);}if(this.x>maxX){this.x=maxX;this.vx*=-BOUNCE_RESTITUTION;audio.playHit(0.4);}if(this.y<minY){this.y=minY;this.vy*=-BOUNCE_RESTITUTION;audio.playHit(0.4);}if(this.y>maxY){this.y=maxY;this.vy*=-BOUNCE_RESTITUTION;audio.playHit(0.4);}}draw(ctx){if(this.isPocketed)return;ctx.save();ctx.beginPath();ctx.arc(this.x,this.y,this.radius,0,Math.PI*2);ctx.shadowColor='rgba(0,0,0,0.4)';ctx.shadowBlur=8;ctx.shadowOffsetY=4;const grad=ctx.createRadialGradient(this.x-this.radius*0.3,this.y-this.radius*0.3,this.radius*0.1,this.x,this.y,this.radius);if(this.type===PIECE_TYPES.WHITE){grad.addColorStop(0,'#ffffff');grad.addColorStop(0.8,'#fef3c7');grad.addColorStop(1,'#d97706');}else if(this.type===PIECE_TYPES.BLACK){grad.addColorStop(0,'#475569');grad.addColorStop(0.8,'#1e293b');grad.addColorStop(1,'#0f172a');}else if(this.type===PIECE_TYPES.QUEEN){grad.addColorStop(0,'#f43f5e');grad.addColorStop(0.8,'#e11d48');grad.addColorStop(1,'#881337');}else if(this.type===PIECE_TYPES.STRIKER){grad.addColorStop(0,'#bae6fd');grad.addColorStop(0.7,'#38bdf8');grad.addColorStop(1,'#0369a1');}ctx.fillStyle=grad;ctx.fill();ctx.shadowBlur=0;ctx.beginPath();ctx.arc(this.x,this.y,this.radius*0.55,0,Math.PI*2);ctx.strokeStyle=this.type.edge;ctx.lineWidth=2;ctx.stroke();ctx.beginPath();ctx.arc(this.x,this.y,this.radius*0.2,0,Math.PI*2);ctx.fillStyle=this.type.edge;ctx.fill();ctx.restore();}}
+        const pockets=[{x:FRAME_MARGIN+22,y:FRAME_MARGIN+22},{x:CANVAS_SIZE-FRAME_MARGIN-22,y:FRAME_MARGIN+22},{x:FRAME_MARGIN+22,y:CANVAS_SIZE-FRAME_MARGIN-22},{x:CANVAS_SIZE-FRAME_MARGIN-22,y:CANVAS_SIZE-FRAME_MARGIN-22}];
+        function initGame(){canvas=document.getElementById('carromCanvas');canvas.width=CANVAS_SIZE;canvas.height=CANVAS_SIZE;ctx=canvas.getContext('2d');setupEvents();resetBoard();requestAnimationFrame(gameLoop);}
+        function resetBoard(){pieces=[];scores={1:0,2:0};queenState='IN_PLAY';queenPocketedBy=null;currentPlayer=1;gameOver=false;document.getElementById('gameOverModal').classList.add('hidden');updateUI();const cx=CANVAS_SIZE/2,cy=CANVAS_SIZE/2,r=PIECE_TYPES.WHITE.radius;pieces.push(new Piece(cx,cy,PIECE_TYPES.QUEEN));for(let i=0;i<6;i++){const a=(i*Math.PI)/3;pieces.push(new Piece(cx+Math.cos(a)*(r*2.05),cy+Math.sin(a)*(r*2.05),i%2===0?PIECE_TYPES.WHITE:PIECE_TYPES.BLACK));}for(let i=0;i<12;i++){const a=(i*Math.PI)/6+(Math.PI/12);pieces.push(new Piece(cx+Math.cos(a)*(r*4.05),cy+Math.sin(a)*(r*4.05),i%2===0?PIECE_TYPES.BLACK:PIECE_TYPES.WHITE));}striker=new Piece(cx,CANVAS_SIZE-FRAME_MARGIN-BASELINE_OFFSET,PIECE_TYPES.STRIKER);resetStrikerPosition();}
+        function resetStrikerPosition(){const sVal=document.getElementById('strikerSlider').value;const minX=FRAME_MARGIN+70,maxX=CANVAS_SIZE-FRAME_MARGIN-70;striker.x=minX+(sVal/100)*(maxX-minX);striker.y=(currentPlayer===1)?CANVAS_SIZE-FRAME_MARGIN-BASELINE_OFFSET:FRAME_MARGIN+BASELINE_OFFSET;striker.vx=0;striker.vy=0;striker.isPocketed=false;}
+        function drawBoard(){ctx.fillStyle='#2d1b0e';ctx.fillRect(0,0,CANVAS_SIZE,CANVAS_SIZE);ctx.lineWidth=6;ctx.strokeStyle='#4a2e18';ctx.strokeRect(FRAME_MARGIN/2,FRAME_MARGIN/2,CANVAS_SIZE-FRAME_MARGIN,CANVAS_SIZE-FRAME_MARGIN);const sg=ctx.createRadialGradient(CANVAS_SIZE/2,CANVAS_SIZE/2,50,CANVAS_SIZE/2,CANVAS_SIZE/2,CANVAS_SIZE/2);sg.addColorStop(0,'#fef3c7');sg.addColorStop(1,'#fde68a');ctx.fillStyle=sg;ctx.fillRect(FRAME_MARGIN,FRAME_MARGIN,BOARD_INNER,BOARD_INNER);ctx.lineWidth=12;ctx.strokeStyle='rgba(0,0,0,0.15)';ctx.strokeRect(FRAME_MARGIN+6,FRAME_MARGIN+6,BOARD_INNER-12,BOARD_INNER-12);pockets.forEach(p=>{ctx.save();ctx.beginPath();ctx.arc(p.x,p.y,POCKET_RADIUS,0,Math.PI*2);ctx.fillStyle='#0f172a';ctx.fill();ctx.lineWidth=4;ctx.strokeStyle='#334155';ctx.stroke();ctx.restore();});const cx=CANVAS_SIZE/2,cy=CANVAS_SIZE/2;ctx.lineWidth=2;ctx.strokeStyle='#b45309';ctx.beginPath();ctx.arc(cx,cy,65,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.arc(cx,cy,18,0,Math.PI*2);ctx.fillStyle='rgba(225,29,72,0.2)';ctx.fill();ctx.strokeStyle='#e11d48';ctx.stroke();drawBaselines();}
+        function drawBaselines(){ctx.lineWidth=2;ctx.strokeStyle='#b45309';const minO=FRAME_MARGIN+70,maxO=CANVAS_SIZE-FRAME_MARGIN-70;[CANVAS_SIZE-FRAME_MARGIN-BASELINE_OFFSET,FRAME_MARGIN+BASELINE_OFFSET].forEach(y=>{ctx.beginPath();ctx.moveTo(minO,y-10);ctx.lineTo(maxO,y-10);ctx.moveTo(minO,y+10);ctx.lineTo(maxO,y+10);ctx.stroke();[minO,maxO].forEach(x=>{ctx.beginPath();ctx.arc(x,y,12,0,Math.PI*2);ctx.fillStyle='#dc2626';ctx.fill();ctx.stroke();});});[FRAME_MARGIN+BASELINE_OFFSET,CANVAS_SIZE-FRAME_MARGIN-BASELINE_OFFSET].forEach(x=>{ctx.beginPath();ctx.moveTo(x-10,minO);ctx.lineTo(x-10,maxO);ctx.moveTo(x+10,minO);ctx.lineTo(x+10,maxO);ctx.stroke();[minO,maxO].forEach(y=>{ctx.beginPath();ctx.arc(x,y,12,0,Math.PI*2);ctx.fillStyle='#dc2626';ctx.fill();ctx.stroke();});});}
+        function drawAimLine(){if(!isAiming||isMoving)return;const dx=aimStart.x-dragCurrent.x,dy=aimStart.y-dragCurrent.y,dist=Math.hypot(dx,dy);if(dist<10)return;const power=Math.min(dist*0.18,28),angle=Math.atan2(dy,dx);ctx.save();ctx.setLineDash([8,6]);ctx.lineWidth=3;ctx.strokeStyle='rgba(251,191,36,0.8)';ctx.beginPath();ctx.moveTo(striker.x,striker.y);ctx.lineTo(striker.x+Math.cos(angle)*power*12,striker.y+Math.sin(angle)*power*12);ctx.stroke();ctx.restore();ctx.beginPath();ctx.moveTo(striker.x,striker.y);ctx.lineTo(dragCurrent.x,dragCurrent.y);ctx.lineWidth=4;ctx.strokeStyle='rgba(239,68,68,0.7)';ctx.stroke();}
+        function updatePhysics(){let am=false;const all=[...pieces,striker];all.forEach(p=>{if(!p.isPocketed){p.update();if(Math.hypot(p.vx,p.vy)>0.05)am=true;}});for(let i=0;i<all.length;i++){for(let j=i+1;j<all.length;j++){const p1=all[i],p2=all[j];if(p1.isPocketed||p2.isPocketed)continue;const dx=p2.x-p1.x,dy=p2.y-p1.y,dist=Math.hypot(dx,dy),minD=p1.radius+p2.radius;if(dist<minD){const overlap=minD-dist,nx=dx/(dist||1),ny=dy/(dist||1);p1.x-=nx*overlap*0.5;p1.y-=ny*overlap*0.5;p2.x+=nx*overlap*0.5;p2.y+=ny*overlap*0.5;const kx=p1.vx-p2.vx,ky=p1.vy-p2.vy,p=2*(nx*kx+ny*ky)/(p1.mass+p2.mass);p1.vx-=p*p2.mass*nx;p1.vy-=p*p2.mass*ny;p2.vx+=p*p1.mass*nx;p2.vy+=p*p1.mass*ny;const iv=Math.hypot(kx,ky);if(iv>0.5)audio.playHit(iv/15);}}}all.forEach(p=>{if(p.isPocketed)return;pockets.forEach(pk=>{const d=Math.hypot(p.x-pk.x,p.y-pk.y);if(d<POCKET_RADIUS-6){p.isPocketed=true;p.vx=0;p.vy=0;audio.playPocket();if(p!==striker)turnPocketedPieces.push(p);}});});if(isMoving&&!am){isMoving=false;processTurnEnd();}}
+        function processTurnEnd(){let foul=false;if(striker.isPocketed){foul=true;scores[currentPlayer]=Math.max(0,scores[currentPlayer]-50);audio.playFoul();showBanner('STRIKER FOUL! -50 pts');}let earned=0,extraTurn=false;turnPocketedPieces.forEach(pc=>{if(pc.type===PIECE_TYPES.QUEEN){queenState='POCKETED_WAITING_COVER';queenPocketedBy=currentPlayer;extraTurn=true;showBanner('QUEEN POCKETED! Cover required.');}else{earned+=pc.type.pts;extraTurn=true;}});if(queenState==='POCKETED_WAITING_COVER'&&queenPocketedBy===currentPlayer){const cover=turnPocketedPieces.find(p=>p.type!==PIECE_TYPES.QUEEN);if(cover){queenState='COVERED';earned+=PIECE_TYPES.QUEEN.pts;showBanner('QUEEN COVERED! +300 pts');}else if(turnPocketedPieces.length===1&&turnPocketedPieces[0].type===PIECE_TYPES.QUEEN){}else{respotQueen();}}scores[currentPlayer]+=earned;const rem=pieces.filter(p=>!p.isPocketed&&p.type!==PIECE_TYPES.STRIKER);if(rem.length===0){endGame();return;}if(!extraTurn||foul){if(queenState==='POCKETED_WAITING_COVER'&&queenPocketedBy!==null&&queenPocketedBy!==currentPlayer)respotQueen();currentPlayer=currentPlayer===1?2:1;showBanner(currentPlayer===1?"Player 1's Turn":(isVsAI?"AI's Turn":"Player 2's Turn"));}turnPocketedPieces=[];resetStrikerPosition();updateUI();if(isVsAI&&currentPlayer===2&&!gameOver)setTimeout(makeAIMove,1000);}
+        function respotQueen(){const q=pieces.find(p=>p.type===PIECE_TYPES.QUEEN);if(q){q.isPocketed=false;q.x=CANVAS_SIZE/2;q.y=CANVAS_SIZE/2;q.vx=0;q.vy=0;queenState='IN_PLAY';queenPocketedBy=null;showBanner('QUEEN RETURNED TO BOARD');}}
+        function makeAIMove(){if(gameOver||currentPlayer!==2)return;const av=pieces.filter(p=>!p.isPocketed);if(av.length===0)return;let target=av.find(p=>p.type===PIECE_TYPES.QUEEN)||av[Math.floor(Math.random()*av.length)];const minX=FRAME_MARGIN+80,maxX=CANVAS_SIZE-FRAME_MARGIN-80;striker.x=minX+Math.random()*(maxX-minX);striker.y=FRAME_MARGIN+BASELINE_OFFSET;const angle=Math.atan2(target.y-striker.y,target.x-striker.x)+(Math.random()-0.5)*0.15;const power=14+Math.random()*10;striker.vx=Math.cos(angle)*power;striker.vy=Math.sin(angle)*power;isMoving=true;audio.playHit(0.8);}
+        function gameLoop(){ctx.clearRect(0,0,CANVAS_SIZE,CANVAS_SIZE);drawBoard();updatePhysics();pieces.forEach(p=>p.draw(ctx));if(!striker.isPocketed)striker.draw(ctx);drawAimLine();requestAnimationFrame(gameLoop);}
+        function setupEvents(){const s=document.getElementById('strikerSlider');s.addEventListener('input',()=>{if(!isMoving)resetStrikerPosition();});canvas.addEventListener('pointerdown',(e)=>{if(isMoving||(isVsAI&&currentPlayer===2))return;const r=canvas.getBoundingClientRect(),sc=CANVAS_SIZE/r.width,px=(e.clientX-r.left)*sc,py=(e.clientY-r.top)*sc;if(Math.hypot(px-striker.x,py-striker.y)<striker.radius*2.5){isAiming=true;aimStart={x:striker.x,y:striker.y};dragCurrent={x:px,y:py};}});canvas.addEventListener('pointermove',(e)=>{if(!isAiming)return;const r=canvas.getBoundingClientRect(),sc=CANVAS_SIZE/r.width;dragCurrent={x:(e.clientX-r.left)*sc,y:(e.clientY-r.top)*sc};});canvas.addEventListener('pointerup',()=>{if(!isAiming)return;isAiming=false;const dx=aimStart.x-dragCurrent.x,dy=aimStart.y-dragCurrent.y,dist=Math.hypot(dx,dy);if(dist>12){const power=Math.min(dist*0.16,26),angle=Math.atan2(dy,dx);striker.vx=Math.cos(angle)*power;striker.vy=Math.sin(angle)*power;isMoving=true;audio.playHit(1);}});document.getElementById('restartBtn').addEventListener('click',resetBoard);document.getElementById('modalPlayAgain').addEventListener('click',resetBoard);document.getElementById('modeBtn').addEventListener('click',()=>{isVsAI=!isVsAI;document.getElementById('modeText').textContent=isVsAI?'vs AI':'2 Player';document.getElementById('p2Name').textContent=isVsAI?'AI Bot':'Player 2';resetBoard();});document.getElementById('audioToggle').addEventListener('click',()=>{audio.muted=!audio.muted;document.getElementById('soundIcon').setAttribute('data-lucide',audio.muted?'volume-x':'volume-2');lucide.createIcons();});}
+        function updateUI(){document.getElementById('p1Score').textContent=scores[1]+' pts';document.getElementById('p2Score').textContent=scores[2]+' pts';const p1=document.getElementById('p1Card'),p2=document.getElementById('p2Card');if(currentPlayer===1){p1.className='flex items-center space-x-2 p-1.5 px-3 rounded-lg border border-amber-500/50 bg-amber-500/20 shadow-lg transition-all';p2.className='flex items-center space-x-2 p-1.5 px-3 rounded-lg border border-transparent transition-all opacity-60';}else{p2.className='flex items-center space-x-2 p-1.5 px-3 rounded-lg border border-indigo-500/50 bg-indigo-500/20 shadow-lg transition-all';p1.className='flex items-center space-x-2 p-1.5 px-3 rounded-lg border border-transparent transition-all opacity-60';}const qe=document.getElementById('queenStatus');if(queenState==='IN_PLAY')qe.innerHTML='<span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block animate-pulse"></span><span>In Play</span>';else if(queenState==='POCKETED_WAITING_COVER')qe.innerHTML='<span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span><span>Needs Cover</span>';else qe.innerHTML='<span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span><span>Covered</span>';const tray=document.getElementById('pocketedTray');tray.innerHTML='';const pk=pieces.filter(p=>p.isPocketed);if(pk.length===0)tray.innerHTML='<span class="text-slate-500 italic text-[11px]">None</span>';else pk.forEach(p=>{const d=document.createElement('div');d.className='w-4 h-4 rounded-full border border-slate-600 shadow-sm flex-shrink-0';if(p.type===PIECE_TYPES.WHITE)d.style.backgroundColor='#fef3c7';else if(p.type===PIECE_TYPES.BLACK)d.style.backgroundColor='#1e293b';else if(p.type===PIECE_TYPES.QUEEN)d.style.backgroundColor='#e11d48';tray.appendChild(d);});}
+        function showBanner(text){const b=document.getElementById('turnBanner');document.getElementById('turnText').textContent=text;b.classList.remove('opacity-0');setTimeout(()=>b.classList.add('opacity-0'),1800);}
+        function endGame(){gameOver=true;const m=document.getElementById('gameOverModal'),wt=document.getElementById('winnerText'),st=document.getElementById('winnerScore');let wn='PLAYER 1',ms=scores[1];if(scores[2]>scores[1]){wn=isVsAI?'AI BOT':'PLAYER 2';ms=scores[2];}else if(scores[1]===scores[2])wn="IT'S A TIE!";wt.textContent=wn+' WINS!';st.textContent='High Score: '+ms+' pts';m.classList.remove('hidden');}
+        window.onload=initGame;
+    <\/script>
+</body>
+</html>
+</script>
+
+<!-- ======================= POOL TEMPLATE ======================= -->
+<script type="text/template" id="tpl-pool">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>%%GAME_NAME%% — LYRA GAME BUILDER</title>
+    <script src="https://cdn.tailwindcss.com"><\/script>
+    <script src="https://unpkg.com/lucide@latest"><\/script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: radial-gradient(circle at center, #0f172a 0%, #0a0f1d 100%); touch-action: none; user-select: none; -webkit-user-select: none; overflow: hidden; }
+        .font-cinzel { font-family: 'Cinzel', serif; }
+        .glass-panel { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(234, 179, 8, 0.2); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6); }
+        .table-container { width: min(92vw, 85vh * 2); height: min(46vw, 85vh); max-width: 960px; max-height: 480px; }
+        canvas { width: 100%; height: 100%; display: block; border-radius: 12px; box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.9), 0 15px 40px rgba(0, 0, 0, 0.8); }
+        input[type=range] { -webkit-appearance: none; background: rgba(255, 255, 255, 0.1); border-radius: 8px; height: 8px; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 22px; width: 22px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #fef08a, #ca8a04); cursor: pointer; box-shadow: 0 0 12px rgba(234, 179, 8, 0.6); }
+        .spin-dot { width: 12px; height: 12px; background: #ef4444; border: 2px solid #ffffff; border-radius: 50%; position: absolute; transform: translate(-50%, -50%); pointer-events: none; box-shadow: 0 0 8px rgba(239, 68, 68, 0.8); }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col justify-between items-center p-2 sm:p-4 text-slate-100 overflow-hidden">
+    <header class="w-full max-w-5xl flex justify-between items-center px-4 py-2 glass-panel rounded-2xl z-10 my-1">
+        <div class="flex items-center space-x-3">
+            <div class="p-2 bg-amber-500/10 rounded-xl border border-amber-500/20 text-amber-400"><i data-lucide="trophy" class="w-6 h-6"></i></div>
+            <div>
+                <h1 class="font-cinzel text-base sm:text-xl font-black tracking-wider text-amber-300">%%GAME_NAME%%</h1>
+                <p class="text-[11px] sm:text-xs text-amber-400/80 font-semibold tracking-wide">#<span class="text-white font-bold">%%GAME_ID%%</span> · @%%USERNAME%%</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-2 sm:space-x-3">
+            <button id="gameTypeBtn" class="px-2.5 py-1.5 sm:px-3 sm:py-2 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 rounded-xl text-amber-300 text-xs font-bold transition flex items-center space-x-1"><i data-lucide="disc" class="w-4 h-4"></i><span id="gameTypeText">8-BALL</span></button>
+            <button id="opponentBtn" class="px-2.5 py-1.5 sm:px-3 sm:py-2 bg-indigo-600/80 hover:bg-indigo-500 rounded-xl text-white font-medium text-xs transition shadow-lg shadow-indigo-900/30 flex items-center space-x-1"><i data-lucide="bot" class="w-4 h-4"></i><span id="opponentText" class="hidden sm:inline">vs AI</span></button>
+            <button id="audioBtn" class="p-2 sm:px-3 sm:py-2 bg-slate-800 hover:bg-slate-700 rounded-xl border border-slate-700 text-slate-300 text-xs transition"><i data-lucide="volume-2" id="soundIcon" class="w-4 h-4"></i></button>
+            <button id="resetBtn" class="p-2 sm:px-3 sm:py-2 bg-rose-600/80 hover:bg-rose-500 rounded-xl text-white font-medium text-xs transition shadow-lg shadow-rose-900/30 flex items-center space-x-1"><i data-lucide="rotate-ccw" class="w-4 h-4"></i><span class="hidden sm:inline">Reset</span></button>
+        </div>
+    </header>
+    <main class="w-full flex-1 flex flex-col items-center justify-center relative">
+        <div class="w-full max-w-3xl flex justify-between items-center px-4 py-2 my-1 glass-panel rounded-xl text-xs sm:text-sm">
+            <div id="p1Card" class="flex items-center space-x-2 p-1.5 px-3 rounded-lg border border-amber-500/50 bg-amber-500/10 transition-all"><div class="w-3 h-3 rounded-full bg-amber-400"></div><div class="flex flex-col"><span class="font-bold text-slate-100">Player 1</span><span id="p1Group" class="text-[10px] text-amber-300">Open Table</span></div></div>
+            <div class="flex flex-col items-center"><span id="statusMessage" class="font-cinzel text-xs sm:text-sm text-amber-300 font-bold tracking-wide">PLAYER 1'S TURN</span><span id="targetMessage" class="text-[10px] text-slate-400">Pocket any ball to assign group</span></div>
+            <div id="p2Card" class="flex items-center space-x-2 p-1.5 px-3 rounded-lg border border-transparent transition-all opacity-60"><div class="w-3 h-3 rounded-full bg-indigo-400"></div><div class="flex flex-col"><span id="p2Name" class="font-bold text-slate-100">AI Bot</span><span id="p2Group" class="text-[10px] text-indigo-300">Open Table</span></div></div>
+        </div>
+        <div class="table-container relative my-auto">
+            <canvas id="poolCanvas"></canvas>
+            <div id="bannerOverlay" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-slate-950/90 border border-amber-500/40 backdrop-blur-md px-6 py-3 rounded-2xl pointer-events-none opacity-0 transition-opacity duration-300 flex items-center space-x-3 shadow-2xl z-20"><i data-lucide="zap" id="bannerIcon" class="w-6 h-6 text-amber-400"></i><span id="bannerText" class="font-cinzel text-sm sm:text-lg text-amber-200 font-bold tracking-wider">BREAK SHOT</span></div>
+            <div id="ballInHandNotice" class="absolute top-4 left-1/2 transform -translate-x-1/2 bg-amber-500/90 text-slate-950 font-bold px-4 py-1.5 rounded-full text-xs shadow-lg hidden pointer-events-none flex items-center space-x-1"><i data-lucide="move" class="w-4 h-4"></i><span>BALL IN HAND: Drag cue ball anywhere</span></div>
+        </div>
+        <div class="w-full max-w-4xl glass-panel p-3 rounded-2xl my-1 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div class="flex items-center space-x-1"><button id="aimLeftBtn" class="p-2.5 bg-slate-800 hover:bg-slate-700 active:bg-amber-600 rounded-xl border border-slate-700 text-amber-400 transition"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button><button id="aimRightBtn" class="p-2.5 bg-slate-800 hover:bg-slate-700 active:bg-amber-600 rounded-xl border border-slate-700 text-amber-400 transition"><i data-lucide="rotate-cw" class="w-4 h-4"></i></button></div>
+            <div class="flex-1 min-w-[160px] flex items-center space-x-3 px-2"><i data-lucide="zap" class="w-4 h-4 text-amber-400"></i><input type="range" id="powerSlider" min="5" max="100" value="45" class="w-full cursor-pointer"><span id="powerVal" class="font-bold text-amber-300 w-8 text-right">45%</span></div>
+            <div class="relative flex items-center"><div id="spinPad" class="w-12 h-12 rounded-full bg-slate-900 border-2 border-amber-500/60 relative cursor-crosshair shadow-inner flex items-center justify-center"><div class="w-full h-0.5 bg-slate-700 absolute"></div><div class="w-0.5 h-full bg-slate-700 absolute"></div><div id="spinDot" class="spin-dot" style="left: 50%; top: 50%;"></div></div></div>
+            <button id="shootBtn" class="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-xl shadow-lg shadow-amber-500/20 active:scale-95 transition flex items-center space-x-2 text-sm"><i data-lucide="crosshair" class="w-4 h-4"></i><span>SHOOT</span></button>
+        </div>
+    </main>
+    <footer class="w-full max-w-4xl glass-panel py-2 px-4 rounded-xl flex items-center justify-between text-xs z-10"><span class="text-slate-400 font-medium flex items-center gap-1"><i data-lucide="layers" class="w-3.5 h-3.5 text-amber-400"></i> Pocketed:</span><div id="pocketedTray" class="flex items-center space-x-1.5 overflow-x-auto py-0.5"><span class="text-slate-500 italic text-[11px]">None</span></div></footer>
+    <div id="gameOverModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 hidden"><div class="glass-panel p-6 sm:p-8 rounded-3xl max-w-sm w-full mx-4 text-center border border-amber-500/40 shadow-2xl flex flex-col items-center"><div class="w-16 h-16 bg-amber-500/20 rounded-full flex items-center justify-center text-amber-400 mb-4 border border-amber-500/40"><i data-lucide="award" class="w-8 h-8"></i></div><h2 id="winnerText" class="font-cinzel text-2xl font-bold text-amber-300 mb-1">PLAYER 1 WINS!</h2><p id="winReason" class="text-xs text-slate-300 mb-6">Successfully pocketed the 8-Ball!</p><button id="modalPlayAgain" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-xl shadow-lg shadow-amber-500/20 transition transform active:scale-95">Play Again</button></div></div>
+    <script>
+        lucide.createIcons();
+        class PoolAudio{constructor(){this.ctx=null;this.muted=false;}init(){if(!this.ctx){const AC=window.AudioContext||window.webkitAudioContext;this.ctx=new AC();}}playCueHit(v=1){if(this.muted)return;this.init();if(!this.ctx)return;const o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type='triangle';o.frequency.setValueAtTime(140+Math.random()*40,this.ctx.currentTime);o.frequency.exponentialRampToValueAtTime(30,this.ctx.currentTime+0.06);g.gain.setValueAtTime(Math.min(v,1)*0.9,this.ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.01,this.ctx.currentTime+0.06);o.connect(g);g.connect(this.ctx.destination);o.start();o.stop(this.ctx.currentTime+0.06);}playBallImpact(v=1){if(this.muted)return;this.init();if(!this.ctx)return;const o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type='sine';o.frequency.setValueAtTime(450+Math.random()*100,this.ctx.currentTime);o.frequency.exponentialRampToValueAtTime(80,this.ctx.currentTime+0.05);g.gain.setValueAtTime(Math.min(v,1)*0.7,this.ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.01,this.ctx.currentTime+0.05);o.connect(g);g.connect(this.ctx.destination);o.start();o.stop(this.ctx.currentTime+0.05);}playCushion(v=1){if(this.muted)return;this.init();if(!this.ctx)return;const o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type='triangle';o.frequency.setValueAtTime(110,this.ctx.currentTime);o.frequency.exponentialRampToValueAtTime(40,this.ctx.currentTime+0.08);g.gain.setValueAtTime(Math.min(v,1)*0.6,this.ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.01,this.ctx.currentTime+0.08);o.connect(g);g.connect(this.ctx.destination);o.start();o.stop(this.ctx.currentTime+0.08);}playPocket(){if(this.muted)return;this.init();if(!this.ctx)return;const o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type='sine';o.frequency.setValueAtTime(280,this.ctx.currentTime);o.frequency.exponentialRampToValueAtTime(90,this.ctx.currentTime+0.22);g.gain.setValueAtTime(0.7,this.ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.01,this.ctx.currentTime+0.22);o.connect(g);g.connect(this.ctx.destination);o.start();o.stop(this.ctx.currentTime+0.22);}playFoul(){if(this.muted)return;this.init();if(!this.ctx)return;const o=this.ctx.createOscillator(),g=this.ctx.createGain();o.type='sawtooth';o.frequency.setValueAtTime(200,this.ctx.currentTime);o.frequency.setValueAtTime(130,this.ctx.currentTime+0.12);g.gain.setValueAtTime(0.4,this.ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.01,this.ctx.currentTime+0.25);o.connect(g);g.connect(this.ctx.destination);o.start();o.stop(this.ctx.currentTime+0.25);}}
+        const audio=new PoolAudio();
+        const CANVAS_W=960,CANVAS_H=480,RAIL_WIDTH=44,PLAY_X1=RAIL_WIDTH,PLAY_Y1=RAIL_WIDTH,PLAY_X2=CANVAS_W-RAIL_WIDTH,PLAY_Y2=CANVAS_H-RAIL_WIDTH,PLAY_W=PLAY_X2-PLAY_X1,PLAY_H=PLAY_Y2-PLAY_Y1,BALL_RADIUS=11,POCKET_RADIUS=22,FRICTION=0.988,BOUNCE_DAMP=0.88;
+        const BALL_COLORS={0:'#ffffff',1:'#facc15',2:'#2563eb',3:'#dc2626',4:'#9333ea',5:'#f97316',6:'#16a34a',7:'#991b1b',8:'#0f172a',9:'#facc15',10:'#2563eb',11:'#dc2626',12:'#9333ea',13:'#f97316',14:'#16a34a',15:'#991b1b'};
+        const POCKETS=[{x:PLAY_X1+4,y:PLAY_Y1+4},{x:CANVAS_W/2,y:PLAY_Y1-2},{x:PLAY_X2-4,y:PLAY_Y1+4},{x:PLAY_X1+4,y:PLAY_Y2-4},{x:CANVAS_W/2,y:PLAY_Y2+2},{x:PLAY_X2-4,y:PLAY_Y2-4}];
+        let canvas,ctx,balls=[],cueBall=null,gameMode='8-BALL',isVsAI=true,currentPlayer=1,playerGroups={1:null,2:null},turnPocketed=[],firstHitBall=null,aimAngle=0,spinOffset={x:0,y:0},isMoving=false,ballInHand=false,isDraggingCueBall=false,gameOver=false,continueTurn=false;
+        class Ball{constructor(id,x,y){this.id=id;this.x=x;this.y=y;this.vx=0;this.vy=0;this.spinX=0;this.spinY=0;this.isPocketed=false;this.radius=BALL_RADIUS;}update(){if(this.isPocketed)return;this.x+=this.vx;this.y+=this.vy;this.vx+=this.spinX*0.05;this.vy+=this.spinY*0.05;this.spinX*=0.95;this.spinY*=0.95;this.vx*=FRICTION;this.vy*=FRICTION;if(Math.abs(this.vx)<0.03)this.vx=0;if(Math.abs(this.vy)<0.03)this.vy=0;const r=this.radius;let hc=false;if(this.x<PLAY_X1+r){this.x=PLAY_X1+r;this.vx*=-BOUNCE_DAMP;hc=true;}if(this.x>PLAY_X2-r){this.x=PLAY_X2-r;this.vx*=-BOUNCE_DAMP;hc=true;}if(this.y<PLAY_Y1+r){this.y=PLAY_Y1+r;this.vy*=-BOUNCE_DAMP;hc=true;}if(this.y>PLAY_Y2-r){this.y=PLAY_Y2-r;this.vy*=-BOUNCE_DAMP;hc=true;}if(hc&&Math.hypot(this.vx,this.vy)>0.3)audio.playCushion(Math.hypot(this.vx,this.vy)/10);}draw(ctx){if(this.isPocketed)return;ctx.save();ctx.beginPath();ctx.arc(this.x+3,this.y+4,this.radius,0,Math.PI*2);ctx.fillStyle='rgba(0,0,0,0.45)';ctx.fill();ctx.beginPath();ctx.arc(this.x,this.y,this.radius,0,Math.PI*2);const g=ctx.createRadialGradient(this.x-this.radius*0.35,this.y-this.radius*0.35,this.radius*0.1,this.x,this.y,this.radius);const bc=BALL_COLORS[this.id];if(this.id===0){g.addColorStop(0,'#ffffff');g.addColorStop(0.85,'#e2e8f0');g.addColorStop(1,'#94a3b8');ctx.fillStyle=g;ctx.fill();ctx.beginPath();ctx.arc(this.x,this.y,2,0,Math.PI*2);ctx.fillStyle='#ef4444';ctx.fill();}else if(this.id<=8||gameMode==='9-BALL'){g.addColorStop(0,'#ffffff');g.addColorStop(0.2,bc);g.addColorStop(1,'#000000');ctx.fillStyle=g;ctx.fill();}else{g.addColorStop(0,'#ffffff');g.addColorStop(0.85,'#f8fafc');g.addColorStop(1,'#cbd5e1');ctx.fillStyle=g;ctx.fill();ctx.save();ctx.beginPath();ctx.arc(this.x,this.y,this.radius,0,Math.PI*2);ctx.clip();ctx.fillStyle=bc;ctx.fillRect(this.x-this.radius,this.y-this.radius*0.5,this.radius*2,this.radius);ctx.restore();}if(this.id!==0){ctx.beginPath();ctx.arc(this.x,this.y,this.radius*0.45,0,Math.PI*2);ctx.fillStyle='#ffffff';ctx.fill();ctx.fillStyle='#0f172a';ctx.font='bold 8px "Plus Jakarta Sans"';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(this.id,this.x,this.y+0.5);}ctx.restore();}}
+        function initGame(){canvas=document.getElementById('poolCanvas');canvas.width=CANVAS_W;canvas.height=CANVAS_H;ctx=canvas.getContext('2d');setupControls();resetMatch();requestAnimationFrame(gameLoop);}
+        function resetMatch(){balls=[];turnPocketed=[];firstHitBall=null;currentPlayer=1;playerGroups={1:null,2:null};gameOver=false;ballInHand=true;continueTurn=false;document.getElementById('gameOverModal').classList.add('hidden');cueBall=new Ball(0,PLAY_X1+PLAY_W*0.25,CANVAS_H/2);balls.push(cueBall);if(gameMode==='8-BALL')setup8BallRack();else setup9BallRack();aimAngle=0;updateUI();showBanner('BREAK SHOT!');}
+        function setup8BallRack(){const sx=PLAY_X1+PLAY_W*0.72,sy=CANVAS_H/2,r=BALL_RADIUS,dx=r*1.732,dy=r*1.02;const order=[1,9,2,3,8,10,11,4,12,5,13,6,14,7,15];let i=0;for(let col=0;col<5;col++){for(let row=0;row<=col;row++){balls.push(new Ball(order[i],sx+col*dx,sy+(row-col/2)*(dy*2)));i++;}}}
+        function setup9BallRack(){const sx=PLAY_X1+PLAY_W*0.72,sy=CANVAS_H/2,r=BALL_RADIUS,dx=r*1.732,dy=r*1.02;const d=[[1],[2,3],[4,9,5],[6,7],[8]];for(let col=0;col<d.length;col++){const arr=d[col];for(let row=0;row<arr.length;row++){balls.push(new Ball(arr[row],sx+col*dx,sy+(row-(arr.length-1)/2)*(dy*2)));}}}
+        function drawTable(){ctx.fillStyle='#1e1b18';ctx.fillRect(0,0,CANVAS_W,CANVAS_H);ctx.fillStyle='#3b2314';ctx.fillRect(8,8,CANVAS_W-16,CANVAS_H-16);ctx.lineWidth=4;ctx.strokeStyle='#5c3a21';ctx.strokeRect(16,16,CANVAS_W-32,CANVAS_H-32);const fg=ctx.createRadialGradient(CANVAS_W/2,CANVAS_H/2,100,CANVAS_W/2,CANVAS_H/2,CANVAS_W/2);fg.addColorStop(0,'#0284c7');fg.addColorStop(1,'#0369a1');ctx.fillStyle=fg;ctx.fillRect(PLAY_X1,PLAY_Y1,PLAY_W,PLAY_H);ctx.lineWidth=8;ctx.strokeStyle='rgba(0,0,0,0.35)';ctx.strokeRect(PLAY_X1+4,PLAY_Y1+4,PLAY_W-8,PLAY_H-8);ctx.lineWidth=1.5;ctx.strokeStyle='rgba(255,255,255,0.25)';const hx=PLAY_X1+PLAY_W*0.25;ctx.beginPath();ctx.moveTo(hx,PLAY_Y1);ctx.lineTo(hx,PLAY_Y2);ctx.stroke();[hx,PLAY_X1+PLAY_W*0.72].forEach(sx=>{ctx.beginPath();ctx.arc(sx,CANVAS_H/2,3,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,0.4)';ctx.fill();});ctx.fillStyle='#fef08a';const dd=(x,y)=>{ctx.beginPath();ctx.arc(x,y,2.5,0,Math.PI*2);ctx.fill();};for(let i=1;i<=3;i++){dd(PLAY_X1+(PLAY_W/4)*i,24);dd(PLAY_X1+(PLAY_W/4)*i,CANVAS_H-24);}dd(24,CANVAS_H/2);dd(CANVAS_W-24,CANVAS_H/2);POCKETS.forEach(p=>{ctx.save();ctx.beginPath();ctx.arc(p.x,p.y,POCKET_RADIUS,0,Math.PI*2);ctx.fillStyle='#020617';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#ca8a04';ctx.stroke();ctx.restore();});}
+        function drawAimingGuide(){if(isMoving||cueBall.isPocketed||(isVsAI&&currentPlayer===2))return;const dX=Math.cos(aimAngle),dY=Math.sin(aimAngle);let ch=null,md=Infinity;balls.forEach(b=>{if(b.isPocketed||b.id===0)return;const dx=b.x-cueBall.x,dy=b.y-cueBall.y,proj=dx*dX+dy*dY;if(proj>0){const pds=(dx*dx+dy*dy)-(proj*proj),mds=(BALL_RADIUS*2)*(BALL_RADIUS*2);if(pds<mds){const hd=proj-Math.sqrt(mds-pds);if(hd>0&&hd<md){md=hd;ch={ball:b,hitDist:hd,ghostX:cueBall.x+dX*hd,ghostY:cueBall.y+dY*hd};}}}});ctx.save();ctx.setLineDash([6,4]);ctx.lineWidth=2;ctx.strokeStyle='rgba(254,240,138,0.85)';const rl=ch?ch.hitDist:600;ctx.beginPath();ctx.moveTo(cueBall.x,cueBall.y);ctx.lineTo(cueBall.x+dX*rl,cueBall.y+dY*rl);ctx.stroke();if(ch){ctx.setLineDash([]);ctx.beginPath();ctx.arc(ch.ghostX,ch.ghostY,BALL_RADIUS,0,Math.PI*2);ctx.strokeStyle='rgba(255,255,255,0.9)';ctx.lineWidth=1.5;ctx.stroke();const tb=ch.ball,dX2=tb.x-ch.ghostX,dY2=tb.y-ch.ghostY,dl=Math.hypot(dX2,dY2);if(dl>0){ctx.beginPath();ctx.setLineDash([4,4]);ctx.strokeStyle='rgba(56,189,248,0.9)';ctx.moveTo(tb.x,tb.y);ctx.lineTo(tb.x+(dX2/dl)*80,tb.y+(dY2/dl)*80);ctx.stroke();}}const pp=parseInt(document.getElementById('powerSlider').value)/100;const co=25+pp*35;const sx=cueBall.x-dX*(co+240),sy=cueBall.y-dY*(co+240),ex=cueBall.x-dX*co,ey=cueBall.y-dY*co;ctx.setLineDash([]);ctx.lineWidth=6;const cg=ctx.createLinearGradient(sx,sy,ex,ey);cg.addColorStop(0,'#451a03');cg.addColorStop(0.7,'#d97706');cg.addColorStop(0.96,'#fef08a');cg.addColorStop(1,'#ffffff');ctx.strokeStyle=cg;ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(ex,ey);ctx.stroke();ctx.restore();}
+        function updatePhysics(){let am=false;for(let step=0;step<6;step++){balls.forEach(b=>{if(!b.isPocketed){b.update();if(Math.hypot(b.vx,b.vy)>0.05)am=true;}});for(let i=0;i<balls.length;i++){for(let j=i+1;j<balls.length;j++){const b1=balls[i],b2=balls[j];if(b1.isPocketed||b2.isPocketed)continue;const dx=b2.x-b1.x,dy=b2.y-b1.y,dist=Math.hypot(dx,dy),minD=b1.radius+b2.radius;if(dist<minD){const ov=minD-dist,nx=dx/(dist||1),ny=dy/(dist||1);b1.x-=nx*ov*0.5;b1.y-=ny*ov*0.5;b2.x+=nx*ov*0.5;b2.y+=ny*ov*0.5;const kx=b1.vx-b2.vx,ky=b1.vy-b2.vy,p=2*(nx*kx+ny*ky)/2;b1.vx-=p*nx;b1.vy-=p*ny;b2.vx+=p*nx;b2.vy+=p*ny;if(b1.id===0&&!firstHitBall)firstHitBall=b2;if(b2.id===0&&!firstHitBall)firstHitBall=b1;const iv=Math.hypot(kx,ky);if(iv>0.4&&step===0)audio.playBallImpact(iv/15);}}}balls.forEach(b=>{if(b.isPocketed)return;POCKETS.forEach(p=>{const d=Math.hypot(b.x-p.x,b.y-p.y);if(d<POCKET_RADIUS-3){b.isPocketed=true;b.vx=0;b.vy=0;audio.playPocket();turnPocketed.push(b);}});});}if(isMoving&&!am){isMoving=false;processTurnResult();}}
+        function processTurnResult(){let foul=false,reason='';if(cueBall.isPocketed){foul=true;reason='Cue Ball Pocketed!';respotCueBall();}if(!foul&&!firstHitBall){foul=true;reason='No Target Ball Hit!';}if(!foul&&gameMode==='8-BALL'&&playerGroups[currentPlayer]){const tg=playerGroups[currentPlayer],hg=getBallGroup(firstHitBall.id);if(hg!==tg&&firstHitBall.id!==8){foul=true;reason='Foul! Must hit '+tg+' first.';}}else if(!foul&&gameMode==='9-BALL'){const lb=getLowestBallOnTable();if(lb&&firstHitBall.id!==lb.id){foul=true;reason='Foul! Must hit lowest ball (#'+lb.id+') first.';}}continueTurn=false;const pk=turnPocketed.filter(b=>b.id!==0);if(gameMode==='8-BALL')process8BallPocketing(pk,foul);else process9BallPocketing(pk,foul);if(foul){audio.playFoul();ballInHand=true;currentPlayer=currentPlayer===1?2:1;showBanner('FOUL: '+reason);}else if(!continueTurn){currentPlayer=currentPlayer===1?2:1;showBanner(currentPlayer===1?"Player 1's Turn":(isVsAI?"AI's Turn":"Player 2's Turn"));}turnPocketed=[];firstHitBall=null;updateUI();if(isVsAI&&currentPlayer===2&&!gameOver)setTimeout(executeAIMove,1200);}
+        function process8BallPocketing(pk,foul){const h8=pk.some(b=>b.id===8);if(h8){const cg=playerGroups[currentPlayer],rem=cg?balls.filter(b=>!b.isPocketed&&getBallGroup(b.id)===cg).length:1;if(rem===0&&!foul)endMatch(currentPlayer===1?'PLAYER 1':(isVsAI?'AI BOT':'PLAYER 2'),'Pocketed 8-Ball legally!');else{const w=currentPlayer===1?(isVsAI?'AI BOT':'PLAYER 2'):'PLAYER 1';endMatch(w,'Opponent pocketed 8-Ball illegally!');}return;}if(pk.length>0&&!foul){if(!playerGroups[1]&&!playerGroups[2]){const fg=getBallGroup(pk[0].id);if(fg!=='EIGHT'){playerGroups[currentPlayer]=fg;playerGroups[currentPlayer===1?2:1]=fg==='SOLIDS'?'STRIPES':'SOLIDS';showBanner('Group Assigned: '+fg);}}const og=playerGroups[currentPlayer];if(!og||pk.some(b=>getBallGroup(b.id)===og))continueTurn=true;}}
+        function process9BallPocketing(pk,foul){const h9=pk.some(b=>b.id===9);if(h9&&!foul){endMatch(currentPlayer===1?'PLAYER 1':(isVsAI?'AI BOT':'PLAYER 2'),'Pocketed the 9-Ball!');return;}if(pk.length>0&&!foul)continueTurn=true;}
+        function respotCueBall(){cueBall.isPocketed=false;cueBall.x=PLAY_X1+PLAY_W*0.25;cueBall.y=CANVAS_H/2;cueBall.vx=0;cueBall.vy=0;ballInHand=true;}
+        function getBallGroup(id){if(id>=1&&id<=7)return'SOLIDS';if(id>=9&&id<=15)return'STRIPES';if(id===8)return'EIGHT';return'CUE';}
+        function getLowestBallOnTable(){const r=balls.filter(b=>!b.isPocketed&&b.id>0);r.sort((a,b)=>a.id-b.id);return r[0]||null;}
+        function executeAIMove(){if(gameOver||currentPlayer!==2)return;if(ballInHand){cueBall.x=PLAY_X1+PLAY_W*0.3;cueBall.y=PLAY_Y1+Math.random()*PLAY_H;ballInHand=false;}let vt=[];if(gameMode==='8-BALL'){const g=playerGroups[2];if(g){vt=balls.filter(b=>!b.isPocketed&&getBallGroup(b.id)===g);if(vt.length===0)vt=balls.filter(b=>!b.isPocketed&&b.id===8);}else vt=balls.filter(b=>!b.isPocketed&&b.id!==0&&b.id!==8);}else{const l=getLowestBallOnTable();if(l)vt=[l];}if(vt.length===0)vt=balls.filter(b=>!b.isPocketed&&b.id!==0);let t=vt[0],md=Infinity;vt.forEach(b=>{const d=Math.hypot(b.x-cueBall.x,b.y-cueBall.y);if(d<md){md=d;t=b;}});const angle=Math.atan2(t.y-cueBall.y,t.x-cueBall.x)+(Math.random()-0.5)*0.04;const sp=35+Math.random()*35;aimAngle=angle;cueBall.vx=Math.cos(angle)*(sp*0.32);cueBall.vy=Math.sin(angle)*(sp*0.32);isMoving=true;audio.playCueHit(sp/100);}
+        function gameLoop(){ctx.clearRect(0,0,CANVAS_W,CANVAS_H);drawTable();updatePhysics();balls.forEach(b=>b.draw(ctx));drawAimingGuide();requestAnimationFrame(gameLoop);}
+        function setupControls(){const s=document.getElementById('powerSlider');s.addEventListener('input',(e)=>{document.getElementById('powerVal').textContent=e.target.value+'%';});document.getElementById('aimLeftBtn').addEventListener('click',()=>{aimAngle-=0.03;});document.getElementById('aimRightBtn').addEventListener('click',()=>{aimAngle+=0.03;});document.getElementById('shootBtn').addEventListener('click',executeShot);canvas.addEventListener('pointerdown',(e)=>{if(isMoving||(isVsAI&&currentPlayer===2))return;const r=canvas.getBoundingClientRect(),sx=CANVAS_W/r.width,sy=CANVAS_H/r.height,px=(e.clientX-r.left)*sx,py=(e.clientY-r.top)*sy;if(ballInHand&&Math.hypot(px-cueBall.x,py-cueBall.y)<BALL_RADIUS*2.5){isDraggingCueBall=true;return;}aimAngle=Math.atan2(py-cueBall.y,px-cueBall.x);});canvas.addEventListener('pointermove',(e)=>{const r=canvas.getBoundingClientRect(),sx=CANVAS_W/r.width,sy=CANVAS_H/r.height,px=(e.clientX-r.left)*sx,py=(e.clientY-r.top)*sy;if(isDraggingCueBall){cueBall.x=Math.max(PLAY_X1+BALL_RADIUS,Math.min(PLAY_X2-BALL_RADIUS,px));cueBall.y=Math.max(PLAY_Y1+BALL_RADIUS,Math.min(PLAY_Y2-BALL_RADIUS,py));return;}if(!isMoving&&e.buttons===1)aimAngle=Math.atan2(py-cueBall.y,px-cueBall.x);});canvas.addEventListener('pointerup',()=>{if(isDraggingCueBall){isDraggingCueBall=false;ballInHand=false;document.getElementById('ballInHandNotice').classList.add('hidden');}});const sp=document.getElementById('spinPad');sp.addEventListener('pointerdown',hs);sp.addEventListener('pointermove',(e)=>{if(e.buttons===1)hs(e);});function hs(e){const r=sp.getBoundingClientRect(),x=Math.max(-1,Math.min(1,((e.clientX-r.left)/r.width)*2-1)),y=Math.max(-1,Math.min(1,((e.clientY-r.top)/r.height)*2-1));spinOffset={x,y};const d=document.getElementById('spinDot');d.style.left=((x+1)*50)+'%';d.style.top=((y+1)*50)+'%';}document.getElementById('gameTypeBtn').addEventListener('click',()=>{gameMode=gameMode==='8-BALL'?'9-BALL':'8-BALL';document.getElementById('gameTypeText').textContent=gameMode;resetMatch();});document.getElementById('opponentBtn').addEventListener('click',()=>{isVsAI=!isVsAI;document.getElementById('opponentText').textContent=isVsAI?'vs AI':'2 Player';document.getElementById('p2Name').textContent=isVsAI?'AI Bot':'Player 2';resetMatch();});document.getElementById('audioBtn').addEventListener('click',()=>{audio.muted=!audio.muted;document.getElementById('soundIcon').setAttribute('data-lucide',audio.muted?'volume-x':'volume-2');lucide.createIcons();});document.getElementById('resetBtn').addEventListener('click',resetMatch);document.getElementById('modalPlayAgain').addEventListener('click',resetMatch);}
+        function executeShot(){if(isMoving||cueBall.isPocketed||(isVsAI&&currentPlayer===2))return;const pp=parseInt(document.getElementById('powerSlider').value)/100,power=5+pp*28;cueBall.vx=Math.cos(aimAngle)*power;cueBall.vy=Math.sin(aimAngle)*power;cueBall.spinX=spinOffset.x*2;cueBall.spinY=spinOffset.y*2;isMoving=true;ballInHand=false;document.getElementById('ballInHandNotice').classList.add('hidden');audio.playCueHit(pp);}
+        function updateUI(){const p1=document.getElementById('p1Card'),p2=document.getElementById('p2Card');if(currentPlayer===1){p1.className='flex items-center space-x-2 p-1.5 px-3 rounded-lg border border-amber-500/50 bg-amber-500/20 shadow-lg transition-all';p2.className='flex items-center space-x-2 p-1.5 px-3 rounded-lg border border-transparent transition-all opacity-60';}else{p2.className='flex items-center space-x-2 p-1.5 px-3 rounded-lg border border-indigo-500/50 bg-indigo-500/20 shadow-lg transition-all';p1.className='flex items-center space-x-2 p-1.5 px-3 rounded-lg border border-transparent transition-all opacity-60';}if(gameMode==='8-BALL'){document.getElementById('p1Group').textContent=playerGroups[1]||'Open Table';document.getElementById('p2Group').textContent=playerGroups[2]||'Open Table';}else{const l=getLowestBallOnTable();const tt=l?'Lowest: #'+l.id:'9-Ball';document.getElementById('p1Group').textContent=tt;document.getElementById('p2Group').textContent=tt;}const bh=document.getElementById('ballInHandNotice');if(ballInHand&&!isMoving)bh.classList.remove('hidden');else bh.classList.add('hidden');const tray=document.getElementById('pocketedTray');tray.innerHTML='';const pk=balls.filter(b=>b.isPocketed&&b.id!==0);if(pk.length===0)tray.innerHTML='<span class="text-slate-500 italic text-[11px]">None</span>';else pk.forEach(b=>{const d=document.createElement('div');d.className='w-5 h-5 rounded-full border border-slate-700 shadow-sm flex items-center justify-center font-bold text-[9px] text-slate-950 flex-shrink-0';d.style.backgroundColor=BALL_COLORS[b.id];d.textContent=b.id;tray.appendChild(d);});}
+        function showBanner(text){const b=document.getElementById('bannerOverlay');document.getElementById('bannerText').textContent=text;b.classList.remove('opacity-0');setTimeout(()=>b.classList.add('opacity-0'),1800);}
+        function endMatch(w,r){gameOver=true;document.getElementById('winnerText').textContent=w+' WINS!';document.getElementById('winReason').textContent=r;document.getElementById('gameOverModal').classList.remove('hidden');}
+        window.onload=initGame;
+    <\/script>
+</body>
+</html>
+</script>
+
+<!-- ======================= PUZZLE TEMPLATE ======================= -->
+<script type="text/template" id="tpl-puzzle">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>%%GAME_NAME%% — LYRA GAME BUILDER</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  font-family:'Plus Jakarta Sans',sans-serif;
+  background:radial-gradient(circle at center, #1b2838 0%, #0d121d 100%);
+  color:#e2e8f0;display:flex;flex-direction:column;min-height:100vh;padding:16px;
+  overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:manipulation;
+}
+header{
+  width:100%;max-width:900px;margin:0 auto 12px;padding:14px 20px;
+  background:rgba(22,32,50,0.75);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(255,215,0,0.15);border-radius:16px;
+  display:flex;justify-content:space-between;align-items:center;
+  box-shadow:0 20px 50px rgba(0,0,0,0.5);flex-wrap:wrap;gap:10px;
+}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-icon{
+  width:40px;height:40px;border-radius:10px;
+  background:linear-gradient(135deg,#6366f1,#a855f7);
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+}
+.brand h1{
+  font-family:'Cinzel',serif;font-size:1.1rem;font-weight:800;
+  letter-spacing:0.08em;color:#fbbf24;
+}
+.brand p{font-size:10px;color:#94a3b8;letter-spacing:0.15em;text-transform:uppercase;}
+.stats{display:flex;gap:16px;}
+.stat{text-align:center;}
+.stat-label{font-size:9px;color:#94a3b8;letter-spacing:0.15em;text-transform:uppercase;display:block;margin-bottom:2px;}
+.stat-value{
+  font-family:'Cinzel',serif;font-size:1.15rem;font-weight:800;color:#fbbf24;
+  font-variant-numeric:tabular-nums;
+}
+main{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:16px;min-height:0;
+}
+.puzzle-wrap{
+  position:relative;display:flex;align-items:center;justify-content:center;
+  flex:1;min-height:0;width:100%;
+}
+.puzzle-container{
+  aspect-ratio:1/1;height:100%;
+  max-height:min(78vw,65vh);max-width:min(78vw,65vh);
+  border-radius:20px;overflow:hidden;
+  border:3px solid rgba(251,191,36,0.4);
+  box-shadow:0 20px 60px rgba(0,0,0,0.7), inset 0 0 30px rgba(0,0,0,0.3);
+  background:#0f172a;position:relative;
+}
+#grid{width:100%;height:100%;display:grid;gap:2px;padding:2px;background:#0f172a;}
+.tile{
+  position:relative;border-radius:6px;
+  background-size:100% 100%;background-repeat:no-repeat;
+  cursor:pointer;transition:transform 0.15s cubic-bezier(0.2,0.8,0.2,1), box-shadow 0.15s;
+  overflow:hidden;display:flex;align-items:center;justify-content:center;
+  font-family:'Cinzel',serif;font-weight:800;
+  font-size:clamp(14px,3.5vw,32px);
+  color:rgba(255,255,255,0.95);
+  text-shadow:0 2px 8px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,1);
+  border:1px solid rgba(255,255,255,0.15);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -2px 4px rgba(0,0,0,0.3);
+  background-color:#1e293b;
+}
+.tile:hover:not(.blank){
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.4), 0 0 20px rgba(251,191,36,0.5);
+  transform:scale(1.03);z-index:2;
+}
+.tile.blank{
+  background:#0a0f1d !important;cursor:default;
+  border:1px dashed rgba(255,255,255,0.08);
+  box-shadow:inset 0 0 30px rgba(0,0,0,0.8);
+  color:transparent;text-shadow:none;
+}
+.tile:active:not(.blank){transform:scale(0.98);}
+#peekImg{
+  position:absolute;inset:2px;width:calc(100% - 4px);height:calc(100% - 4px);
+  object-fit:cover;border-radius:14px;display:none;pointer-events:none;
+  box-shadow:0 0 40px rgba(0,0,0,0.8);
+}
+.controls{
+  width:100%;max-width:900px;padding:10px 14px;
+  background:rgba(22,32,50,0.75);backdrop-filter:blur(16px);
+  border:1px solid rgba(255,215,0,0.15);border-radius:14px;
+  display:flex;gap:8px;justify-content:center;flex-wrap:wrap;
+  box-shadow:0 10px 30px rgba(0,0,0,0.4);
+}
+button{
+  font-family:inherit;font-weight:700;font-size:12px;letter-spacing:0.05em;
+  padding:10px 18px;border-radius:10px;
+  border:1px solid rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.08);color:#e2e8f0;
+  cursor:pointer;transition:0.18s;
+  display:inline-flex;align-items:center;gap:6px;
+}
+button:hover{background:rgba(255,255,255,0.15);transform:translateY(-1px);}
+button.primary{
+  background:linear-gradient(135deg,#f59e0b,#d97706);
+  border-color:#fbbf24;color:#0f172a;
+  box-shadow:0 8px 20px rgba(245,158,11,0.3);
+}
+button.primary:hover{background:linear-gradient(135deg,#fbbf24,#f59e0b);}
+.win-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.85);
+  backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;
+  z-index:100;padding:20px;animation:fadeIn 0.4s ease;
+}
+.win-overlay.show{display:flex;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.win-card{
+  background:rgba(15,23,42,0.95);
+  border:2px solid rgba(251,191,36,0.5);border-radius:24px;
+  padding:40px 32px;max-width:420px;width:100%;text-align:center;
+  box-shadow:0 30px 80px rgba(0,0,0,0.8);
+  animation:popIn 0.5s cubic-bezier(0.2,0.8,0.2,1);
+}
+@keyframes popIn{0%{transform:scale(0.7);opacity:0}80%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+.win-icon{
+  width:80px;height:80px;margin:0 auto 20px;border-radius:50%;
+  background:linear-gradient(135deg,#10b981,#059669);
+  display:flex;align-items:center;justify-content:center;font-size:40px;
+  box-shadow:0 15px 40px rgba(16,185,129,0.5);
+}
+.win-card h2{
+  font-family:'Cinzel',serif;font-size:1.8rem;font-weight:900;
+  color:#fbbf24;letter-spacing:0.05em;margin-bottom:8px;
+}
+.win-card p{font-size:13px;color:#94a3b8;margin-bottom:24px;line-height:1.6;}
+.win-stats{
+  display:flex;justify-content:center;gap:24px;margin-bottom:24px;
+  padding:16px;background:rgba(255,255,255,0.03);border-radius:12px;
+  border:1px solid rgba(255,255,255,0.08);
+}
+.win-stat-value{
+  font-family:'Cinzel',serif;font-size:1.6rem;font-weight:900;
+  color:#fbbf24;display:block;
+}
+.win-stat-label{font-size:10px;color:#94a3b8;letter-spacing:0.15em;text-transform:uppercase;}
+.footer{
+  width:100%;max-width:900px;margin:12px auto 0;text-align:center;
+  font-size:10px;color:#475569;letter-spacing:0.15em;text-transform:uppercase;
+}
+@media (max-width:500px){
+  header{padding:10px 14px;}
+  .brand h1{font-size:0.95rem;}
+  .brand p{font-size:9px;}
+  .stats{gap:10px;}
+  .stat-value{font-size:1rem;}
+  .controls{padding:8px;}
+  button{font-size:11px;padding:8px 14px;}
+  .puzzle-container{max-height:min(92vw,60vh);max-width:min(92vw,60vh);}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="brand-icon">🧩</div>
+    <div>
+      <h1>%%GAME_NAME%%</h1>
+      <p>#%%GAME_ID%% · @%%USERNAME%%</p>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="stat">
+      <span class="stat-label">Moves</span>
+      <span class="stat-value" id="movesEl">0</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">Time</span>
+      <span class="stat-value" id="timeEl">0:00</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="puzzle-wrap">
+    <div class="puzzle-container">
+      <div id="grid"></div>
+      <img id="peekImg" alt="preview">
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="primary" id="shuffleBtn">🔄 Shuffle</button>
+    <button id="previewBtn">👁 Peek</button>
+    <button id="resetBtn">↺ Reset</button>
+  </div>
+</main>
+
+<div class="footer">LYRA GAME BUILDER · Created by MUHAMMAD TAQI</div>
+
+<div class="win-overlay" id="winOverlay">
+  <div class="win-card">
+    <div class="win-icon">🏆</div>
+    <h2>PUZZLE SOLVED!</h2>
+    <p>Great job! You completed the puzzle.</p>
+    <div class="win-stats">
+      <div>
+        <span class="win-stat-value" id="winMoves">0</span>
+        <span class="win-stat-label">Moves</span>
+      </div>
+      <div>
+        <span class="win-stat-value" id="winTime">0:00</span>
+        <span class="win-stat-label">Time</span>
+      </div>
+    </div>
+    <button class="primary" id="playAgainBtn">Play Again</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  var GRID_SIZE = %%GRID_SIZE%%;
+  var IMAGE_URL = %%IMAGE_URL_JSON%% || '';
+
+  var tiles = [];
+  var moves = 0;
+  var startTime = null;
+  var timerInterval = null;
+  var solved = false;
+  var peeking = false;
+  var DEFAULT_IMAGE = null;
+  var ACTUAL_IMAGE = null;
+  var audioCtx = null;
+
+  function playClick(pitch) {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      var osc = audioCtx.createOscillator();
+      var gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(pitch || 440, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime((pitch || 440) * 0.5, audioCtx.currentTime + 0.08);
+      gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.08);
+    } catch(e){}
+  }
+
+  function playWin() {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      [523, 659, 784, 1047].forEach(function(freq, i) {
+        var osc = audioCtx.createOscillator();
+        var gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0, audioCtx.currentTime + i * 0.1);
+        gain.gain.linearRampToValueAtTime(0.15, audioCtx.currentTime + i * 0.1 + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.1 + 0.35);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(audioCtx.currentTime + i * 0.1);
+        osc.stop(audioCtx.currentTime + i * 0.1 + 0.35);
+      });
+    } catch(e){}
+  }
+
+  function getDefaultImage() {
+    if (DEFAULT_IMAGE) return DEFAULT_IMAGE;
+    var size = 720;
+    var canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    var ctx = canvas.getContext('2d');
+
+    var bg = ctx.createRadialGradient(size/2, size/2, 50, size/2, size/2, size/1.4);
+    bg.addColorStop(0, '#2d1b69');
+    bg.addColorStop(0.4, '#1e1b4b');
+    bg.addColorStop(1, '#0a0a1a');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, size, size);
+
+    for (var i = 0; i < 220; i++) {
+      var x = Math.random() * size;
+      var y = Math.random() * size;
+      var r = Math.random() * 1.5 + 0.3;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,255,255,' + (0.2 + Math.random() * 0.7) + ')';
+      ctx.fill();
+    }
+
+    var orbs = [
+      { x: size*0.25, y: size*0.3, r: size*0.15, c1: '#f472b6', c2: '#ec4899' },
+      { x: size*0.72, y: size*0.25, r: size*0.18, c1: '#a855f7', c2: '#7c3aed' },
+      { x: size*0.5, y: size*0.55, r: size*0.22, c1: '#38bdf8', c2: '#0284c7' },
+      { x: size*0.78, y: size*0.72, r: size*0.14, c1: '#fbbf24', c2: '#f59e0b' },
+      { x: size*0.22, y: size*0.72, r: size*0.13, c1: '#10b981', c2: '#059669' }
+    ];
+
+    orbs.forEach(function(o) {
+      var g = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r);
+      g.addColorStop(0, o.c1);
+      g.addColorStop(1, o.c2);
+      ctx.beginPath();
+      ctx.arc(o.x, o.y, o.r, 0, Math.PI * 2);
+      ctx.fillStyle = g;
+      ctx.fill();
+    });
+
+    ctx.font = '900 160px "Cinzel", serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(168,85,247,0.8)';
+    ctx.shadowBlur = 40;
+    ctx.fillStyle = 'rgba(255,255,255,0.95)';
+    ctx.fillText('LYRA', size/2, size/2);
+
+    ctx.shadowBlur = 0;
+    ctx.font = '700 22px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.fillText('PUZZLE', size/2, size/2 + 100);
+
+    DEFAULT_IMAGE = canvas.toDataURL('image/png');
+    return DEFAULT_IMAGE;
+  }
+
+  function init() {
+    ACTUAL_IMAGE = IMAGE_URL || getDefaultImage();
+    var testImg = new Image();
+    testImg.crossOrigin = 'anonymous';
+    testImg.onerror = function() {
+      ACTUAL_IMAGE = getDefaultImage();
+      newGame();
+    };
+    testImg.onload = function() {
+      newGame();
+    };
+    testImg.src = ACTUAL_IMAGE;
+  }
+
+  function getNeighbors(idx) {
+    var row = Math.floor(idx / GRID_SIZE);
+    var col = idx % GRID_SIZE;
+    var result = [];
+    if (row > 0) result.push(idx - GRID_SIZE);
+    if (row < GRID_SIZE - 1) result.push(idx + GRID_SIZE);
+    if (col > 0) result.push(idx - 1);
+    if (col < GRID_SIZE - 1) result.push(idx + 1);
+    return result;
+  }
+
+  function isSolved() {
+    for (var i = 0; i < tiles.length - 1; i++) {
+      if (tiles[i] !== i + 1) return false;
+    }
+    return tiles[tiles.length - 1] === 0;
+  }
+
+  function shuffle() {
+    var attempts = 0;
+    do {
+      tiles = [];
+      for (var i = 0; i < GRID_SIZE * GRID_SIZE; i++) tiles.push(i);
+      var blankIdx = tiles.indexOf(0);
+      var steps = 220 + Math.floor(Math.random() * 80);
+      for (var s = 0; s < steps; s++) {
+        var neighbors = getNeighbors(blankIdx);
+        var pick = neighbors[Math.floor(Math.random() * neighbors.length)];
+        var tmp = tiles[blankIdx];
+        tiles[blankIdx] = tiles[pick];
+        tiles[pick] = tmp;
+        blankIdx = pick;
+      }
+      attempts++;
+    } while (isSolved() && attempts < 5);
+  }
+
+  function newGame() {
+    solved = false;
+    peeking = false;
+    moves = 0;
+    startTime = null;
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    document.getElementById('movesEl').textContent = '0';
+    document.getElementById('timeEl').textContent = '0:00';
+    document.getElementById('winOverlay').classList.remove('show');
+    document.getElementById('previewBtn').textContent = '👁 Peek';
+    shuffle();
+    render();
+  }
+
+  function render() {
+    var grid = document.getElementById('grid');
+    grid.style.gridTemplateColumns = 'repeat(' + GRID_SIZE + ', 1fr)';
+    grid.style.gridTemplateRows = 'repeat(' + GRID_SIZE + ', 1fr)';
+    grid.innerHTML = '';
+
+    tiles.forEach(function(num, idx) {
+      var tile = document.createElement('div');
+      tile.className = 'tile' + (num === 0 ? ' blank' : '');
+
+      if (num !== 0) {
+        var tileNum = num - 1;
+        var sx = tileNum % GRID_SIZE;
+        var sy = Math.floor(tileNum / GRID_SIZE);
+        var bgPosX = (sx / (GRID_SIZE - 1)) * 100;
+        var bgPosY = (sy / (GRID_SIZE - 1)) * 100;
+        tile.style.backgroundImage = 'url("' + ACTUAL_IMAGE + '")';
+        tile.style.backgroundSize = (GRID_SIZE * 100) + '% ' + (GRID_SIZE * 100) + '%';
+        tile.style.backgroundPosition = bgPosX + '% ' + bgPosY + '%';
+        tile.textContent = num;
+      }
+
+      tile.addEventListener('click', (function(i) {
+        return function() { moveTile(i); };
+      })(idx));
+
+      grid.appendChild(tile);
+    });
+
+    var peekImg = document.getElementById('peekImg');
+    if (peeking) {
+      peekImg.src = ACTUAL_IMAGE;
+      peekImg.style.display = 'block';
+    } else {
+      peekImg.style.display = 'none';
+    }
+  }
+
+  function startTimer() {
+    if (startTime) return;
+    startTime = Date.now();
+    timerInterval = setInterval(function() {
+      var elapsed = Math.floor((Date.now() - startTime) / 1000);
+      var min = Math.floor(elapsed / 60);
+      var sec = elapsed % 60;
+      document.getElementById('timeEl').textContent = min + ':' + (sec < 10 ? '0' : '') + sec;
+    }, 250);
+  }
+
+  function formatTime() {
+    if (!startTime) return '0:00';
+    var elapsed = Math.floor((Date.now() - startTime) / 1000);
+    var min = Math.floor(elapsed / 60);
+    var sec = elapsed % 60;
+    return min + ':' + (sec < 10 ? '0' : '') + sec;
+  }
+
+  function moveTile(idx) {
+    if (solved || peeking) return;
+
+    var blankIdx = tiles.indexOf(0);
+    var neighbors = getNeighbors(blankIdx);
+    if (neighbors.indexOf(idx) === -1) return;
+
+    var tmp = tiles[blankIdx];
+    tiles[blankIdx] = tiles[idx];
+    tiles[idx] = tmp;
+
+    moves++;
+    if (!startTime) startTimer();
+    document.getElementById('movesEl').textContent = moves;
+    playClick(500 + Math.random() * 300);
+
+    render();
+
+    if (isSolved()) {
+      solved = true;
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      playWin();
+      setTimeout(function() {
+        document.getElementById('winMoves').textContent = moves;
+        document.getElementById('winTime').textContent = formatTime();
+        document.getElementById('winOverlay').classList.add('show');
+      }, 300);
+    }
+  }
+
+  document.getElementById('shuffleBtn').addEventListener('click', newGame);
+  document.getElementById('resetBtn').addEventListener('click', newGame);
+  document.getElementById('playAgainBtn').addEventListener('click', newGame);
+
+  document.getElementById('previewBtn').addEventListener('click', function() {
+    peeking = !peeking;
+    this.textContent = peeking ? '🙈 Hide' : '👁 Peek';
+    render();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (solved || peeking) return;
+    var blankIdx = tiles.indexOf(0);
+    var target = -1;
+    if (e.key === 'ArrowUp' && blankIdx >= GRID_SIZE) target = blankIdx - GRID_SIZE;
+    else if (e.key === 'ArrowDown' && blankIdx < GRID_SIZE * (GRID_SIZE - 1)) target = blankIdx + GRID_SIZE;
+    else if (e.key === 'ArrowLeft' && blankIdx % GRID_SIZE !== 0) target = blankIdx - 1;
+    else if (e.key === 'ArrowRight' && blankIdx % GRID_SIZE !== GRID_SIZE - 1) target = blankIdx + 1;
+    if (target !== -1) {
+      e.preventDefault();
+      moveTile(target);
+    }
+  });
+
+  init();
+})();
+<\/script>
+</body>
+</html>
+</script>
+
+<!-- ======================= LYRA GAME BUILDER LOGIC ======================= -->
+<script>
+(function(){
+  'use strict';
+
+  var CARROM_TPL = '';
+  var POOL_TPL = '';
+  var PUZZLE_TPL = '';
+  var chosenGame = null;
+  var finalShareUrl = '';
+  var finalGameID = '';
+  var finalUsername = '';
+  var finalGameName = '';
+
+  function escHtml(s){
+    return String(s==null?'':s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function slugify(s){
+    return String(s||'').trim().toLowerCase()
+      .replace(/[^a-z0-9]+/g,'-')
+      .replace(/^-+|-+$/g,'');
+  }
+  function prettify(slug){
+    if (!slug) return '';
+    return slug.split('-').map(function(w){
+      return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+    }).join(' ');
+  }
+  function prettierName(raw){
+    return String(raw||'').replace(/\s+/g,' ').trim();
+  }
+  function loadTemplates(){
+    var t1 = document.getElementById('tpl-carrom');
+    var t2 = document.getElementById('tpl-pool');
+    var t3 = document.getElementById('tpl-puzzle');
+    if (t1) CARROM_TPL = t1.textContent.replace(/<\\\//g,'</');
+    if (t2) POOL_TPL = t2.textContent.replace(/<\\\//g,'</');
+    if (t3) PUZZLE_TPL = t3.textContent.replace(/<\\\//g,'</');
+  }
+
+  function buildGame(gametype, gameName, gameID, username, config){
+    var tpl;
+    if (gametype === 'carrom') tpl = CARROM_TPL;
+    else if (gametype === 'pool') tpl = POOL_TPL;
+    else if (gametype === 'puzzle') tpl = PUZZLE_TPL;
+    else return '';
+
+    if (!tpl) return '';
+
+    config = config || {};
+    var imgUrl = config.img || '';
+    var gridSize = parseInt(config.grid, 10) || 3;
+    if (gridSize !== 3 && gridSize !== 4 && gridSize !== 5) gridSize = 3;
+
+    return tpl
+      .split('%%GAME_NAME%%').join(escHtml(gameName))
+      .split('%%GAME_ID%%').join(escHtml(gameID))
+      .split('%%USERNAME%%').join(escHtml(username))
+      .split('%%IMAGE_URL_JSON%%').join(JSON.stringify(imgUrl))
+      .split('%%GRID_SIZE%%').join(String(gridSize));
+  }
+
+  function parseRoute(){
+    var rawHash = location.hash.slice(1);
+    if (!rawHash) return null;
+
+    var pipeParts = rawHash.split('|');
+    var mainHash = pipeParts[0];
+    var config = { img: '', grid: 3 };
+
+    if (pipeParts.length > 1) {
+      try { config.img = decodeURIComponent(pipeParts[1]); } catch(e){ config.img = ''; }
+    }
+    if (pipeParts.length > 2) {
+      var g = parseInt(pipeParts[2], 10);
+      if (g === 3 || g === 4 || g === 5) config.grid = g;
+    }
+
+    try { mainHash = decodeURIComponent(mainHash); } catch(e){}
+
+    var parts = mainHash.split('+');
+    if (parts.length < 2) return null;
+
+    var gameID = parts[0].trim();
+    var username = parts[1].trim();
+    if (!gameID || !username) return null;
+
+    var firstDash = gameID.indexOf('-');
+    var gametype, nameSlug;
+    if (firstDash > 0){
+      gametype = gameID.substring(0, firstDash).toLowerCase();
+      nameSlug = gameID.substring(firstDash + 1);
+    } else {
+      gametype = gameID.toLowerCase();
+      nameSlug = '';
+    }
+
+    if (gametype !== 'carrom' && gametype !== 'pool' && gametype !== 'puzzle') return null;
+
+    var fallback = gametype === 'carrom' ? 'Carrom' : gametype === 'pool' ? 'Pool' : 'Puzzle';
+    var gameName = prettify(nameSlug) || fallback;
+
+    return { gametype: gametype, gameID: gameID, username: username, gameName: gameName, nameSlug: nameSlug, config: config };
+  }
+
+  function setScreen(html){
+    document.getElementById('lyraRoot').innerHTML = html;
+  }
+  function getBaseUrl(){
+    return location.href.split('#')[0].split('?')[0];
+  }
+
+  function renderLanding(){
+    setScreen(
+      '<div class="screen active">' +
+        '<div class="card">' +
+          '<div class="badge">◆ POWERED BY TAQI CLOUD</div>' +
+          '<h1>LYRA <span>GAME</span> BUILDER</h1>' +
+          '<p class="byline">Crafted by <b>MUHAMMAD TAQI</b></p>' +
+          '<button class="cta" onclick="window.__lyraGoChoose()">◈ CREATE YOUR GAME</button>' +
+          '<div class="version">v3.0 · ALL-IN-ONE EDITION</div>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function renderChoose(){
+    setScreen(
+      '<div class="screen active">' +
+        '<div class="card">' +
+          '<div class="step">STEP 1 OF 3</div>' +
+          '<h2>CHOOSE YOUR GAME</h2>' +
+          '<p class="sub">Select the game engine you want to build with</p>' +
+          '<div class="game-grid">' +
+            '<div class="game-card" onclick="window.__lyraSelectGame(\'carrom\')">' +
+              '<div class="game-icon">🎯</div>' +
+              '<h3>CARROM</h3>' +
+              '<p>Classic board game with real physics</p>' +
+              '<div class="arrow">→</div>' +
+            '</div>' +
+            '<div class="game-card" onclick="window.__lyraSelectGame(\'pool\')">' +
+              '<div class="game-icon">🎱</div>' +
+              '<h3>POOL</h3>' +
+              '<p>8-Ball & 9-Ball billiards with AI</p>' +
+              '<div class="arrow">→</div>' +
+            '</div>' +
+            '<div class="game-card" onclick="window.__lyraSelectGame(\'puzzle\')">' +
+              '<div class="game-icon">🧩</div>' +
+              '<h3>PUZZLE</h3>' +
+              '<p>Sliding puzzle · custom image & grid</p>' +
+              '<div class="arrow">→</div>' +
+            '</div>' +
+          '</div>' +
+          '<button class="back" onclick="window.__lyraGoLanding()">← BACK</button>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function renderDetails(gametype){
+    var icon = gametype === 'carrom' ? '🎯' : gametype === 'pool' ? '🎱' : '🧩';
+    var label = gametype === 'carrom' ? 'CARROM' : gametype === 'pool' ? 'POOL' : 'PUZZLE';
+
+    var extraFields = '';
+    if (gametype === 'puzzle') {
+      extraFields =
+        '<label>PUZZLE IMAGE URL (OPTIONAL)</label>' +
+        '<input class="inp" id="inImageUrl" placeholder="https://... (leave empty for default)" style="font-size:12px;">' +
+        '<label>GRID SIZE</label>' +
+        '<div class="grid-options">' +
+          '<button class="grid-btn active" data-size="3">3 × 3</button>' +
+          '<button class="grid-btn" data-size="4">4 × 4</button>' +
+          '<button class="grid-btn" data-size="5">5 × 5</button>' +
+        '</div>';
+    }
+
+    setScreen(
+      '<div class="screen active">' +
+        '<div class="card">' +
+          '<div class="step">STEP 2 OF 3</div>' +
+          '<h2>NAME YOUR GAME</h2>' +
+          '<p class="sub">Give your game a name and choose a username</p>' +
+          '<div class="chosen-game"><span class="icon">' + icon + '</span><span>' + label + '</span></div>' +
+          '<label>GAME NAME</label>' +
+          '<input class="inp" id="inGameName" maxlength="30" placeholder="e.g. MY ' + label + ' ARENA">' +
+          '<label>USERNAME</label>' +
+          '<div class="hash-wrap"><span>@</span><input class="inp" id="inUsername" maxlength="20" placeholder="e.g. taqi"></div>' +
+          extraFields +
+          '<div class="preview" id="urlPreview">Fill in the fields to preview your URL</div>' +
+          '<button class="cta" onclick="window.__lyraPublish()">🚀 PUBLISH GAME</button>' +
+          '<button class="back" onclick="window.__lyraGoChoose()">← BACK</button>' +
+        '</div>' +
+      '</div>'
+    );
+
+    var gi = document.getElementById('inGameName');
+    var un = document.getElementById('inUsername');
+    var pv = document.getElementById('urlPreview');
+
+    var gridBtns = document.querySelectorAll('.grid-btn');
+    for (var i = 0; i < gridBtns.length; i++) {
+      (function(btn) {
+        btn.addEventListener('click', function() {
+          for (var j = 0; j < gridBtns.length; j++) gridBtns[j].classList.remove('active');
+          btn.classList.add('active');
+          updatePreview();
+        });
+      })(gridBtns[i]);
+    }
+
+    function updatePreview(){
+      var name = slugify(gi.value);
+      var user = un.value.trim().replace(/\s+/g, '');
+      var base = getBaseUrl();
+      if (!name || !user){
+        pv.innerHTML = 'Fill in the fields to preview your URL';
+        pv.style.opacity = '.75';
+        return;
+      }
+      var gid = gametype + '-' + name;
+      var suffix = '';
+      if (gametype === 'puzzle') {
+        var imgInput = document.getElementById('inImageUrl');
+        var activeGridBtn = document.querySelector('.grid-btn.active');
+        var imgVal = imgInput ? imgInput.value.trim() : '';
+        var gridVal = activeGridBtn ? activeGridBtn.dataset.size : '3';
+        suffix = '|' + encodeURIComponent(imgVal) + '|' + gridVal;
+      }
+      pv.innerHTML = '🔗 <span class="domain">' + escHtml(base) + '</span><span class="hash">#' + escHtml(gid) + '+' + escHtml(user) + escHtml(suffix) + '</span>';
+      pv.style.opacity = '1';
+    }
+
+    gi.addEventListener('input', updatePreview);
+    un.addEventListener('input', updatePreview);
+    if (gametype === 'puzzle') {
+      var imgEl = document.getElementById('inImageUrl');
+      if (imgEl) imgEl.addEventListener('input', updatePreview);
+    }
+
+    setTimeout(function(){ gi.focus(); }, 100);
+  }
+
+  function renderSuccess(){
+    var base = getBaseUrl();
+    setScreen(
+      '<div class="screen active">' +
+        '<div class="card">' +
+          '<div class="tick">✓</div>' +
+          '<h2>GAME PUBLISHED!</h2>' +
+          '<p class="sub">Share this URL — anyone who opens it plays your game directly</p>' +
+          '<div class="url-display">' +
+            '🔗 <span class="domain">' + escHtml(base) + '</span><span class="hash">#' + escHtml(finalGameID) + '+' + escHtml(finalUsername) + '</span>' +
+          '</div>' +
+          '<div class="meta">' +
+            'Game: <b style="color:#c7d2fe">' + escHtml(finalGameName) + '</b> · ' +
+            'Creator: <b style="color:#c084fc">#' + escHtml(finalUsername) + '</b>' +
+          '</div>' +
+          '<button class="cta" style="margin-top:24px" onclick="window.__lyraOpenGame()">🎮 OPEN GAME</button>' +
+          '<div class="rows">' +
+            '<button class="ghost" onclick="window.__lyraCopyLink()">🔗 COPY LINK</button>' +
+            '<button class="ghost" onclick="window.__lyraNewGame()">+ NEW GAME</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  window.__lyraGoLanding = function(){ renderLanding(); };
+  window.__lyraGoChoose = function(){ renderChoose(); };
+  window.__lyraSelectGame = function(type){ chosenGame = type; renderDetails(type); };
+  window.__lyraNewGame = function(){
+    chosenGame = null;
+    finalShareUrl = '';
+    renderChoose();
+  };
+
+  window.__lyraPublish = function(){
+    var gi = document.getElementById('inGameName');
+    var un = document.getElementById('inUsername');
+    var rawName = (gi.value || '').trim();
+    var rawUser = (un.value || '').trim().replace(/^#+/, '').replace(/\s+/g, '');
+    if (!rawName){ alert('Please enter a game name.'); gi.focus(); return; }
+    if (!rawUser){ alert('Please enter a username.'); un.focus(); return; }
+    var nameSlug = slugify(rawName);
+    if (!nameSlug){
+      alert('Game name must contain at least one letter or number.');
+      gi.focus(); return;
+    }
+    if (!/^[a-zA-Z0-9_-]+$/.test(rawUser)){
+      alert('Username can only contain letters, numbers, hyphens and underscores.');
+      un.focus(); return;
+    }
+
+    finalGameID = chosenGame + '-' + nameSlug;
+    finalUsername = rawUser;
+    finalGameName = prettierName(rawName);
+
+    var suffix = '';
+    if (chosenGame === 'puzzle') {
+      var imgInput = document.getElementById('inImageUrl');
+      var activeGridBtn = document.querySelector('.grid-btn.active');
+      var imgVal = imgInput ? (imgInput.value || '').trim() : '';
+      var gridVal = activeGridBtn ? activeGridBtn.dataset.size : '3';
+      suffix = '|' + encodeURIComponent(imgVal) + '|' + gridVal;
+    }
+
+    finalShareUrl = getBaseUrl() + '#' + finalGameID + '+' + finalUsername + suffix;
+    renderSuccess();
+  };
+
+  window.__lyraOpenGame = function(){
+    if (!finalShareUrl){ alert('Please publish first.'); return; }
+    window.open(finalShareUrl, '_blank');
+  };
+
+  window.__lyraCopyLink = function(){
+    if (!finalShareUrl){ alert('Please publish first.'); return; }
+    copyText(finalShareUrl, '🔗 Link copied!');
+  };
+
+  function copyText(text, msg){
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ alert(msg); })
+        .catch(function(){ fallbackCopy(text, msg); });
+    } else {
+      fallbackCopy(text, msg);
+    }
+  }
+  function fallbackCopy(text, msg){
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); alert(msg); }
+    catch(e){ alert('Copy failed.'); }
+    document.body.removeChild(ta);
+  }
+
+  function openGameInIframe(route){
+    var html = buildGame(route.gametype, route.gameName, route.gameID, route.username, route.config);
+    if (!html){ renderLanding(); return; }
+    document.title = route.gameName + ' — LYRA GAME BUILDER';
+    document.body.innerHTML = '';
+    document.body.style.cssText = 'margin:0;padding:0;overflow:hidden;background:#020617;display:block;min-height:100vh;';
+    var iframe = document.createElement('iframe');
+    iframe.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;border:none;display:block;';
+    iframe.setAttribute('allow', 'autoplay; fullscreen');
+    document.body.appendChild(iframe);
+    iframe.srcdoc = html;
+  }
+
+  function boot(){
+    loadTemplates();
+    var route = parseRoute();
+    if (route){
+      openGameInIframe(route);
+      return;
+    }
+    renderLanding();
+  }
+
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+})();
+</script>
+
+</body>
+</html>
