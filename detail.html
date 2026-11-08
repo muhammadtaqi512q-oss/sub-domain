@@ -260,6 +260,7 @@ code{
 .grid-services{ grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
 .grid-langs{ grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
 .grid-links{ grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.grid-videos{ grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
 
 .card{
   position: relative;
@@ -342,6 +343,7 @@ code{
   border-left: 3px solid var(--cyan);
   background: rgba(0,229,255,.05);
   border-radius: 0 10px 10px 0;
+  white-space: pre-line;
 }
 .services-status.error{ border-left-color: var(--pink); background: rgba(255,46,136,.06); color: #ffb3cd; }
 .services-status.hidden{ display: none; }
@@ -382,6 +384,68 @@ code{
 .link-meta{ display: flex; flex-direction: column; min-width: 0; }
 .link-meta strong{ font-size: 14px; letter-spacing: .02em; }
 .link-meta small{ font-size: 12px; color: var(--txt-dim); }
+
+/* ============================================================
+   VIDEOS  (lazy load — iframe sirf click par)
+   ============================================================ */
+.video-card{
+  padding: 0;
+  display: flex; flex-direction: column;
+  cursor: pointer;
+  outline: none;
+}
+.video-card:focus-visible{ border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(0,229,255,.25); }
+
+.video-thumb{
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+}
+.video-thumb img{
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform .4s ease, opacity .3s ease;
+}
+.video-card:hover .video-thumb img{ transform: scale(1.06); opacity: .78; }
+
+.video-play{
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+  pointer-events: none;
+}
+.video-play span{
+  width: 60px; height: 60px; border-radius: 50%;
+  display: grid; place-items: center;
+  padding-left: 4px;
+  font-size: 20px; color: #fff;
+  background: rgba(255,46,136,.92);
+  box-shadow: 0 0 30px rgba(255,46,136,.6);
+  transition: transform .22s, background .22s;
+}
+.video-card:hover .video-play span{ transform: scale(1.12); background: var(--pink); }
+
+.video-body{ padding: 15px 18px 18px; display: flex; flex-direction: column; gap: 6px; }
+.video-body h3{
+  font-size: 13px; font-weight: 800; letter-spacing: .03em;
+  line-height: 1.45; text-transform: none;
+  margin: 0; color: var(--txt);
+}
+.video-body p{ font-size: 12.5px; color: var(--txt-dim); }
+
+.video-frame{
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+.video-frame iframe{
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  border: 0;
+}
 
 /* ============================================================
    FOOTER
@@ -432,6 +496,7 @@ code{
       <li><a href="#skills">Skills</a></li>
       <li><a href="#languages">Languages</a></li>
       <li><a href="#services">Services</a></li>
+      <li><a href="#videos">Videos</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
   </nav>
@@ -474,7 +539,7 @@ code{
 
     <div class="hero-actions">
       <a class="btn btn-primary" href="#services">View Services</a>
-      <a class="btn btn-ghost" href="#contact">Official Channels</a>
+      <a class="btn btn-ghost" href="#videos">Watch Videos</a>
     </div>
   </section>
 
@@ -581,9 +646,21 @@ code{
     <div id="services-grid" class="grid grid-services" aria-live="polite"></div>
   </section>
 
+  <!-- ================= VIDEOS (100% EXTERNAL FETCH) ================= -->
+  <section class="section container" id="videos">
+    <h2 class="section-title"><span class="num">04</span> VIDEOS</h2>
+    <p class="section-sub">
+      Loaded 100% from <code>videos.json</code>. Player sirf tab load hota hai jab user click kare —
+      is tarah video views bhi count hote hain.
+    </p>
+
+    <p id="videos-status" class="services-status">⏳ Fetching videos from videos.json…</p>
+    <div id="videos-grid" class="grid grid-videos" aria-live="polite"></div>
+  </section>
+
   <!-- ================= CONTACT ================= -->
   <section class="section container" id="contact">
-    <h2 class="section-title"><span class="num">04</span> OFFICIAL CHANNELS</h2>
+    <h2 class="section-title"><span class="num">05</span> OFFICIAL CHANNELS</h2>
     <p class="section-sub">Only these are official. Verify before trusting anything else.</p>
 
     <h3 class="mini-title">▶ YouTube</h3>
@@ -642,6 +719,7 @@ code{
       <li><a href="death.html">Death Language</a></li>
       <li><a href="nova.html">Nova Language</a></li>
       <li><a href="#services">Services</a></li>
+      <li><a href="#videos">Videos</a></li>
     </ul>
   </div>
   <div class="container copyright">
@@ -738,5 +816,134 @@ code{
 })();
 </script>
 
+<!-- ============================================================
+     VIDEO FETCHING SCRIPT
+     - Titles + IDs 100% from videos.json
+     - iframe sirf click par banta hai (lazy) => views count
+     ============================================================ -->
+<script>
+(function () {
+  "use strict";
+
+  var VIDEO_URL = "videos.json";          // <-- yahan apna path/naam rakh sakte hain
+  var GRID      = document.getElementById("videos-grid");
+  var STATUS    = document.getElementById("videos-status");
+
+  function escapeHTML(str) {
+    return String(str == null ? "" : str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  /* Full URL, iframe code ya sirf ID — teeno se 11-char video ID nikalta hai */
+  function extractId(input) {
+    var s = String(input == null ? "" : input).trim();
+    var m = s.match(/(?:embed\/|v=|youtu\.be\/|shorts\/|live\/)([A-Za-z0-9_-]{11})/);
+    if (m) return m[1];
+    var m2 = s.match(/^([A-Za-z0-9_-]{11})$/);
+    if (m2) return m2[1];
+    var m3 = s.match(/([A-Za-z0-9_-]{11})/);
+    return m3 ? m3[1] : "";
+  }
+
+  function renderVideos(list) {
+    GRID.innerHTML = "";
+    var shown = 0;
+
+    list.forEach(function (v, i) {
+      var id = extractId(v.id || v.url || v.embed || v.iframe || "");
+      if (!id) return;                       // invalid entry skip
+
+      var title = v.title || "Untitled Video";
+      var desc  = v.description || "";
+
+      var card = document.createElement("article");
+      card.className = "card video-card reveal";
+      card.style.animationDelay = (i * 70) + "ms";
+      card.setAttribute("role", "button");
+      card.setAttribute("tabindex", "0");
+      card.setAttribute("aria-label", "Play video: " + title);
+
+      card.innerHTML =
+        '<div class="video-thumb">' +
+          '<img src="https://i.ytimg.com/vi/' + id + '/maxresdefault.jpg" ' +
+               'alt="' + escapeHTML(title) + '" loading="lazy" ' +
+               'onerror="this.onerror=null;this.src=\'https://i.ytimg.com/vi/' + id + '/hqdefault.jpg\';">' +
+          '<div class="video-play"><span>▶</span></div>' +
+        '</div>' +
+        '<div class="video-body">' +
+          '<h3>' + escapeHTML(title) + '</h3>' +
+          (desc ? '<p>' + escapeHTML(desc) + '</p>' : '') +
+        '</div>';
+
+      function play() {
+        if (card.querySelector("iframe")) return;
+        card.innerHTML =
+          '<div class="video-frame">' +
+            '<iframe src="https://www.youtube.com/embed/' + id + '?autoplay=1&rel=0" ' +
+              'title="' + escapeHTML(title) + '" ' +
+              'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" ' +
+              'referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>' +
+          '</div>';
+        card.style.cursor = "default";
+        card.removeAttribute("role");
+        card.removeAttribute("tabindex");
+      }
+
+      card.addEventListener("click", play);
+      card.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          play();
+        }
+      });
+
+      GRID.appendChild(card);
+      shown++;
+    });
+
+    return shown;
+  }
+
+  function loadVideos() {
+    fetch(VIDEO_URL, { cache: "no-store" })
+      .then(function (res) {
+        if (!res.ok) throw new Error("HTTP " + res.status + " — videos.json nahi mila");
+        return res.json();
+      })
+      .then(function (data) {
+        var list = Array.isArray(data) ? data : (data.videos || []);
+        if (!list.length) throw new Error("videos.json khali hai ya 'videos' array nahi hai");
+
+        var shown = renderVideos(list);
+        if (!shown) throw new Error("Koi valid YouTube ID nahi mili");
+
+        STATUS.classList.add("hidden");
+        STATUS.textContent = "";
+      })
+      .catch(function (err) {
+        console.warn("Failed to fetch " + VIDEO_URL, err);
+        GRID.innerHTML = "";
+        STATUS.classList.remove("hidden");
+        STATUS.classList.add("error");
+        STATUS.textContent =
+          "❌ Could not load videos from " + VIDEO_URL + "\n" +
+          "Error: " + err.message + "\n\n" +
+          "Make sure 'videos.json' is uploaded next to index.html in your GitHub Pages repo.";
+      });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", loadVideos);
+  } else {
+    loadVideos();
+  }
+})();
+</script>
+
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"e3c1c9af36de41759418005494a48906","r":1,"spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>
