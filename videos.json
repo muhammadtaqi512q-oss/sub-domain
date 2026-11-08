@@ -1,0 +1,29 @@
+{
+  "videos": [
+    {
+      "id": "8X9cAsM-ZqI",
+      "title": "Create Your Own Game Without a Line of Code | AVELIA Game Builder",
+      "description": "Build a complete game with zero coding using AVELIA Game Builder."
+    },
+    {
+      "id": "9XFS_HqIem4",
+      "title": "AVELIA Compare Software (Compare Software)",
+      "description": "A quick look at the AVELIA Compare Software tool."
+    },
+    {
+      "id": "bGZaBZQvtlg",
+      "title": "AVELIA Game Builder (How to Make a Game Without Code)",
+      "description": "Step-by-step: make your own game without writing any code."
+    },
+    {
+      "id": "udoKOFqOkHs",
+      "title": "AVELIA — Create Your Own AI Like ChatGPT",
+      "description": "Learn how to build and launch your own AI assistant like ChatGPT."
+    },
+    {
+      "id": "SujmTqPepAQ",
+      "title": "Create Your Own AI Free Like ChatGPT",
+      "description": "Free method to create your own ChatGPT-style AI from scratch."
+    }
+  ]
+}
