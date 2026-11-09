@@ -1,76 +1,97 @@
-name: Secure Build and Auto Commit
+name: Compile JS to WebAssembly and Deploy
 
 on:
   push:
     branches:
-      - main  # Jab aap main branch par push karenge to yeh chalega 
+      - main
 
 jobs:
-  build-and-push:
+  build-wasm:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # Rust language compiler system setup karna
+      - name: Install Rust and wasm-pack
+        run: |
+          rustup target add wasm32-unknown-unknown
+          curl https://github.io -sSf | sh
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
-      - name: Inject Secret Into HTML Files
+      # Secret JSON se scripts utha kar Rust WASM framework tayar karna
+      - name: Generate WASM Code
         env:
           SECRET_JSON: ${{ secrets.MY_SECRET_JS_CODE }}
         run: |
           python -c "
-          import os, json, base64
-
+          import os, json
           secret_json_str = os.environ.get('SECRET_JSON', '{}')
           try:
               secrets_map = json.loads(secret_json_str)
-          except Exception as e:
-              print('Error: Secret JSON sahi format mein nahi hai!', e)
-              exit(1)
+          except:
+              print('Error: Secret JSON khali hai ya galat hai!'); exit(1)
 
           mapping = {
-              'soft.html': 'soft.js',
-              'game/13.html': '13.js',
-              'game/2.html': '2.js',
-              'game/20.html': '20.js',
-              'game/3-pro.html': '3.js',
-              'game/4.html': '4.js',
-              'game/5.html': '5.js'
+              'soft': 'soft.js',
+              'game_13': '13.js',
+              'game_2': '2.js',
+              'game_20': '20.js',
+              'game_3': '3.js',
+              'game_4': '4.js',
+              'game_5': '5.js'
           }
 
-          for html_path, js_key in mapping.items():
-              if os.path.exists(html_path):
-                  if js_key in secrets_map:
-                      raw_code = secrets_map[js_key]
-                      base64_code = base64.b64encode(raw_code.encode('utf-8')).decode('utf-8')
-                      
-                      with open(html_path, 'r', encoding='utf-8') as f:
-                          content = f.read()
-                      
-                      secure_content = content.replace('/*SECRET_SCRIPT_HERE*/', base64_code)
-                      
-                      with open(html_path, 'w', encoding='utf-8') as f:
-                          f.write(secure_content)
-                          
-                      print(f'Successfully injected {js_key} into {html_path}')
+          # Rust project ka boiler-plate setup karna
+          os.makedirs('src', exist_ok=True)
+          with open('Cargo.toml', 'w') as f:
+              f.write('[package]\nname = \"lyra_wasm\"\nversion = \"0.1.0\"\nedition = \"2021\"\n\n[lib]\ncrate-type = [\"cdylib\"]\n\n[dependencies]\nwasm-bindgen = \"0.2\"\njs-sys = \"0.3\"\nweb-sys = { version = \"0.3\", features = [\"Window\", \"Document\", \"Body\"] }\n')
+
+          # Rust Code likhna jo JS code ko binary banaye ga
+          rust_code = 'use wasm_bindgen::prelude::*;\n\n'
+          for func_name, js_key in mapping.items():
+              if js_key in secrets_map:
+                  js_content = secrets_map[js_key].replace('\"', '\\\"').replace('\n', ' ')
+                  rust_code += f'#[wasm_bindgen]\npub fn load_{func_name}() {{\n    let window = web_sys::window().unwrap();\n    let document = window.document().unwrap();\n    let body = document.body().unwrap();\n    let script = document.create_element(\"script\").unwrap();\n    script.set_text_content(Some(\"{js_content}\"));\n    body.append_child(&script).unwrap();\n    script.remove();\n}}\n\n'
+          
+          with open('src/lib.rs', 'w') as f:
+              f.write(rust_code)
           "
 
-      # Injected files ko automatic ek alag 'deploy' branch par push karna
-      - name: Push to Deploy Branch
+      # Core compilation: JavaScript functions ko secure .wasm file mein convert karna
+      - name: Compile to WASM Binary
+        run: wasm-pack build --target web --release
+
+      # HTML templates ko configure karna aur deployment folder ready karna
+      - name: Prepare HTML Files
+        run: |
+          mkdir -p pkg_deploy/game
+          cp pkg/lyra_wasm_bg.wasm pkg_deploy/
+          cp pkg/lyra_wasm.js pkg_deploy/
+          
+          # Templates copying
+          cp soft.html pkg_deploy/soft.html
+          cp game/13.html pkg_deploy/game/13.html
+          cp game/2.html pkg_deploy/game/2.html
+          cp game/20.html pkg_deploy/game/20.html
+          cp game/3-pro.html pkg_deploy/game/3-pro.html
+          cp game/4.html pkg_deploy/game/4.html
+          cp game/5.html pkg_deploy/game/5.html
+
+      # Code ko encrypted deploy branch par auto-commit karna
+      - name: Push Compiled App to Deploy Branch
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@://github.com"
-          
-          # Nayi branch create karna ya switch karna
-          git checkout -b deploy || git checkout deploy
-          
-          # Changes add karna
-          git add soft.html game/*.html
-          
-          # Commit aur push karna (agar koi change ho)
-          git commit -m "Auto-inject secure scripts [skip ci]" || echo "No changes to commit"
+          cd pkg_deploy
+          git init
+          git checkout -b deploy
+          git add .
+          git commit -m "Deploy production WASM binary [skip ci]"
+          git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@://github.com{{ github.repository }}.git
           git push origin deploy --force
