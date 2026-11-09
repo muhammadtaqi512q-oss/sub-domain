@@ -1,0 +1,76 @@
+name: Secure Build and Auto Commit
+
+on:
+  push:
+    branches:
+      - main  # Jab aap main branch par push karenge to yeh chalega
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Inject Secret Into HTML Files
+        env:
+          SECRET_JSON: ${{ secrets.MY_SECRET_JS_CODE }}
+        run: |
+          python -c "
+          import os, json, base64
+
+          secret_json_str = os.environ.get('SECRET_JSON', '{}')
+          try:
+              secrets_map = json.loads(secret_json_str)
+          except Exception as e:
+              print('Error: Secret JSON sahi format mein nahi hai!', e)
+              exit(1)
+
+          mapping = {
+              'soft.html': 'soft.js',
+              'game/13.html': '13.js',
+              'game/2.html': '2.js',
+              'game/20.html': '20.js',
+              'game/3-pro.html': '3.js',
+              'game/4.html': '4.js',
+              'game/5.html': '5.js'
+          }
+
+          for html_path, js_key in mapping.items():
+              if os.path.exists(html_path):
+                  if js_key in secrets_map:
+                      raw_code = secrets_map[js_key]
+                      base64_code = base64.b64encode(raw_code.encode('utf-8')).decode('utf-8')
+                      
+                      with open(html_path, 'r', encoding='utf-8') as f:
+                          content = f.read()
+                      
+                      secure_content = content.replace('/*SECRET_SCRIPT_HERE*/', base64_code)
+                      
+                      with open(html_path, 'w', encoding='utf-8') as f:
+                          f.write(secure_content)
+                          
+                      print(f'Successfully injected {js_key} into {html_path}')
+          "
+
+      # Injected files ko automatic ek alag 'deploy' branch par push karna
+      - name: Push to Deploy Branch
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@://github.com"
+          
+          # Nayi branch create karna ya switch karna
+          git checkout -b deploy || git checkout deploy
+          
+          # Changes add karna
+          git add soft.html game/*.html
+          
+          # Commit aur push karna (agar koi change ho)
+          git commit -m "Auto-inject secure scripts [skip ci]" || echo "No changes to commit"
+          git push origin deploy --force
