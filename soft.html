@@ -362,7 +362,47 @@ input:focus,textarea:focus{
 <div id="app"></div>
 
 <script>
-(function(_0x1){eval(decodeURIComponent(escape(atob(_0x1))));})('Ly8gTS5UQVFJLVNUVURJTwovLyBNLlRBUUktU1RVRElPCi8vIE0uVEFRSS1TVFVESU8KLy8gTS5UQVFJLVNUVURJTwovLyBNLlRBUUktU1RVRElPCi8vIE0uVEFRSS1TVFVESU8KLy8gTS5UQVFJLVNUVURJTwovLyBNLlRBUUktU1RVRElPCi8vIE0uVEFRSS1TVFVESU8KLy8gTS5UQVFJLVNUVURJTwovLyBNLlRBUUktU1RVRElPCi8vIE0uVEFRSS1TVFVESU8KLy8gTS5UQVFJLVNUVURJTwovLyBNLlRBUUktU1RVRElPCi8vIE0uVEFRSS1TVFVESU8KLy8gTS5UQVFJLVNUVURJTwovLyBNLlRBUUktU1RVRElPCi8vIE0uVEFRSS1TVFVESU8KLy8gTS5UQVFJLVNUVURJTwovLyBNLlRBUUktU1RVRElPCi8vIE0uVEFRSS1TVFVESU8KLy8gTS5UQVFJLVNUVURJTwovLyBNLlRBUUktU1RVRElPCi8vIE0uVEFRSS1TVFVESU8KLy8gTS5UQVFJLVNUVURJTwovLyBNLlRBUUktU1RVRElPCi8vIE0uVEFRSS1TVFVESU8KLy8gTS5UQVFJLVNUVURJTwovLyBNLlRBUUktU1RVRElPCi8vIE0uVEFRSS1TVFVESU8KLy8gTS5UQVFJLVNUVURJTwovLyBNLlRBUUktU1RVRElPCi8vIE0uVEFRSS1TVFVESU8KLy8gTS5UQVFJLVNUVURJTwovLyBNLlRBUUktU1RVRElPCi8vIE0uVEFRSS1TVFVESU8KLy8gTS5UQVFJLVNUVURJTwovLyBNLlRBUUktU1RVRElPCi8vIE0uVEFRSS1TVFVESU8KLy8gTS5UQVFJLVNUVURJTwovLyBNLlRBUUktU1RVRElPCi8vIE0uVEFRSS1TVFVESU8KLy8gTS5UQVFJLVNUVURJTwovLyBNLlRBUUktU1RVRElPCi8vIE0uVEFRSS1TVFVESU8KLy8gTS5UQVFJLVNUVURJTwovLyBNLlRBUUktU1RVRElPCi8vIE0uVEFRSS1TVFVESU8KCgoKCnZhciBzID0gZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgnc2NyaXB0Jyk7CnMuc3JjID0gJ3NvZnQuanMnOwpkb2N1bWVudC5jdXJyZW50U2NyaXB0ID8gZG9jdW1lbnQuY3VycmVudFNjcmlwdC5wYXJlbnROb2RlLmluc2VydEJlZm9yZShzLCBkb2N1bWVudC5jdXJyZW50U2NyaXB0Lm5leHRTaWJsaW5nKSA6IGRvY3VtZW50LmhlYWQuYXBwZW5kQ2hpbGQocyk7');
+(function() {
+    // 🔒 Cloudflare build command (build.py) is placeholder ki jagah automatic encrypted string daal degi.
+    // Aapko is line ko khud se hath lagane ki zaroorat nahi hai.
+    const encryptedData = "/*SECRET_SCRIPT_HERE*/";
+
+    if (encryptedData && !encryptedData.startsWith("/*")) {
+        try {
+            // Memory ke andar hi code ko decode (Base64 se raw text) karna bina kisi network request ke
+            const decodedCode = atob(encryptedData);
+            
+            // Script element bana kar code execute karna
+            const script = document.createElement('script');
+            script.text = decodedCode;
+            document.body.appendChild(script);
+            
+            // Code run hote hi foran element ko DOM se remove kar dena taaki Inspect Element mein kuch na mile
+            script.remove(); 
+        } catch (e) {
+            console.error("Initialization failed.");
+        }
+    }
+})();
+
+// 🛡️ Extra Protection: Right Click aur Context Menu block karna
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+// 🛡️ Key Shortcuts Blocking (Ctrl+U, F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C)
+document.onkeydown = function(e) {
+  // F12 key (Developer Tools)
+  if (e.keyCode == 123) {
+    return false;
+  }
+  // Ctrl+Shift+I (Inspect), Ctrl+Shift+C (Element Selector), Ctrl+Shift+J (Console)
+  if (e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'C'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0))) {
+    return false;
+  }
+  // Ctrl+U (View Source Code)
+  if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) {
+    return false;
+  }
+};
 </script>
 
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"e3c1c9af36de41759418005494a48906","r":1,"spa":2}' crossorigin="anonymous"></script>
