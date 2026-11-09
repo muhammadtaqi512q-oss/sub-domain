@@ -16,13 +16,13 @@ def inject_secrets():
 
     # Aapka bataya hua mapping matrix
     mapping = {
-        'soft.html': 'soft.mt.js',
-        'game/13.html': '13.mt.js',
-        'game/2.html': '2.mt.js',
-        'game/20.html': '20.mt.js',
-        'game/3-pro.html': '3.mt.js',
-        'game/4.html': '4.mt.js',
-        'game/5.html': '5.mt.js'
+        'soft.html': 'soft.js',
+        'game/13.html': '13.js',
+        'game/2.html': '2.js',
+        'game/20.html': '20.js',
+        'game/3-pro.html': '3.js',
+        'game/4.html': '4.js',
+        'game/5.html': '5.js'
     }
 
     for html_path, js_key in mapping.items():
