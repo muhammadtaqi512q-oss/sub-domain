@@ -362,69 +362,53 @@ input:focus,textarea:focus{
 <div id="app"></div>
 
 <script>
-// 🛡️ High-Security Anti-Debugger Execution Protection Loop
-(function() {
-    function trap() {
-        try {
-            (function r(n) {
-                if (("" + n / n).length !== 1 || n % 20 === 0) {
-                    (function(){}).constructor("debugger")();
-                } else {
-                    debugger;
-                }
-                r(++n);
-            })(0);
-        } catch (e) {
-            setTimeout(trap, 50);
-        }
-    }
-    // Infinite trap running background mein taaki Console freeze rahay
-    setInterval(trap, 200);
-})();
-
 (async function() {
     const isSubFolder = window.location.pathname.includes('/game/');
-    const jsonPath = isSubFolder ? '../data.json' : './data.json';
+    const binPath = isSubFolder ? '../data.bin' : './data.bin';
 
-    // 🎯 HAR PAGE KE LIYE IS KEY KO CHANGE KAREIN:
-    const pageKey = "soft"; 
+    // 🎯 HAR PAGE KE LIYE IS ID KO CHANGE KAREIN:
+    // soft.html -> 1  | game/13.html -> 13 | game/2.html -> 2 | game/20.html -> 20
+    // game/3-pro.html -> 3 | game/4.html -> 4  | game/5.html -> 5
+    const currentFileId = 1; 
 
     try {
-        const response = await fetch(jsonPath);
-        const payload = await response.json();
+        // data.bin ko pure binary network stream ke roop mein fetch karna
+        const response = await fetch(binPath);
+        const arrayBuffer = await response.arrayBuffer(); // Binary byte array buffer open karna
+        const dataView = new DataView(arrayBuffer);
         
-        if (payload && payload.vault && payload.vault[pageKey]) {
-            const dynamicSalt = payload.salt;
-            const secureBuffer = payload.vault[pageKey];
-            
-            // Runtime dynamic key extraction inside active memory only
-            const encoder = new TextEncoder();
-            const hashBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(dynamicSalt));
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            const hashedKey = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        let offset = 0;
+        let actualCode = "";
 
-            // Memory bytecode decoding buffer channel execution
-            const binaryString = atob(secureBuffer);
-            let decryptedCode = "";
-            
-            for (let i = 0; i < binaryString.length; i++) {
-                const charCode = binaryString.charCodeAt(i) ^ parseInt(hashedKey[i % 64], 16);
-                decryptedCode += String.fromCharCode(charCode);
+        // Custom Binary Parser Loop execution block
+        while (offset < arrayBuffer.byteLength) {
+            // Header se File ID aur Length read karna (Big-Endian integer parsing)
+            const fileId = dataView.getUint32(offset, false);
+            const codeLength = dataView.getUint32(offset + 4, false);
+            offset += 8;
+
+            if (fileId === currentFileId) {
+                // Sahi chunk milne par uske bytes ko string/text mein convert karna
+                const bytes = new Uint8Array(arrayBuffer, offset, codeLength);
+                actualCode = new TextDecoder("utf-8").decode(bytes);
+                break;
             }
-            
-            // Dynamic secure memory node injection
+            offset += codeLength; // Agle byte chunk par jump karna
+        }
+
+        if (actualCode) {
+            // Script element banana aur memory runtime par chalana
             const script = document.createElement('script');
-            script.textContent = decryptedCode;
+            script.textContent = actualCode;
             document.body.appendChild(script);
-            script.remove(); // Trace remove kar dena foran memory se
+            script.remove(); // Nishan khatam karna
         }
     } catch (e) {
-        // Tamper hone ki surat mein page completely blank ya redirect ho jaye ga
-        window.location.reload();
+        console.error("Binary execution failure.");
     }
 })();
 
-// Hard-coded hardware blocking layers
+// Anti-Debugger & View Protection layers
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.onkeydown = function(e) {
   if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 67 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) {
