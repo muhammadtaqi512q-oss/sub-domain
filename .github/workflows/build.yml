@@ -19,7 +19,7 @@ jobs:
         with:
           targets: wasm32-unknown-unknown
 
-      # 2. WASM-Pack official Action ke zariye install karna (Hamesha perfect chalta hai)
+      # 2. WASM-Pack official Action ke zariye install karna
       - name: Install wasm-pack
         uses: jetli/wasm-pack-action@v0.4.0
         with:
@@ -31,7 +31,7 @@ jobs:
         with:
           python-version: '3.x'
 
-      # 4. Secret JSON se scripts utha kar Rust code automatic likhna
+      # 4. Secret JSON se scripts utha kar Rust configurations lock karna
       - name: Generate WASM Code
         env:
           SECRET_JSON: ${{ secrets.MY_SECRET_JS_CODE }}
@@ -55,14 +55,16 @@ jobs:
           }
 
           os.makedirs('src', exist_ok=True)
+          
+          # Cargo.toml mein exact stable versions freeze kar diye hain taaki version conflict na aye
           with open('Cargo.toml', 'w') as f:
-              f.write('[package]\nname = \"lyra_wasm\"\nversion = \"0.1.0\"\nedition = \"2021\"\n\n[lib]\ncrate-type = [\"cdylib\"]\n\n[dependencies]\nwasm-bindgen = \"0.2\"\njs-sys = \"0.3\"\nweb-sys = { version = \"0.3\", features = [\"Window\", \"Document\", \"Body\"] }\n')
+              f.write('[package]\nname = \"lyra_wasm\"\nversion = \"0.1.0\"\nedition = \"2021\"\n\n[lib]\ncrate-type = [\"cdylib\"]\n\n[dependencies]\nwasm-bindgen = \"0.2.92\"\njs-sys = \"0.3.69\"\nweb-sys = { version = \"0.3.69\", features = [\"Window\", \"Document\", \"Body\", \"HtmlScriptElement\"] }\n')
 
           rust_code = 'use wasm_bindgen::prelude::*;\n\n'
           for func_name, js_key in mapping.items():
               if js_key in secrets_map:
                   js_content = secrets_map[js_key].replace('\\\\', '\\\\\\\\').replace('\\\"', '\\\\\\\"').replace('\"', '\\\"').replace('\n', ' ')
-                  rust_code += f'#[wasm_bindgen]\npub fn load_{func_name}() {{\n    let window = web_sys::window().unwrap();\n    let document = window.document().unwrap();\n    let body = document.body().unwrap();\n    let script = document.create_element(\"script\").unwrap();\n    script.set_text_content(Some(\"{js_content}\"));\n    body.append_child(&script).unwrap();\n    script.remove();\n}}\n\n'
+                  rust_code += f'#[wasm_bindgen]\npub fn load_{func_name}() {{\n    let window = web_sys::window().unwrap();\n    let document = window.document().unwrap();\n    let body = document.body().unwrap();\n    let script = document.create_element(\"script\").unwrap().dyn_into::<web_sys::HtmlScriptElement>().unwrap();\n    script.set_text_content(Some(\"{js_content}\"));\n    body.append_child(&script).unwrap();\n    script.remove();\n}}\n\n'
           
           with open('src/lib.rs', 'w') as f:
               f.write(rust_code)
