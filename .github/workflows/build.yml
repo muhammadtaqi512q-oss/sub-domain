@@ -19,16 +19,11 @@ jobs:
         with:
           targets: wasm32-unknown-unknown
 
-      # 2. WASM-Pack direct binary download karna (Kabhi fail nahi hota)
-      - name: Install wasm-pack from Release Binary
-        run: |
-          echo "Downloading stable pre-compiled wasm-pack binary..."
-          curl -L https://github.com -o wasm-pack.tar.gz
-          tar -xzf wasm-pack.tar.gz
-          mv wasm-pack-v0.12.1-x86_64-unknown-linux-musl/wasm-pack .
-          chmod +x wasm-pack
-          sudo mv wasm-pack /usr/local/bin/
-          wasm-pack --version
+      # 2. WASM-Pack official Action ke zariye install karna (Hamesha perfect chalta hai)
+      - name: Install wasm-pack
+        uses: jetli/wasm-pack-action@v0.4.0
+        with:
+          version: 'latest'
 
       # 3. Python setup karna
       - name: Set up Python
@@ -66,7 +61,6 @@ jobs:
           rust_code = 'use wasm_bindgen::prelude::*;\n\n'
           for func_name, js_key in mapping.items():
               if js_key in secrets_map:
-                  # Special escape characters taaki break na ho code
                   js_content = secrets_map[js_key].replace('\\\\', '\\\\\\\\').replace('\\\"', '\\\\\\\"').replace('\"', '\\\"').replace('\n', ' ')
                   rust_code += f'#[wasm_bindgen]\npub fn load_{func_name}() {{\n    let window = web_sys::window().unwrap();\n    let document = window.document().unwrap();\n    let body = document.body().unwrap();\n    let script = document.create_element(\"script\").unwrap();\n    script.set_text_content(Some(\"{js_content}\"));\n    body.append_child(&script).unwrap();\n    script.remove();\n}}\n\n'
           
