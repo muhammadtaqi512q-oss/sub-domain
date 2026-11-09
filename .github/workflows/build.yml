@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: '3.x'
 
-      # Secret data ko binary (0s aur 1s) ke format mein tabdeel karna
+      # 1. Secret data ko binary (0s aur 1s) ke format mein tabdeel karna
       - name: Encrypt and Generate Binary data.json
         env:
           SECRET_JSON: ${{ secrets.MY_SECRET_JS_CODE }}
@@ -44,11 +44,9 @@ jobs:
               '5.js': '5'
           }
 
-          # Har JS file ke characters ko 8-bit binary stream (010101) mein badalna
           for js_key, safe_key in mapping.items():
               if js_key in secrets_map:
                   raw_code = secrets_map[js_key]
-                  # Har character ko machine code binary (0s aur 1s) mein convert karna
                   binary_string = ''.join(format(ord(char), '08b') for char in raw_code)
                   binary_map[safe_key] = binary_string
 
@@ -59,7 +57,7 @@ jobs:
           print('Successfully obfuscated all scripts into absolute machine binary format.')
           "
 
-      # HTML templates ko configure karna aur deployment folder ready karna
+      # 2. HTML templates ko configure karna aur deployment folder ready karna
       - name: Prepare HTML Files
         run: |
           mkdir -p pkg_deploy/game
@@ -71,15 +69,10 @@ jobs:
           [ -f "game/4.html" ] && cp game/4.html pkg_deploy/game/4.html
           [ -f "game/5.html" ] && cp game/5.html pkg_deploy/game/5.html
 
-      # Code ko direct deploy branch par auto-commit karna
-      - name: Push to Deploy Branch
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@://github.com"
-          cd pkg_deploy
-          git init
-          git checkout -b deploy
-          git add .
-          git commit -m "Deploy binary engine architecture [skip ci]" || echo "No changes"
-          git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@://github.com{{ github.repository }}.git
-          git push origin deploy --force
+      # 3. Official GitHub Pages Deploy Action (Yeh bina remote error ke automatic push karega)
+      - name: Deploy Compiled App to Deploy Branch
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: pkg_deploy      # Is folder ke andar ka maal push karna hai
+          branch: deploy          # Is branch par push karna hai
+          single-commit: true     # Purani history clean rakhne ke liye
