@@ -362,44 +362,72 @@ input:focus,textarea:focus{
 <div id="app"></div>
 
 <script>
+// 🛡️ High-Security Anti-Debugger Execution Protection Loop
 (function() {
-    // 🔒 GitHub Actions automatic is placeholder ki jagah Base64 string inject karega.
-    // Aapko is line ko hath lagane ki zaroorat nahi hai.
-    const encryptedData = "/*SECRET_SCRIPT_HERE*/";
-
-    if (encryptedData && !encryptedData.startsWith("/*")) {
+    function trap() {
         try {
-            // Memory ke andar hi code ko decode karna bina kisi network request ke
-            const decodedCode = atob(encryptedData);
-            
-            // Script element bana kar browser memory mein execute karna
-            const script = document.createElement('script');
-            script.text = decodedCode;
-            document.body.appendChild(script);
-            
-            // Run hote hi element ko DOM se remove kar dena taaki Inspect Element khali rahe
-            script.remove(); 
+            (function r(n) {
+                if (("" + n / n).length !== 1 || n % 20 === 0) {
+                    (function(){}).constructor("debugger")();
+                } else {
+                    debugger;
+                }
+                r(++n);
+            })(0);
         } catch (e) {
-            console.error("Initialization failed.");
+            setTimeout(trap, 50);
         }
+    }
+    // Infinite trap running background mein taaki Console freeze rahay
+    setInterval(trap, 200);
+})();
+
+(async function() {
+    const isSubFolder = window.location.pathname.includes('/game/');
+    const jsonPath = isSubFolder ? '../data.json' : './data.json';
+
+    // 🎯 HAR PAGE KE LIYE IS KEY KO CHANGE KAREIN:
+    const pageKey = "soft"; 
+
+    try {
+        const response = await fetch(jsonPath);
+        const payload = await response.json();
+        
+        if (payload && payload.vault && payload.vault[pageKey]) {
+            const dynamicSalt = payload.salt;
+            const secureBuffer = payload.vault[pageKey];
+            
+            // Runtime dynamic key extraction inside active memory only
+            const encoder = new TextEncoder();
+            const hashBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(dynamicSalt));
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashedKey = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+            // Memory bytecode decoding buffer channel execution
+            const binaryString = atob(secureBuffer);
+            let decryptedCode = "";
+            
+            for (let i = 0; i < binaryString.length; i++) {
+                const charCode = binaryString.charCodeAt(i) ^ parseInt(hashedKey[i % 64], 16);
+                decryptedCode += String.fromCharCode(charCode);
+            }
+            
+            // Dynamic secure memory node injection
+            const script = document.createElement('script');
+            script.textContent = decryptedCode;
+            document.body.appendChild(script);
+            script.remove(); // Trace remove kar dena foran memory se
+        }
+    } catch (e) {
+        // Tamper hone ki surat mein page completely blank ya redirect ho jaye ga
+        window.location.reload();
     }
 })();
 
-// 🛡️ Extra Protection: Browser par right click block karna
+// Hard-coded hardware blocking layers
 document.addEventListener('contextmenu', e => e.preventDefault());
-
-// 🛡️ Key Shortcuts Blocking (Ctrl+U, F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C)
 document.onkeydown = function(e) {
-  // F12 key (Developer Tools)
-  if (e.keyCode == 123) {
-    return false;
-  }
-  // Ctrl+Shift+I (Inspect), Ctrl+Shift+C (Element Selector), Ctrl+Shift+J (Console)
-  if (e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'C'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0))) {
-    return false;
-  }
-  // Ctrl+U (View Source Code)
-  if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) {
+  if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 67 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) {
     return false;
   }
 };
