@@ -12,6 +12,9 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          # Direct main branch par push karne ke liye full history token ke sath checkout karna zaroori hai
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -50,29 +53,22 @@ jobs:
                   binary_string = ''.join(format(ord(char), '08b') for char in raw_code)
                   binary_map[safe_key] = binary_string
 
-          os.makedirs('pkg_deploy', exist_ok=True)
-          with open('pkg_deploy/data.json', 'w', encoding='utf-8') as f:
+          # Direct root folder ke andar data.json banana bina pkg_deploy ke
+          with open('data.json', 'w', encoding='utf-8') as f:
               json.dump(binary_map, f)
           
           print('Successfully obfuscated all scripts into absolute machine binary format.')
           "
 
-      # 2. HTML templates ko configure karna aur deployment folder ready karna
-      - name: Prepare HTML Files
+      # 2. data.json ko direct 'main' branch par automatic push/commit karna
+      - name: Commit and Push data.json directly to Main
         run: |
-          mkdir -p pkg_deploy/game
-          [ -f "soft.html" ] && cp soft.html pkg_deploy/soft.html
-          [ -f "game/13.html" ] && cp game/13.html pkg_deploy/game/13.html
-          [ -f "game/2.html" ] && cp game/2.html pkg_deploy/game/2.html
-          [ -f "game/20.html" ] && cp game/20.html pkg_deploy/game/20.html
-          [ -f "game/3-pro.html" ] && cp game/3-pro.html pkg_deploy/game/3-pro.html
-          [ -f "game/4.html" ] && cp game/4.html pkg_deploy/game/4.html
-          [ -f "game/5.html" ] && cp game/5.html pkg_deploy/game/5.html
-
-      # 3. Official GitHub Pages Deploy Action (Yeh bina remote error ke automatic push karega)
-      - name: Deploy Compiled App to Deploy Branch
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: pkg_deploy      # Is folder ke andar ka maal push karna hai
-          branch: deploy          # Is branch par push karna hai
-          single-commit: true     # Purani history clean rakhne ke liye
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@://github.com"
+          
+          # Check karna agar file generate hui hai aur koi tabdeeli hai
+          git add data.json
+          
+          # [skip ci] likhna zaroori hai taaki yeh commit dubara workflow ko loop mein start na kare
+          git commit -m "Auto-generated binary data.json [skip ci]" || echo "No changes to commit"
+          git push origin main
