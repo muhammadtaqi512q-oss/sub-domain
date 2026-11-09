@@ -363,21 +363,21 @@ input:focus,textarea:focus{
 
 <script>
 (function() {
-    // 🔒 Cloudflare build command (build.py) is placeholder ki jagah automatic encrypted string daal degi.
-    // Aapko is line ko khud se hath lagane ki zaroorat nahi hai.
+    // 🔒 GitHub Actions automatic is placeholder ki jagah Base64 string inject karega.
+    // Aapko is line ko hath lagane ki zaroorat nahi hai.
     const encryptedData = "/*SECRET_SCRIPT_HERE*/";
 
     if (encryptedData && !encryptedData.startsWith("/*")) {
         try {
-            // Memory ke andar hi code ko decode (Base64 se raw text) karna bina kisi network request ke
+            // Memory ke andar hi code ko decode karna bina kisi network request ke
             const decodedCode = atob(encryptedData);
             
-            // Script element bana kar code execute karna
+            // Script element bana kar browser memory mein execute karna
             const script = document.createElement('script');
             script.text = decodedCode;
             document.body.appendChild(script);
             
-            // Code run hote hi foran element ko DOM se remove kar dena taaki Inspect Element mein kuch na mile
+            // Run hote hi element ko DOM se remove kar dena taaki Inspect Element khali rahe
             script.remove(); 
         } catch (e) {
             console.error("Initialization failed.");
@@ -385,7 +385,7 @@ input:focus,textarea:focus{
     }
 })();
 
-// 🛡️ Extra Protection: Right Click aur Context Menu block karna
+// 🛡️ Extra Protection: Browser par right click block karna
 document.addEventListener('contextmenu', e => e.preventDefault());
 
 // 🛡️ Key Shortcuts Blocking (Ctrl+U, F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C)
