@@ -13,28 +13,27 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 1. C# (.NET) environment configuration setup karna
+      # 1. C# Environment configuration
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
-      # 2. WASM build karne ke liye tools activate karna
+      # 2. WASM tools workload install karna
       - name: Install WASM Tools workload
         run: dotnet workload install wasm-tools
 
-      # 3. Python script ke zariye C# code automatic generate karna
+      # 3. Python script ke zariye C# project aur safe text assets setup karna
       - name: Generate C# Project and Code
         env:
           SECRET_JSON: ${{ secrets.MY_SECRET_JS_CODE }}
         run: |
-          python -c "
           import os, json
           secret_json_str = os.environ.get('SECRET_JSON', '{}')
           try:
               secrets_map = json.loads(secret_json_str)
           except Exception as e:
-              print('Error: Secret JSON key invalid hai!', e); exit(1)
+              print('Error: Secret JSON invalid hai!', e); exit(1)
 
           mapping = {
               'soft': 'soft.js',
@@ -46,36 +45,75 @@ jobs:
               'game_5': '5.js'
           }
 
-          # C# Project File setup (.csproj)
-          os.makedirs('LyraWasm', exist_ok=True)
+          os.makedirs('LyraWasm/Resources', exist_ok=True)
+          
+          # C# Project File Setup (Isme humne Resources ko embed kar diya hai taaki compiler code se crash na ho)
           with open('LyraWasm/LyraWasm.csproj', 'w') as f:
-              f.write('<Project Sdk=\"Microsoft.NET.Sdk.BlazorWebAssembly\">\n  <PropertyGroup>\n    <TargetFramework>net8.0</TargetFramework>\n    <ImplicitUsings>enable</ImplicitUsings>\n    <Nullable>enable</Nullable>\n  </PropertyGroup>\n</Project>\n')
+              f.write('<Project Sdk=\"Microsoft.NET.Sdk.BlazorWebAssembly\">\n  <PropertyGroup>\n    <TargetFramework>net8.0</TargetFramework>\n    <ImplicitUsings>enable</ImplicitUsings>\n    <Nullable>enable</Nullable>\n  </PropertyGroup>\n  <ItemGroup>\n    <EmbeddedResource Include=\"Resources\\*\" />\n  </ItemGroup>\n</Project>\n')
 
-          # C# File setup (.cs) jo JS code ko compile karegi
-          csharp_functions = ''
+          # Har page ka JavaScript code safely raw text format mein file ke andar write karna
           for func_name, js_key in mapping.items():
               if js_key in secrets_map:
-                  js_content = secrets_map[js_key].replace('\\\\', '\\\\\\\\').replace('\\\"', '\\\\\\\"').replace('\"', '\\\"').replace('\n', ' ')
-                  csharp_functions += f'    [JSInvokable]\n    public static void Load{func_name}()\n    {{\n        var js = \"var script = document.createElement(\\\"script\\\"); script.textContent = \\\"{js_content}\\\"; document.body.appendChild(script); script.remove();\";\n        JSRuntime.InvokeVoid(\"eval\", js);\n    }}\n\n'
+                  with open(f'LyraWasm/Resources/{func_name}.js', 'w', encoding='utf-8') as js_file:
+                      js_file.write(secrets_map[js_key])
 
-          os.makedirs('LyraWasm/Pages', exist_ok=True)
-          # Program.cs structure
-          with open('LyraWasm/Program.cs', 'w') as f:
-              f.write('using Microsoft.AspNetCore.Components.WebAssembly.Hosting;\nusing Microsoft.JSInterop;\nusing System.Runtime.InteropServices.JavaScript;\n\nnamespace LyraWasm;\n\npublic class Program\n{\n    private static IJSInProcessRuntime JSRuntime;\n    public static async Task Main(string[] args)\n    {\n        var builder = WebAssemblyHostBuilder.CreateDefault(args);\n        var host = builder.Build();\n        JSRuntime = (IJSInProcessRuntime)host.Services.GetRequiredService<IJSRuntime>();\n        await host.RunAsync();\n    }\n\n' + csharp_functions + '}')
-          "
+          # Program.cs write karna jo un raw files ko direct read karke execute karega bina static strings ke
+          csharp_code = """using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.JSInterop;
+using System.Reflection;
+using System.IO;
 
-      # 4. C# Project ko production build (.wasm binary) mein compile karna
+namespace LyraWasm;
+
+public class Program
+{
+    private static IJSInProcessRuntime? JSRuntime;
+
+    public static async Task Main(string[] args)
+    {
+        var builder = WebAssemblyHostBuilder.CreateDefault(args);
+        var host = builder.Build();
+        JSRuntime = (IJSInProcessRuntime)host.Services.GetRequiredService<IJSRuntime>();
+        await host.RunAsync();
+    }
+
+    private static void ExecuteEmbeddedJs(string resourceName)
+    {
+        if (JSRuntime == null) return;
+        var assembly = Assembly.GetExecutingAssembly();
+        using Stream? stream = assembly.GetManifestResourceStream($"LyraWasm.Resources.{resourceName}.js");
+        if (stream == null) return;
+        using StreamReader reader = new StreamReader(stream);
+        string jsContent = reader.ReadToEnd();
+        
+        string wrapper = "var script = document.createElement('script'); script.textContent = " + Newtonsoft.Json.JsonConvert.SerializeObject(jsContent) + "; document.body.appendChild(script); script.remove();";
+        JSRuntime.InvokeVoid("eval", wrapper);
+    }
+
+    [JSInvokable] public static void Loadsoft() => ExecuteEmbeddedJs("soft");
+    [JSInvokable] public static void Loadgame_13() => ExecuteEmbeddedJs("game_13");
+    [JSInvokable] public static void Loadgame_2() => ExecuteEmbeddedJs("game_2");
+    [JSInvokable] public static void Loadgame_20() => ExecuteEmbeddedJs("game_20");
+    [JSInvokable] public static void Loadgame_3() => ExecuteEmbeddedJs("game_3");
+    [JSInvokable] public static void Loadgame_4() => ExecuteEmbeddedJs("game_4");
+    [JSInvokable] public static void Loadgame_5() => ExecuteEmbeddedJs("game_5");
+}"""
+
+          with open('LyraWasm/Program.cs', 'w', encoding='utf-8') as f:
+              f.write(csharp_code)
+          
+        shell: python
+
+      # 4. Compilation framework execute karna
       - name: Publish C# Project to WASM
         run: dotnet publish LyraWasm/LyraWasm.csproj -c Release -o output_dist
 
-      # 5. Deployment folder ready karna
+      # 5. Deployment directory organize karna
       - name: Prepare HTML Files
         run: |
           mkdir -p pkg_deploy/game
-          # Compiled binary contents transfer karna
           cp -r output_dist/wwwroot/_framework pkg_deploy/
           
-          # Templates copy karna safely
           [ -f "soft.html" ] && cp soft.html pkg_deploy/soft.html
           [ -f "game/13.html" ] && cp game/13.html pkg_deploy/game/13.html
           [ -f "game/2.html" ] && cp game/2.html pkg_deploy/game/2.html
@@ -84,7 +122,7 @@ jobs:
           [ -f "game/4.html" ] && cp game/4.html pkg_deploy/game/4.html
           [ -f "game/5.html" ] && cp game/5.html pkg_deploy/game/5.html
 
-      # 6. Target deploy branch par automatic files commit karna
+      # 6. Push to deploy branch
       - name: Push Compiled App to Deploy Branch
         run: |
           git config --global user.name "github-actions[bot]"
@@ -93,6 +131,6 @@ jobs:
           git init
           git checkout -b deploy
           git add .
-          git commit -m "Deploy stable C# WASM production app [skip ci]" || echo "No changes"
+          git commit -m "Deploy stable embedded C# WASM app [skip ci]" || echo "No changes"
           git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@://github.com{{ github.repository }}.git
           git push origin deploy --force
