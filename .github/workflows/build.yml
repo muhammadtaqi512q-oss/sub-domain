@@ -1,4 +1,4 @@
-name: Compile JS to WebAssembly and Deploy
+name: Compile JS to C# WebAssembly and Deploy
 
 on:
   push:
@@ -6,33 +6,25 @@ on:
       - main
 
 jobs:
-  build-wasm:
+  build-csharp-wasm:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 1. Rust setup karna
-      - name: Install Rust Toolchain
-        uses: dtolnay/rust-toolchain@stable
+      # 1. C# (.NET) environment configuration setup karna
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
         with:
-          targets: wasm32-unknown-unknown
+          dotnet-version: '8.0.x'
 
-      # 2. WASM-Pack official Action ke zariye install karna
-      - name: Install wasm-pack
-        uses: jetli/wasm-pack-action@v0.4.0
-        with:
-          version: 'latest'
+      # 2. WASM build karne ke liye tools activate karna
+      - name: Install WASM Tools workload
+        run: dotnet workload install wasm-tools
 
-      # 3. Python setup karna
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
-      # 4. Secret JSON se scripts utha kar Rust configurations lock karna
-      - name: Generate WASM Code
+      # 3. Python script ke zariye C# code automatic generate karna
+      - name: Generate C# Project and Code
         env:
           SECRET_JSON: ${{ secrets.MY_SECRET_JS_CODE }}
         run: |
@@ -42,7 +34,7 @@ jobs:
           try:
               secrets_map = json.loads(secret_json_str)
           except Exception as e:
-              print('Error: Secret JSON invalid hai!', e); exit(1)
+              print('Error: Secret JSON key invalid hai!', e); exit(1)
 
           mapping = {
               'soft': 'soft.js',
@@ -54,35 +46,36 @@ jobs:
               'game_5': '5.js'
           }
 
-          os.makedirs('src', exist_ok=True)
-          
-          # Cargo.toml mein exact stable versions freeze kar diye hain taaki version conflict na aye
-          with open('Cargo.toml', 'w') as f:
-              f.write('[package]\nname = \"lyra_wasm\"\nversion = \"0.1.0\"\nedition = \"2021\"\n\n[lib]\ncrate-type = [\"cdylib\"]\n\n[dependencies]\nwasm-bindgen = \"0.2.92\"\njs-sys = \"0.3.69\"\nweb-sys = { version = \"0.3.69\", features = [\"Window\", \"Document\", \"Body\", \"HtmlScriptElement\"] }\n')
+          # C# Project File setup (.csproj)
+          os.makedirs('LyraWasm', exist_ok=True)
+          with open('LyraWasm/LyraWasm.csproj', 'w') as f:
+              f.write('<Project Sdk=\"Microsoft.NET.Sdk.BlazorWebAssembly\">\n  <PropertyGroup>\n    <TargetFramework>net8.0</TargetFramework>\n    <ImplicitUsings>enable</ImplicitUsings>\n    <Nullable>enable</Nullable>\n  </PropertyGroup>\n</Project>\n')
 
-          rust_code = 'use wasm_bindgen::prelude::*;\n\n'
+          # C# File setup (.cs) jo JS code ko compile karegi
+          csharp_functions = ''
           for func_name, js_key in mapping.items():
               if js_key in secrets_map:
                   js_content = secrets_map[js_key].replace('\\\\', '\\\\\\\\').replace('\\\"', '\\\\\\\"').replace('\"', '\\\"').replace('\n', ' ')
-                  rust_code += f'#[wasm_bindgen]\npub fn load_{func_name}() {{\n    let window = web_sys::window().unwrap();\n    let document = window.document().unwrap();\n    let body = document.body().unwrap();\n    let script = document.create_element(\"script\").unwrap().dyn_into::<web_sys::HtmlScriptElement>().unwrap();\n    script.set_text_content(Some(\"{js_content}\"));\n    body.append_child(&script).unwrap();\n    script.remove();\n}}\n\n'
-          
-          with open('src/lib.rs', 'w') as f:
-              f.write(rust_code)
+                  csharp_functions += f'    [JSInvokable]\n    public static void Load{func_name}()\n    {{\n        var js = \"var script = document.createElement(\\\"script\\\"); script.textContent = \\\"{js_content}\\\"; document.body.appendChild(script); script.remove();\";\n        JSRuntime.InvokeVoid(\"eval\", js);\n    }}\n\n'
+
+          os.makedirs('LyraWasm/Pages', exist_ok=True)
+          # Program.cs structure
+          with open('LyraWasm/Program.cs', 'w') as f:
+              f.write('using Microsoft.AspNetCore.Components.WebAssembly.Hosting;\nusing Microsoft.JSInterop;\nusing System.Runtime.InteropServices.JavaScript;\n\nnamespace LyraWasm;\n\npublic class Program\n{\n    private static IJSInProcessRuntime JSRuntime;\n    public static async Task Main(string[] args)\n    {\n        var builder = WebAssemblyHostBuilder.CreateDefault(args);\n        var host = builder.Build();\n        JSRuntime = (IJSInProcessRuntime)host.Services.GetRequiredService<IJSRuntime>();\n        await host.RunAsync();\n    }\n\n' + csharp_functions + '}')
           "
 
-      # 5. Compile karke binary .wasm bundle file banana
-      - name: Compile to WASM Binary
-        run: wasm-pack build --target web --release
+      # 4. C# Project ko production build (.wasm binary) mein compile karna
+      - name: Publish C# Project to WASM
+        run: dotnet publish LyraWasm/LyraWasm.csproj -c Release -o output_dist
 
-      # 6. Deployment files organize karna
+      # 5. Deployment folder ready karna
       - name: Prepare HTML Files
         run: |
           mkdir -p pkg_deploy/game
-          if [ -d "pkg" ]; then
-            cp pkg/lyra_wasm_bg.wasm pkg_deploy/
-            cp pkg/lyra_wasm.js pkg_deploy/
-          fi
+          # Compiled binary contents transfer karna
+          cp -r output_dist/wwwroot/_framework pkg_deploy/
           
+          # Templates copy karna safely
           [ -f "soft.html" ] && cp soft.html pkg_deploy/soft.html
           [ -f "game/13.html" ] && cp game/13.html pkg_deploy/game/13.html
           [ -f "game/2.html" ] && cp game/2.html pkg_deploy/game/2.html
@@ -91,7 +84,7 @@ jobs:
           [ -f "game/4.html" ] && cp game/4.html pkg_deploy/game/4.html
           [ -f "game/5.html" ] && cp game/5.html pkg_deploy/game/5.html
 
-      # 7. Final auto-commit block on deploy branch
+      # 6. Target deploy branch par automatic files commit karna
       - name: Push Compiled App to Deploy Branch
         run: |
           git config --global user.name "github-actions[bot]"
@@ -100,6 +93,6 @@ jobs:
           git init
           git checkout -b deploy
           git add .
-          git commit -m "Deploy production WASM binary [skip ci]" || echo "No changes"
+          git commit -m "Deploy stable C# WASM production app [skip ci]" || echo "No changes"
           git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@://github.com{{ github.repository }}.git
           git push origin deploy --force
