@@ -3,7 +3,7 @@ name: Secure Build and Auto Commit
 on:
   push:
     branches:
-      - main  # Jab aap main branch par push karenge to yeh chalega
+      - main  # Jab aap main branch par push karenge to yeh chalega 
 
 jobs:
   build-and-push:
