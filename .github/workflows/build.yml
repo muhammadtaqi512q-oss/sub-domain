@@ -13,24 +13,30 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Rust toolchain setup aur cache ke sath taaki build fast ho
+      # 1. Rust setup karna
       - name: Install Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32-unknown-unknown
 
-      # wasm-pack ko direct pre-compiled binary se safe install karna
-      - name: Install wasm-pack
+      # 2. WASM-Pack direct binary download karna (Kabhi fail nahi hota)
+      - name: Install wasm-pack from Release Binary
         run: |
-          curl -sSL https://github.io | sh
+          echo "Downloading stable pre-compiled wasm-pack binary..."
+          curl -L https://github.com -o wasm-pack.tar.gz
+          tar -xzf wasm-pack.tar.gz
+          mv wasm-pack-v0.12.1-x86_64-unknown-linux-musl/wasm-pack .
+          chmod +x wasm-pack
+          sudo mv wasm-pack /usr/local/bin/
+          wasm-pack --version
 
-      # Set up Python configuration
+      # 3. Python setup karna
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
-      # Secret JSON se scripts utha kar Rust WASM framework tayar karna
+      # 4. Secret JSON se scripts utha kar Rust code automatic likhna
       - name: Generate WASM Code
         env:
           SECRET_JSON: ${{ secrets.MY_SECRET_JS_CODE }}
@@ -40,8 +46,8 @@ jobs:
           secret_json_str = os.environ.get('SECRET_JSON', '{}')
           try:
               secrets_map = json.loads(secret_json_str)
-          except:
-              print('Error: Secret JSON khali hai ya galat hai!'); exit(1)
+          except Exception as e:
+              print('Error: Secret JSON invalid hai!', e); exit(1)
 
           mapping = {
               'soft': 'soft.js',
@@ -60,18 +66,19 @@ jobs:
           rust_code = 'use wasm_bindgen::prelude::*;\n\n'
           for func_name, js_key in mapping.items():
               if js_key in secrets_map:
-                  js_content = secrets_map[js_key].replace('\\', '\\\\').replace('\"', '\\\"').replace('\n', ' ')
+                  # Special escape characters taaki break na ho code
+                  js_content = secrets_map[js_key].replace('\\\\', '\\\\\\\\').replace('\\\"', '\\\\\\\"').replace('\"', '\\\"').replace('\n', ' ')
                   rust_code += f'#[wasm_bindgen]\npub fn load_{func_name}() {{\n    let window = web_sys::window().unwrap();\n    let document = window.document().unwrap();\n    let body = document.body().unwrap();\n    let script = document.create_element(\"script\").unwrap();\n    script.set_text_content(Some(\"{js_content}\"));\n    body.append_child(&script).unwrap();\n    script.remove();\n}}\n\n'
           
           with open('src/lib.rs', 'w') as f:
               f.write(rust_code)
           "
 
-      # Core compilation: JavaScript functions ko secure .wasm file mein convert karna
+      # 5. Compile karke binary .wasm bundle file banana
       - name: Compile to WASM Binary
         run: wasm-pack build --target web --release
 
-      # HTML templates ko configure karna aur deployment folder ready karna
+      # 6. Deployment files organize karna
       - name: Prepare HTML Files
         run: |
           mkdir -p pkg_deploy/game
@@ -80,7 +87,6 @@ jobs:
             cp pkg/lyra_wasm.js pkg_deploy/
           fi
           
-          # Templates copying safely
           [ -f "soft.html" ] && cp soft.html pkg_deploy/soft.html
           [ -f "game/13.html" ] && cp game/13.html pkg_deploy/game/13.html
           [ -f "game/2.html" ] && cp game/2.html pkg_deploy/game/2.html
@@ -89,7 +95,7 @@ jobs:
           [ -f "game/4.html" ] && cp game/4.html pkg_deploy/game/4.html
           [ -f "game/5.html" ] && cp game/5.html pkg_deploy/game/5.html
 
-      # Code ko encrypted deploy branch par auto-commit karna
+      # 7. Final auto-commit block on deploy branch
       - name: Push Compiled App to Deploy Branch
         run: |
           git config --global user.name "github-actions[bot]"
