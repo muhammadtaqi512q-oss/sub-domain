@@ -13,12 +13,18 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Rust language compiler system setup karna
-      - name: Install Rust and wasm-pack
-        run: |
-          rustup target add wasm32-unknown-unknown
-          curl https://github.io -sSf | sh
+      # Rust toolchain setup aur cache ke sath taaki build fast ho
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
 
+      # wasm-pack ko direct pre-compiled binary se safe install karna
+      - name: Install wasm-pack
+        run: |
+          curl -sSL https://github.io | sh
+
+      # Set up Python configuration
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -47,16 +53,14 @@ jobs:
               'game_5': '5.js'
           }
 
-          # Rust project ka boiler-plate setup karna
           os.makedirs('src', exist_ok=True)
           with open('Cargo.toml', 'w') as f:
               f.write('[package]\nname = \"lyra_wasm\"\nversion = \"0.1.0\"\nedition = \"2021\"\n\n[lib]\ncrate-type = [\"cdylib\"]\n\n[dependencies]\nwasm-bindgen = \"0.2\"\njs-sys = \"0.3\"\nweb-sys = { version = \"0.3\", features = [\"Window\", \"Document\", \"Body\"] }\n')
 
-          # Rust Code likhna jo JS code ko binary banaye ga
           rust_code = 'use wasm_bindgen::prelude::*;\n\n'
           for func_name, js_key in mapping.items():
               if js_key in secrets_map:
-                  js_content = secrets_map[js_key].replace('\"', '\\\"').replace('\n', ' ')
+                  js_content = secrets_map[js_key].replace('\\', '\\\\').replace('\"', '\\\"').replace('\n', ' ')
                   rust_code += f'#[wasm_bindgen]\npub fn load_{func_name}() {{\n    let window = web_sys::window().unwrap();\n    let document = window.document().unwrap();\n    let body = document.body().unwrap();\n    let script = document.create_element(\"script\").unwrap();\n    script.set_text_content(Some(\"{js_content}\"));\n    body.append_child(&script).unwrap();\n    script.remove();\n}}\n\n'
           
           with open('src/lib.rs', 'w') as f:
@@ -71,17 +75,19 @@ jobs:
       - name: Prepare HTML Files
         run: |
           mkdir -p pkg_deploy/game
-          cp pkg/lyra_wasm_bg.wasm pkg_deploy/
-          cp pkg/lyra_wasm.js pkg_deploy/
+          if [ -d "pkg" ]; then
+            cp pkg/lyra_wasm_bg.wasm pkg_deploy/
+            cp pkg/lyra_wasm.js pkg_deploy/
+          fi
           
-          # Templates copying
-          cp soft.html pkg_deploy/soft.html
-          cp game/13.html pkg_deploy/game/13.html
-          cp game/2.html pkg_deploy/game/2.html
-          cp game/20.html pkg_deploy/game/20.html
-          cp game/3-pro.html pkg_deploy/game/3-pro.html
-          cp game/4.html pkg_deploy/game/4.html
-          cp game/5.html pkg_deploy/game/5.html
+          # Templates copying safely
+          [ -f "soft.html" ] && cp soft.html pkg_deploy/soft.html
+          [ -f "game/13.html" ] && cp game/13.html pkg_deploy/game/13.html
+          [ -f "game/2.html" ] && cp game/2.html pkg_deploy/game/2.html
+          [ -f "game/20.html" ] && cp game/20.html pkg_deploy/game/20.html
+          [ -f "game/3-pro.html" ] && cp game/3-pro.html pkg_deploy/game/3-pro.html
+          [ -f "game/4.html" ] && cp game/4.html pkg_deploy/game/4.html
+          [ -f "game/5.html" ] && cp game/5.html pkg_deploy/game/5.html
 
       # Code ko encrypted deploy branch par auto-commit karna
       - name: Push Compiled App to Deploy Branch
@@ -92,6 +98,6 @@ jobs:
           git init
           git checkout -b deploy
           git add .
-          git commit -m "Deploy production WASM binary [skip ci]"
+          git commit -m "Deploy production WASM binary [skip ci]" || echo "No changes"
           git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@://github.com{{ github.repository }}.git
           git push origin deploy --force
