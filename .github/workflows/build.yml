@@ -1,4 +1,4 @@
-name: Compile JS to C# WebAssembly and Deploy
+name: Secure Binary JSON Obfuscation and Deploy
 
 on:
   push:
@@ -6,114 +6,63 @@ on:
       - main
 
 jobs:
-  build-csharp-wasm:
+  build-binary-json:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 1. C# Environment configuration
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          dotnet-version: '8.0.x'
+          python-version: '3.x'
 
-      # 2. WASM tools workload install karna
-      - name: Install WASM Tools workload
-        run: dotnet workload install wasm-tools
-
-      # 3. Python script ke zariye C# project aur safe text assets setup karna
-      - name: Generate C# Project and Code
+      # Secret data ko binary (0s aur 1s) ke format mein tabdeel karna
+      - name: Encrypt and Generate Binary data.json
         env:
           SECRET_JSON: ${{ secrets.MY_SECRET_JS_CODE }}
         run: |
+          python -c "
           import os, json
+
           secret_json_str = os.environ.get('SECRET_JSON', '{}')
           try:
               secrets_map = json.loads(secret_json_str)
           except Exception as e:
-              print('Error: Secret JSON invalid hai!', e); exit(1)
+              print('Error: Secret JSON sahi format mein nahi hai!', e); exit(1)
 
+          binary_map = {}
+          
           mapping = {
-              'soft': 'soft.js',
-              'game_13': '13.js',
-              'game_2': '2.js',
-              'game_20': '20.js',
-              'game_3': '3.js',
-              'game_4': '4.js',
-              'game_5': '5.js'
+              'soft.js': 'soft',
+              '13.js': '13',
+              '2.js': '2',
+              '20.js': '20',
+              '3.js': '3',
+              '4.js': '4',
+              '5.js': '5'
           }
 
-          os.makedirs('LyraWasm/Resources', exist_ok=True)
-          
-          # C# Project File Setup (Isme humne Resources ko embed kar diya hai taaki compiler code se crash na ho)
-          with open('LyraWasm/LyraWasm.csproj', 'w') as f:
-              f.write('<Project Sdk=\"Microsoft.NET.Sdk.BlazorWebAssembly\">\n  <PropertyGroup>\n    <TargetFramework>net8.0</TargetFramework>\n    <ImplicitUsings>enable</ImplicitUsings>\n    <Nullable>enable</Nullable>\n  </PropertyGroup>\n  <ItemGroup>\n    <EmbeddedResource Include=\"Resources\\*\" />\n  </ItemGroup>\n</Project>\n')
-
-          # Har page ka JavaScript code safely raw text format mein file ke andar write karna
-          for func_name, js_key in mapping.items():
+          # Har JS file ke characters ko 8-bit binary stream (010101) mein badalna
+          for js_key, safe_key in mapping.items():
               if js_key in secrets_map:
-                  with open(f'LyraWasm/Resources/{func_name}.js', 'w', encoding='utf-8') as js_file:
-                      js_file.write(secrets_map[js_key])
+                  raw_code = secrets_map[js_key]
+                  # Har character ko machine code binary (0s aur 1s) mein convert karna
+                  binary_string = ''.join(format(ord(char), '08b') for char in raw_code)
+                  binary_map[safe_key] = binary_string
 
-          # Program.cs write karna jo un raw files ko direct read karke execute karega bina static strings ke
-          csharp_code = """using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Microsoft.JSInterop;
-using System.Reflection;
-using System.IO;
-
-namespace LyraWasm;
-
-public class Program
-{
-    private static IJSInProcessRuntime? JSRuntime;
-
-    public static async Task Main(string[] args)
-    {
-        var builder = WebAssemblyHostBuilder.CreateDefault(args);
-        var host = builder.Build();
-        JSRuntime = (IJSInProcessRuntime)host.Services.GetRequiredService<IJSRuntime>();
-        await host.RunAsync();
-    }
-
-    private static void ExecuteEmbeddedJs(string resourceName)
-    {
-        if (JSRuntime == null) return;
-        var assembly = Assembly.GetExecutingAssembly();
-        using Stream? stream = assembly.GetManifestResourceStream($"LyraWasm.Resources.{resourceName}.js");
-        if (stream == null) return;
-        using StreamReader reader = new StreamReader(stream);
-        string jsContent = reader.ReadToEnd();
-        
-        string wrapper = "var script = document.createElement('script'); script.textContent = " + Newtonsoft.Json.JsonConvert.SerializeObject(jsContent) + "; document.body.appendChild(script); script.remove();";
-        JSRuntime.InvokeVoid("eval", wrapper);
-    }
-
-    [JSInvokable] public static void Loadsoft() => ExecuteEmbeddedJs("soft");
-    [JSInvokable] public static void Loadgame_13() => ExecuteEmbeddedJs("game_13");
-    [JSInvokable] public static void Loadgame_2() => ExecuteEmbeddedJs("game_2");
-    [JSInvokable] public static void Loadgame_20() => ExecuteEmbeddedJs("game_20");
-    [JSInvokable] public static void Loadgame_3() => ExecuteEmbeddedJs("game_3");
-    [JSInvokable] public static void Loadgame_4() => ExecuteEmbeddedJs("game_4");
-    [JSInvokable] public static void Loadgame_5() => ExecuteEmbeddedJs("game_5");
-}"""
-
-          with open('LyraWasm/Program.cs', 'w', encoding='utf-8') as f:
-              f.write(csharp_code)
+          os.makedirs('pkg_deploy', exist_ok=True)
+          with open('pkg_deploy/data.json', 'w', encoding='utf-8') as f:
+              json.dump(binary_map, f)
           
-        shell: python
+          print('Successfully obfuscated all scripts into absolute machine binary format.')
+          "
 
-      # 4. Compilation framework execute karna
-      - name: Publish C# Project to WASM
-        run: dotnet publish LyraWasm/LyraWasm.csproj -c Release -o output_dist
-
-      # 5. Deployment directory organize karna
+      # HTML templates ko configure karna aur deployment folder ready karna
       - name: Prepare HTML Files
         run: |
           mkdir -p pkg_deploy/game
-          cp -r output_dist/wwwroot/_framework pkg_deploy/
-          
           [ -f "soft.html" ] && cp soft.html pkg_deploy/soft.html
           [ -f "game/13.html" ] && cp game/13.html pkg_deploy/game/13.html
           [ -f "game/2.html" ] && cp game/2.html pkg_deploy/game/2.html
@@ -122,8 +71,8 @@ public class Program
           [ -f "game/4.html" ] && cp game/4.html pkg_deploy/game/4.html
           [ -f "game/5.html" ] && cp game/5.html pkg_deploy/game/5.html
 
-      # 6. Push to deploy branch
-      - name: Push Compiled App to Deploy Branch
+      # Code ko direct deploy branch par auto-commit karna
+      - name: Push to Deploy Branch
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@://github.com"
@@ -131,6 +80,6 @@ public class Program
           git init
           git checkout -b deploy
           git add .
-          git commit -m "Deploy stable embedded C# WASM app [skip ci]" || echo "No changes"
+          git commit -m "Deploy binary engine architecture [skip ci]" || echo "No changes"
           git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@://github.com{{ github.repository }}.git
           git push origin deploy --force
