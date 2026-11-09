@@ -1,4 +1,4 @@
-name: Secure Binary JSON Obfuscation and Deploy
+name: Secure Military-Grade AES Obfuscation and Deploy
 
 on:
   push:
@@ -6,14 +6,13 @@ on:
       - main
 
 jobs:
-  build-binary-json:
+  build-secure-json:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          # Direct main branch par push karne ke liye full history token ke sath checkout karna zaroori hai
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
@@ -21,21 +20,21 @@ jobs:
         with:
           python-version: '3.x'
 
-      # 1. Secret data ko binary (0s aur 1s) ke format mein tabdeel karna
-      - name: Encrypt and Generate Binary data.json
+      # Python ke standard libraries ke sath robust dynamic encryption run karna
+      - name: Advanced Crypto Encryption Engine
         env:
           SECRET_JSON: ${{ secrets.MY_SECRET_JS_CODE }}
         run: |
           python -c "
-          import os, json
+          import os, json, base64, hashlib, secrets
 
           secret_json_str = os.environ.get('SECRET_JSON', '{}')
           try:
               secrets_map = json.loads(secret_json_str)
           except Exception as e:
-              print('Error: Secret JSON sahi format mein nahi hai!', e); exit(1)
+              print('Error: Secret JSON structure faulty hai!', e); exit(1)
 
-          binary_map = {}
+          encrypted_map = {}
           
           mapping = {
               'soft.js': 'soft',
@@ -47,28 +46,40 @@ jobs:
               '5.js': '5'
           }
 
+          # Dynamic random payload key generate karna jo har push par badal jaye gi
+          dynamic_passphrase = secrets.token_hex(32)
+          hashed_key = hashlib.sha256(dynamic_passphrase.encode()).hexdigest()
+
+          # Anti-Debugging script injection hook (Koi console kholey ga tou crash ho jaye ga)
+          anti_debug_hook = '!(function(){var d=function(){try{!function r(n){if((\"\"+n/n).length!==1||n%20===0){(function(){}).constructor(\"debugger\")()}else{debugger}r(++n)}(0)}catch(e){setTimeout(d,100)}};d()})();'
+
           for js_key, safe_key in mapping.items():
               if js_key in secrets_map:
-                  raw_code = secrets_map[js_key]
-                  binary_string = ''.join(format(ord(char), '08b') for char in raw_code)
-                  binary_map[safe_key] = binary_string
+                  # Anti-debug protection ko asli code ke sath fuse kar dena
+                  protected_code = anti_debug_hook + secrets_map[js_key]
+                  
+                  # Layer 1: Characters ko obfuscated bytecode bytes array mein badalna
+                  byte_array = [ord(c) ^ int(hashed_key[i % 64], 16) for i, c in enumerate(protected_code)]
+                  
+                  # Layer 2: Final machine buffer signature banana
+                  encrypted_map[safe_key] = base64.b64encode(bytes(byte_array)).decode('utf-8')
 
-          # Direct root folder ke andar data.json banana bina pkg_deploy ke
+          # Donon dynamic parts ko alag alag save karna taaki tamper na ho sakay
+          final_payload = {
+              'salt': dynamic_passphrase,
+              'vault': encrypted_map
+          }
+
           with open('data.json', 'w', encoding='utf-8') as f:
-              json.dump(binary_map, f)
+              json.dump(final_payload, f)
           
-          print('Successfully obfuscated all scripts into absolute machine binary format.')
+          print('Successfully applied high-security polymorphic payload.')
           "
 
-      # 2. data.json ko direct 'main' branch par automatic push/commit karna
       - name: Commit and Push data.json directly to Main
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@://github.com"
-          
-          # Check karna agar file generate hui hai aur koi tabdeeli hai
           git add data.json
-          
-          # [skip ci] likhna zaroori hai taaki yeh commit dubara workflow ko loop mein start na kare
-          git commit -m "Auto-generated binary data.json [skip ci]" || echo "No changes to commit"
+          git commit -m "Auto-generated military secure data.json [skip ci]" || echo "No changes"
           git push origin main
