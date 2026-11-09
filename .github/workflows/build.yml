@@ -1,0 +1,73 @@
+name: Generate True Binary Pack and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-binary-bin:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # Secret data ko utha kar real byte streams bana kar data.bin mein save karna
+      - name: Pack Scripts into Native data.bin
+        env:
+          SECRET_JSON: ${{ secrets.MY_SECRET_JS_CODE }}
+        run: |
+          python -c "
+          import os, json, struct
+
+          secret_json_str = os.environ.get('SECRET_JSON', '{}')
+          try:
+              secrets_map = json.loads(secret_json_str)
+          except Exception as e:
+              print('Error: Secret JSON invalid format mein hai!', e); exit(1)
+
+          mapping = {
+              'soft.js': 1,
+              '13.js': 13,
+              '2.js': 2,
+              '20.js': 20,
+              '3.js': 3,
+              '4.js': 4,
+              '5.js': 5
+          }
+
+          # Binary file ko 'wb' (write-binary) mode mein open karna
+          with open('data.bin', 'wb') as bin_file:
+              for js_key, file_id in mapping.items():
+                  if js_key in secrets_map:
+                      raw_code = secrets_map[js_key]
+                      # Code ko raw bytes mein convert karna (UTF-8 format byte stream)
+                      code_bytes = raw_code.encode('utf-8')
+                      code_length = len(code_bytes)
+                      
+                      # Custom Binary Header Structure packing:
+                      # [4-bytes for File ID] + [4-bytes for Code Length] + [Actual Raw Bytes of Code]
+                      header = struct.pack('>II', file_id, code_length)
+                      
+                      bin_file.write(header)
+                      bin_file.write(code_bytes)
+
+          print('Successfully generated a unified pure native data.bin file.')
+          "
+
+      # data.bin ko direct 'main' branch par commit karna
+      - name: Commit and Push data.bin directly to Main
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data.bin
+          git commit -m "Auto-generated native data.bin [skip ci]" || echo "No changes to commit"
+          git push origin main
